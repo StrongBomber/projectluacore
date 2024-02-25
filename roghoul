@@ -10,15 +10,20 @@ local UICorner = Instance.new("UICorner")
 local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
 local UICorner_2 = Instance.new("UICorner")
 local Close = Instance.new("ImageButton")
-local Z4GS = Instance.new("TextButton")
 local UICorner_3 = Instance.new("UICorner")
-local UITextSizeConstraint_2 = Instance.new("UITextSizeConstraint")
-local WHK = Instance.new("TextButton")
+local Z4GS = Instance.new("TextButton")
 local UICorner_4 = Instance.new("UICorner")
+local UITextSizeConstraint_2 = Instance.new("UITextSizeConstraint")
 local IYield = Instance.new("TextButton")
 local UICorner_5 = Instance.new("UICorner")
 local UITextSizeConstraint_3 = Instance.new("UITextSizeConstraint")
+local Visible = Instance.new("ImageButton")
+local UICorner_6 = Instance.new("UICorner")
+local WHK = Instance.new("TextButton")
+local UICorner_7 = Instance.new("UICorner")
 local UITextSizeConstraint_4 = Instance.new("UITextSizeConstraint")
+local ImageButton = Instance.new("ImageButton")
+local UICorner_8 = Instance.new("UICorner")
 
 --Properties:
 
@@ -30,8 +35,9 @@ Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 Frame.BackgroundTransparency = 0.250
 Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Frame.BorderSizePixel = 0
-Frame.Position = UDim2.new(0.357142866, 0, 0.253036439, 0)
-Frame.Size = UDim2.new(0.285714298, 0, 0.493927121, 0)
+Frame.Position = UDim2.new(0.373912513, 0, 0.253036439, 0)
+Frame.Size = UDim2.new(0.252175003, 0, 0.493927091, 0)
+Frame.Draggable = true
 
 TextLabel.Parent = Frame
 TextLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -39,7 +45,7 @@ TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 TextLabel.BorderSizePixel = 0
 TextLabel.Size = UDim2.new(1, 0, 0.204918027, 0)
 TextLabel.Font = Enum.Font.Unknown
-TextLabel.Text = " Raiwesy Ro Ghoul"
+TextLabel.Text = "   Raiwesy Ro Ghoul"
 TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 TextLabel.TextScaled = true
 TextLabel.TextSize = 18.000
@@ -57,13 +63,14 @@ UICorner_2.Parent = Frame
 
 Close.Name = "Close"
 Close.Parent = Frame
-Close.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Close.BackgroundTransparency = 1.000
+Close.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 Close.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Close.BorderSizePixel = 0
-Close.Position = UDim2.new(0.844262302, 0, 0.0409836061, 0)
-Close.Size = UDim2.new(0.122950822, 0, 0.122950822, 0)
+Close.Position = UDim2.new(0.840762258, 0, 0.0409836099, 0)
+Close.Size = UDim2.new(0.126450822, 0, 0.122950815, 0)
 Close.Image = "http://www.roblox.com/asset/?id=6031094678"
+
+UICorner_3.Parent = Close
 
 Z4GS.Name = "Z4GS"
 Z4GS.Parent = Frame
@@ -79,11 +86,42 @@ Z4GS.TextScaled = true
 Z4GS.TextSize = 14.000
 Z4GS.TextWrapped = true
 
-UICorner_3.CornerRadius = UDim.new(0, 5)
-UICorner_3.Parent = Z4GS
+UICorner_4.CornerRadius = UDim.new(0, 5)
+UICorner_4.Parent = Z4GS
 
 UITextSizeConstraint_2.Parent = Z4GS
 UITextSizeConstraint_2.MaxTextSize = 14
+
+IYield.Name = "IYield"
+IYield.Parent = Frame
+IYield.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+IYield.BorderColor3 = Color3.fromRGB(0, 0, 0)
+IYield.BorderSizePixel = 0
+IYield.Position = UDim2.new(0.0901638865, 0, 0.737331152, 0)
+IYield.Size = UDim2.new(0.819672227, 0, 0.205000013, 0)
+IYield.Font = Enum.Font.Unknown
+IYield.Text = "Infinite Yield"
+IYield.TextColor3 = Color3.fromRGB(255, 255, 255)
+IYield.TextScaled = true
+IYield.TextSize = 14.000
+IYield.TextWrapped = true
+
+UICorner_5.CornerRadius = UDim.new(0, 5)
+UICorner_5.Parent = IYield
+
+UITextSizeConstraint_3.Parent = IYield
+UITextSizeConstraint_3.MaxTextSize = 14
+
+Visible.Name = "Visible"
+Visible.Parent = Frame
+Visible.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+Visible.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Visible.BorderSizePixel = 0
+Visible.Position = UDim2.new(0.686762273, 0, 0.0409836099, 0)
+Visible.Size = UDim2.new(0.126450822, 0, 0.122950815, 0)
+Visible.Image = "http://www.roblox.com/asset/?id=6026568240"
+
+UICorner_6.Parent = Visible
 
 WHK.Name = "WHK"
 WHK.Parent = Frame
@@ -99,35 +137,28 @@ WHK.TextScaled = true
 WHK.TextSize = 14.000
 WHK.TextWrapped = true
 
-UICorner_4.CornerRadius = UDim.new(0, 5)
-UICorner_4.Parent = WHK
-
-IYield.Name = "IYield"
-IYield.Parent = WHK
-IYield.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-IYield.BorderColor3 = Color3.fromRGB(0, 0, 0)
-IYield.BorderSizePixel = 0
-IYield.Position = UDim2.new(-0.00483612064, 0, 1.17360651, 0)
-IYield.Size = UDim2.new(1, 0, 1, 0)
-IYield.Font = Enum.Font.Unknown
-IYield.Text = "Infinite Yield"
-IYield.TextColor3 = Color3.fromRGB(255, 255, 255)
-IYield.TextScaled = true
-IYield.TextSize = 14.000
-IYield.TextWrapped = true
-
-UICorner_5.CornerRadius = UDim.new(0, 5)
-UICorner_5.Parent = IYield
-
-UITextSizeConstraint_3.Parent = IYield
-UITextSizeConstraint_3.MaxTextSize = 14
+UICorner_7.CornerRadius = UDim.new(0, 5)
+UICorner_7.Parent = WHK
 
 UITextSizeConstraint_4.Parent = WHK
 UITextSizeConstraint_4.MaxTextSize = 14
 
+ImageButton.Parent = ScreenGui
+ImageButton.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+ImageButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ImageButton.BorderSizePixel = 0
+ImageButton.Position = UDim2.new(0.470725983, 0, 0, 0)
+ImageButton.Size = UDim2.new(0.0761124119, 0, 0.117845118, 0)
+ImageButton.Visible = false
+ImageButton.Image = "rbxassetid://16519606293"
+ImageButton.ScaleType = Enum.ScaleType.Fit
+
+UICorner_8.CornerRadius = UDim.new(0, 30)
+UICorner_8.Parent = ImageButton
+
 -- Scripts:
 
-local function HKTHJF_fake_script() -- Close.LocalScript 
+local function VYBXRC_fake_script() -- Close.LocalScript 
 	local script = Instance.new('LocalScript', Close)
 
 	local sum = script.Parent
@@ -136,8 +167,8 @@ local function HKTHJF_fake_script() -- Close.LocalScript
 		sum.Parent.Parent.Frame.Visible = false 
 	end)
 end
-coroutine.wrap(HKTHJF_fake_script)()
-local function DBZHR_fake_script() -- Z4GS.LocalScript 
+coroutine.wrap(VYBXRC_fake_script)()
+local function BUBJJ_fake_script() -- Z4GS.LocalScript 
 	local script = Instance.new('LocalScript', Z4GS)
 
 	local sum = script.Parent
@@ -679,8 +710,203 @@ local function DBZHR_fake_script() -- Z4GS.LocalScript
 		end
 	end)
 end
-coroutine.wrap(DBZHR_fake_script)()
-local function VFLL_fake_script() -- WHK.LocalScript 
+coroutine.wrap(BUBJJ_fake_script)()
+local function PFQZSU_fake_script() -- IYield.LocalScript 
+	local script = Instance.new('LocalScript', IYield)
+
+	local sum = script.Parent
+	
+	sum.MouseButton1Click:Connect(function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		loadstring(game:GetObjects("rbxassetid://15900013841")[1].Source)()
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	end)
+end
+coroutine.wrap(PFQZSU_fake_script)()
+local function JXUMUT_fake_script() -- Visible.LocalScript 
+	local script = Instance.new('LocalScript', Visible)
+
+	local sum = script.Parent
+	
+	sum.MouseButton1Click:Connect(function()
+		sum.Parent.Parent.Frame.Visible = false
+		sum.Parent.Parent.ImageButton.Visible = true
+	end)
+end
+coroutine.wrap(JXUMUT_fake_script)()
+local function FDBAGZB_fake_script() -- WHK.LocalScript 
 	local script = Instance.new('LocalScript', WHK)
 
 	local sum = script.Parent
@@ -922,188 +1148,15 @@ local function VFLL_fake_script() -- WHK.LocalScript
 	
 	end)
 end
-coroutine.wrap(VFLL_fake_script)()
-local function VJYM_fake_script() -- IYield.LocalScript 
-	local script = Instance.new('LocalScript', IYield)
+coroutine.wrap(FDBAGZB_fake_script)()
+local function GQLFAIV_fake_script() -- ImageButton.LocalScript 
+	local script = Instance.new('LocalScript', ImageButton)
 
 	local sum = script.Parent
 	
 	sum.MouseButton1Click:Connect(function()
-		loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-		loadstring(game:GetObjects("rbxassetid://15900013841")[1].Source)()
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+		sum.Parent.Frame.Visible = true
+		sum.Parent.ImageButton.Visible = false
 	end)
 end
-coroutine.wrap(VJYM_fake_script)()
+coroutine.wrap(GQLFAIV_fake_script)()
