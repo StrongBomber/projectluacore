@@ -4,130 +4,144 @@
 -- Instances:
 
 local ScreenGui = Instance.new("ScreenGui")
-local Frame = Instance.new("Frame")
-local TextLabel = Instance.new("TextLabel")
+local MainFrame = Instance.new("Frame")
 local UICorner = Instance.new("UICorner")
-local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
+local ToolBar = Instance.new("Frame")
 local UICorner_2 = Instance.new("UICorner")
+local PLuacoreText = Instance.new("TextLabel")
 local Close = Instance.new("ImageButton")
 local UICorner_3 = Instance.new("UICorner")
-local Z4GS = Instance.new("TextButton")
+local raiwesy = Instance.new("TextLabel")
+local Minimize = Instance.new("ImageButton")
 local UICorner_4 = Instance.new("UICorner")
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+local HacksFrame = Instance.new("Frame")
+local UICorner_5 = Instance.new("UICorner")
+local WHK = Instance.new("TextButton")
+local UICorner_6 = Instance.new("UICorner")
+local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
+local Z4GS = Instance.new("TextButton")
+local UICorner_7 = Instance.new("UICorner")
 local UITextSizeConstraint_2 = Instance.new("UITextSizeConstraint")
 local IYield = Instance.new("TextButton")
-local UICorner_5 = Instance.new("UICorner")
-local UITextSizeConstraint_3 = Instance.new("UITextSizeConstraint")
-local Visible = Instance.new("ImageButton")
-local UICorner_6 = Instance.new("UICorner")
-local WHK = Instance.new("TextButton")
-local UICorner_7 = Instance.new("UICorner")
-local UITextSizeConstraint_4 = Instance.new("UITextSizeConstraint")
-local ImageButton = Instance.new("ImageButton")
 local UICorner_8 = Instance.new("UICorner")
+local UITextSizeConstraint_3 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
+local GameNameText = Instance.new("TextLabel")
+local UICorner_9 = Instance.new("UICorner")
+local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_4 = Instance.new("UITextSizeConstraint")
+local Rejoin = Instance.new("TextButton")
+local UICorner_10 = Instance.new("UICorner")
+local UITextSizeConstraint_5 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_4 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_5 = Instance.new("UIAspectRatioConstraint")
+local OpenButton = Instance.new("ImageButton")
+local UICorner_11 = Instance.new("UICorner")
+local UIAspectRatioConstraint_6 = Instance.new("UIAspectRatioConstraint")
 
 --Properties:
 
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
-Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Frame.BackgroundTransparency = 0.250
-Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Frame.BorderSizePixel = 0
-Frame.Position = UDim2.new(0.374819368, 0, 0.253036439, 0)
-Frame.Size = UDim2.new(0.250361264, 0, 0.493927091, 0)
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.BackgroundTransparency = 0.200
+MainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.319064438, 0, 0.109311745, 0)
+MainFrame.Size = UDim2.new(0.361871153, 0, 0.781376541, 0)
 
-TextLabel.Parent = Frame
-TextLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-TextLabel.BorderSizePixel = 0
-TextLabel.Size = UDim2.new(1, 0, 0.204918027, 0)
-TextLabel.Font = Enum.Font.Unknown
-TextLabel.Text = "   Raiwesy Ro Ghoul"
-TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TextLabel.TextScaled = true
-TextLabel.TextSize = 18.000
-TextLabel.TextWrapped = true
-TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainFrame
 
-UICorner.CornerRadius = UDim.new(0, 5)
-UICorner.Parent = TextLabel
+ToolBar.Name = "ToolBar"
+ToolBar.Parent = MainFrame
+ToolBar.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ToolBar.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ToolBar.BorderSizePixel = 0
+ToolBar.Size = UDim2.new(1, 0, 0.134715021, 0)
 
-UITextSizeConstraint.Parent = TextLabel
-UITextSizeConstraint.MaxTextSize = 18
+UICorner_2.CornerRadius = UDim.new(0, 6)
+UICorner_2.Parent = ToolBar
 
-UICorner_2.CornerRadius = UDim.new(0, 10)
-UICorner_2.Parent = Frame
+PLuacoreText.Name = "PLuacoreText"
+PLuacoreText.Parent = ToolBar
+PLuacoreText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+PLuacoreText.BackgroundTransparency = 1.000
+PLuacoreText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+PLuacoreText.BorderSizePixel = 0
+PLuacoreText.Position = UDim2.new(0.0292682927, 0, 0.0192307699, 0)
+PLuacoreText.Size = UDim2.new(0, 120, 0, 50)
+PLuacoreText.Font = Enum.Font.IndieFlower
+PLuacoreText.Text = "Project Luacore"
+PLuacoreText.TextColor3 = Color3.fromRGB(255, 255, 255)
+PLuacoreText.TextSize = 25.000
+PLuacoreText.TextWrapped = true
+PLuacoreText.TextXAlignment = Enum.TextXAlignment.Left
 
 Close.Name = "Close"
-Close.Parent = Frame
+Close.Parent = ToolBar
 Close.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 Close.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Close.BorderSizePixel = 0
-Close.Position = UDim2.new(0.840762258, 0, 0.0409836099, 0)
-Close.Size = UDim2.new(0.126450822, 0, 0.122950815, 0)
+Close.Position = UDim2.new(0.899309099, 0, 0.159355536, 0)
+Close.Size = UDim2.new(0.0849124193, 0, 0.667922854, 0)
 Close.Image = "http://www.roblox.com/asset/?id=6031094678"
+Close.ScaleType = Enum.ScaleType.Fit
 
 UICorner_3.Parent = Close
 
-Z4GS.Name = "Z4GS"
-Z4GS.Parent = Frame
-Z4GS.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Z4GS.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Z4GS.BorderSizePixel = 0
-Z4GS.Position = UDim2.new(0.0901639313, 0, 0.25, 0)
-Z4GS.Size = UDim2.new(0.819672108, 0, 0.204918027, 0)
-Z4GS.Font = Enum.Font.Unknown
-Z4GS.Text = "Z4GS"
-Z4GS.TextColor3 = Color3.fromRGB(255, 255, 255)
-Z4GS.TextScaled = true
-Z4GS.TextSize = 14.000
-Z4GS.TextWrapped = true
+raiwesy.Name = "raiwesy"
+raiwesy.Parent = ToolBar
+raiwesy.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+raiwesy.BackgroundTransparency = 1.000
+raiwesy.BorderColor3 = Color3.fromRGB(0, 0, 0)
+raiwesy.BorderSizePixel = 0
+raiwesy.Position = UDim2.new(0.336585373, 0, 0, 0)
+raiwesy.Size = UDim2.new(0, 60, 0, 52)
+raiwesy.Font = Enum.Font.Cartoon
+raiwesy.Text = "@raiwesy"
+raiwesy.TextColor3 = Color3.fromRGB(31, 31, 31)
+raiwesy.TextSize = 15.000
+raiwesy.TextWrapped = true
+raiwesy.TextXAlignment = Enum.TextXAlignment.Left
 
-UICorner_4.CornerRadius = UDim.new(0, 5)
-UICorner_4.Parent = Z4GS
+Minimize.Name = "Minimize"
+Minimize.Parent = ToolBar
+Minimize.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+Minimize.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Minimize.BorderSizePixel = 0
+Minimize.Position = UDim2.new(0.805000007, 0, 0.158999994, 0)
+Minimize.Size = UDim2.new(0.0849124193, 0, 0.667922854, 0)
+Minimize.Image = "http://www.roblox.com/asset/?id=6026568240"
+Minimize.ScaleType = Enum.ScaleType.Fit
 
-UITextSizeConstraint_2.Parent = Z4GS
-UITextSizeConstraint_2.MaxTextSize = 14
+UICorner_4.Parent = Minimize
 
-IYield.Name = "IYield"
-IYield.Parent = Frame
-IYield.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-IYield.BorderColor3 = Color3.fromRGB(0, 0, 0)
-IYield.BorderSizePixel = 0
-IYield.Position = UDim2.new(0.0901638865, 0, 0.737331152, 0)
-IYield.Size = UDim2.new(0.819672227, 0, 0.205000013, 0)
-IYield.Font = Enum.Font.Unknown
-IYield.Text = "Infinite Yield"
-IYield.TextColor3 = Color3.fromRGB(255, 255, 255)
-IYield.TextScaled = true
-IYield.TextSize = 14.000
-IYield.TextWrapped = true
+UIAspectRatioConstraint.Parent = ToolBar
+UIAspectRatioConstraint.AspectRatio = 7.885
 
-UICorner_5.CornerRadius = UDim.new(0, 5)
-UICorner_5.Parent = IYield
+HacksFrame.Name = "HacksFrame"
+HacksFrame.Parent = MainFrame
+HacksFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+HacksFrame.BackgroundTransparency = 0.500
+HacksFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+HacksFrame.BorderSizePixel = 0
+HacksFrame.Position = UDim2.new(0.117073171, 0, 0.33765161, 0)
+HacksFrame.Size = UDim2.new(0.763414681, 0, 0.510362685, 0)
 
-UITextSizeConstraint_3.Parent = IYield
-UITextSizeConstraint_3.MaxTextSize = 14
-
-Visible.Name = "Visible"
-Visible.Parent = Frame
-Visible.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-Visible.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Visible.BorderSizePixel = 0
-Visible.Position = UDim2.new(0.686762273, 0, 0.0409836099, 0)
-Visible.Size = UDim2.new(0.126450822, 0, 0.122950815, 0)
-Visible.Image = "http://www.roblox.com/asset/?id=6026568240"
-
-UICorner_6.Parent = Visible
+UICorner_5.CornerRadius = UDim.new(0, 12)
+UICorner_5.Parent = HacksFrame
 
 WHK.Name = "WHK"
-WHK.Parent = Frame
+WHK.Parent = HacksFrame
 WHK.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 WHK.BorderColor3 = Color3.fromRGB(0, 0, 0)
 WHK.BorderSizePixel = 0
-WHK.Position = UDim2.new(0.0901639313, 0, 0.491803288, 0)
+WHK.Position = UDim2.new(0.0901639387, 0, 0.395356625, 0)
 WHK.Size = UDim2.new(0.819672108, 0, 0.204918027, 0)
 WHK.Font = Enum.Font.Unknown
 WHK.Text = "Webhook"
@@ -136,28 +150,125 @@ WHK.TextScaled = true
 WHK.TextSize = 14.000
 WHK.TextWrapped = true
 
+UICorner_6.CornerRadius = UDim.new(0, 5)
+UICorner_6.Parent = WHK
+
+UITextSizeConstraint.Parent = WHK
+UITextSizeConstraint.MaxTextSize = 14
+
+Z4GS.Name = "Z4GS"
+Z4GS.Parent = HacksFrame
+Z4GS.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Z4GS.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Z4GS.BorderSizePixel = 0
+Z4GS.Position = UDim2.new(0.0901639387, 0, 0.153553292, 0)
+Z4GS.Size = UDim2.new(0.819672108, 0, 0.204918027, 0)
+Z4GS.Font = Enum.Font.Unknown
+Z4GS.Text = "Z4GS"
+Z4GS.TextColor3 = Color3.fromRGB(255, 255, 255)
+Z4GS.TextScaled = true
+Z4GS.TextSize = 14.000
+Z4GS.TextWrapped = true
+
 UICorner_7.CornerRadius = UDim.new(0, 5)
-UICorner_7.Parent = WHK
+UICorner_7.Parent = Z4GS
 
-UITextSizeConstraint_4.Parent = WHK
-UITextSizeConstraint_4.MaxTextSize = 14
+UITextSizeConstraint_2.Parent = Z4GS
+UITextSizeConstraint_2.MaxTextSize = 14
 
-ImageButton.Parent = ScreenGui
-ImageButton.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-ImageButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-ImageButton.BorderSizePixel = 0
-ImageButton.Position = UDim2.new(0.474076152, 0, 0, 0)
-ImageButton.Size = UDim2.new(0.0518477038, 0, 0.117845118, 0)
-ImageButton.Visible = false
-ImageButton.Image = "rbxassetid://16519606293"
-ImageButton.ScaleType = Enum.ScaleType.Fit
+IYield.Name = "IYield"
+IYield.Parent = HacksFrame
+IYield.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+IYield.BorderColor3 = Color3.fromRGB(0, 0, 0)
+IYield.BorderSizePixel = 0
+IYield.Position = UDim2.new(0.0901639387, 0, 0.640884459, 0)
+IYield.Size = UDim2.new(0.819672227, 0, 0.205000013, 0)
+IYield.Font = Enum.Font.Unknown
+IYield.Text = "Infinite Yield"
+IYield.TextColor3 = Color3.fromRGB(255, 255, 255)
+IYield.TextScaled = true
+IYield.TextSize = 14.000
+IYield.TextWrapped = true
 
-UICorner_8.CornerRadius = UDim.new(0, 30)
-UICorner_8.Parent = ImageButton
+UICorner_8.CornerRadius = UDim.new(0, 5)
+UICorner_8.Parent = IYield
+
+UITextSizeConstraint_3.Parent = IYield
+UITextSizeConstraint_3.MaxTextSize = 14
+
+UIAspectRatioConstraint_2.Parent = HacksFrame
+UIAspectRatioConstraint_2.AspectRatio = 1.589
+
+GameNameText.Name = "GameNameText"
+GameNameText.Parent = MainFrame
+GameNameText.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+GameNameText.BackgroundTransparency = 0.500
+GameNameText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+GameNameText.BorderSizePixel = 0
+GameNameText.Position = UDim2.new(0.256097555, 0, 0.171014488, 0)
+GameNameText.Size = UDim2.new(0.48780489, 0, 0.129533678, 0)
+GameNameText.Font = Enum.Font.Unknown
+GameNameText.Text = "Ro Ghoul"
+GameNameText.TextColor3 = Color3.fromRGB(255, 255, 255)
+GameNameText.TextScaled = true
+GameNameText.TextSize = 21.000
+GameNameText.TextWrapped = true
+
+UICorner_9.CornerRadius = UDim.new(0, 12)
+UICorner_9.Parent = GameNameText
+
+UIAspectRatioConstraint_3.Parent = GameNameText
+UIAspectRatioConstraint_3.AspectRatio = 4.000
+
+UITextSizeConstraint_4.Parent = GameNameText
+UITextSizeConstraint_4.MaxTextSize = 21
+
+Rejoin.Name = "Rejoin"
+Rejoin.Parent = MainFrame
+Rejoin.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Rejoin.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Rejoin.BorderSizePixel = 0
+Rejoin.Position = UDim2.new(0.419432193, 0, 0.865988553, 0)
+Rejoin.Size = UDim2.new(0.158696473, 0, 0.0939424336, 0)
+Rejoin.Font = Enum.Font.Unknown
+Rejoin.Text = "Rejoin"
+Rejoin.TextColor3 = Color3.fromRGB(255, 255, 255)
+Rejoin.TextScaled = true
+Rejoin.TextSize = 14.000
+Rejoin.TextWrapped = true
+
+UICorner_10.CornerRadius = UDim.new(0, 12)
+UICorner_10.Parent = Rejoin
+
+UITextSizeConstraint_5.Parent = Rejoin
+UITextSizeConstraint_5.MaxTextSize = 14
+
+UIAspectRatioConstraint_4.Parent = Rejoin
+UIAspectRatioConstraint_4.AspectRatio = 1.794
+
+UIAspectRatioConstraint_5.Parent = MainFrame
+UIAspectRatioConstraint_5.AspectRatio = 1.062
+
+OpenButton.Name = "OpenButton"
+OpenButton.Parent = ScreenGui
+OpenButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+OpenButton.BackgroundTransparency = 0.350
+OpenButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+OpenButton.BorderSizePixel = 0
+OpenButton.Position = UDim2.new(0, 0, 0.41093117, 0)
+OpenButton.Size = UDim2.new(0.0547219776, 0, 0.125506073, 0)
+OpenButton.Visible = false
+OpenButton.Image = "rbxassetid://16519606293"
+OpenButton.ScaleType = Enum.ScaleType.Fit
+
+UICorner_11.CornerRadius = UDim.new(0, 30)
+UICorner_11.Parent = OpenButton
+
+UIAspectRatioConstraint_6.Parent = OpenButton
 
 -- Scripts:
 
-local function EJCRMS_fake_script() -- Close.LocalScript 
+local function IOUGGJ_fake_script() -- Close.LocalScript 
 	local script = Instance.new('LocalScript', Close)
 
 	local sum = script.Parent
@@ -166,8 +277,29 @@ local function EJCRMS_fake_script() -- Close.LocalScript
 		sum.Parent.Parent.Frame.Visible = false 
 	end)
 end
-coroutine.wrap(EJCRMS_fake_script)()
-local function ALJOTS_fake_script() -- Z4GS.LocalScript 
+coroutine.wrap(IOUGGJ_fake_script)()
+local function FLCWH_fake_script() -- Minimize.LocalScript 
+	local script = Instance.new('LocalScript', Minimize)
+
+	local sum = script.Parent
+	
+	sum.MouseButton1Click:Connect(function()
+		sum.Parent.Parent.Parent.MainFrame.Visible = false
+		sum.Parent.Parent.Parent.OpenButton.Visible = true
+	end)
+end
+coroutine.wrap(FLCWH_fake_script)()
+local function NLXPQ_fake_script() -- WHK.LocalScript 
+	local script = Instance.new('LocalScript', WHK)
+
+	local sum = script.Parent
+	
+	sum.MouseButton1Click:Connect(function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/StrongBomber/projectluacore/main/roghoulwhk'))()
+	end)
+end
+coroutine.wrap(NLXPQ_fake_script)()
+local function NAKJ_fake_script() -- Z4GS.LocalScript 
 	local script = Instance.new('LocalScript', Z4GS)
 
 	local sum = script.Parent
@@ -709,8 +841,8 @@ local function ALJOTS_fake_script() -- Z4GS.LocalScript
 		end
 	end)
 end
-coroutine.wrap(ALJOTS_fake_script)()
-local function CIDWZRQ_fake_script() -- IYield.LocalScript 
+coroutine.wrap(NAKJ_fake_script)()
+local function DILVZ_fake_script() -- IYield.LocalScript 
 	local script = Instance.new('LocalScript', IYield)
 
 	local sum = script.Parent
@@ -893,36 +1025,27 @@ local function CIDWZRQ_fake_script() -- IYield.LocalScript
 	
 	end)
 end
-coroutine.wrap(CIDWZRQ_fake_script)()
-local function XWZL_fake_script() -- Visible.LocalScript 
-	local script = Instance.new('LocalScript', Visible)
+coroutine.wrap(DILVZ_fake_script)()
+local function OWMSNZA_fake_script() -- Rejoin.LocalScript 
+	local script = Instance.new('LocalScript', Rejoin)
+
+	print("Rejoining... Made By Raiwesy")
+	game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(state)
+		if state == Enum.TeleportState.Started then
+			game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId)
+		end
+	end)
+	
+end
+coroutine.wrap(OWMSNZA_fake_script)()
+local function HJCMZH_fake_script() -- OpenButton.LocalScript 
+	local script = Instance.new('LocalScript', OpenButton)
 
 	local sum = script.Parent
 	
 	sum.MouseButton1Click:Connect(function()
-		sum.Parent.Parent.Frame.Visible = false
-		sum.Parent.Parent.ImageButton.Visible = true
+		sum.Parent.MainFrame.Visible = true 
+		sum.Parent.OpenButton.Visible = false 
 	end)
 end
-coroutine.wrap(XWZL_fake_script)()
-local function CPHANLG_fake_script() -- WHK.LocalScript 
-	local script = Instance.new('LocalScript', WHK)
-
-	local sum = script.Parent
-	
-	sum.MouseButton1Click:Connect(function()
-		loadstring(game:HttpGet('https://raw.githubusercontent.com/StrongBomber/projectluacore/main/roghoulwhk'))()
-	end)
-end
-coroutine.wrap(CPHANLG_fake_script)()
-local function YCZSXF_fake_script() -- ImageButton.LocalScript 
-	local script = Instance.new('LocalScript', ImageButton)
-
-	local sum = script.Parent
-	
-	sum.MouseButton1Click:Connect(function()
-		sum.Parent.Frame.Visible = true
-		sum.Parent.ImageButton.Visible = false
-	end)
-end
-coroutine.wrap(YCZSXF_fake_script)()
+coroutine.wrap(HJCMZH_fake_script)()
