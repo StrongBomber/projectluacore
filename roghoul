@@ -9,36 +9,119 @@ local UICorner = Instance.new("UICorner")
 local ToolBar = Instance.new("Frame")
 local UICorner_2 = Instance.new("UICorner")
 local PLuacoreText = Instance.new("TextLabel")
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
 local Close = Instance.new("ImageButton")
 local UICorner_3 = Instance.new("UICorner")
+local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
 local raiwesy = Instance.new("TextLabel")
+local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_2 = Instance.new("UITextSizeConstraint")
 local Minimize = Instance.new("ImageButton")
 local UICorner_4 = Instance.new("UICorner")
-local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_4 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_5 = Instance.new("UIAspectRatioConstraint")
 local HacksFrame = Instance.new("Frame")
 local UICorner_5 = Instance.new("UICorner")
 local WHK = Instance.new("TextButton")
 local UICorner_6 = Instance.new("UICorner")
-local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
+local UITextSizeConstraint_3 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_6 = Instance.new("UIAspectRatioConstraint")
 local Z4GS = Instance.new("TextButton")
 local UICorner_7 = Instance.new("UICorner")
-local UITextSizeConstraint_2 = Instance.new("UITextSizeConstraint")
+local UITextSizeConstraint_4 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_7 = Instance.new("UIAspectRatioConstraint")
 local IYield = Instance.new("TextButton")
 local UICorner_8 = Instance.new("UICorner")
-local UITextSizeConstraint_3 = Instance.new("UITextSizeConstraint")
-local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_5 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_8 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_9 = Instance.new("UIAspectRatioConstraint")
 local GameNameText = Instance.new("TextLabel")
 local UICorner_9 = Instance.new("UICorner")
-local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
-local UITextSizeConstraint_4 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_10 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_6 = Instance.new("UITextSizeConstraint")
 local Rejoin = Instance.new("TextButton")
 local UICorner_10 = Instance.new("UICorner")
-local UITextSizeConstraint_5 = Instance.new("UITextSizeConstraint")
-local UIAspectRatioConstraint_4 = Instance.new("UIAspectRatioConstraint")
-local UIAspectRatioConstraint_5 = Instance.new("UIAspectRatioConstraint")
-local OpenButton = Instance.new("ImageButton")
+local UITextSizeConstraint_7 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_11 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_12 = Instance.new("UIAspectRatioConstraint")
+local ContactFrame = Instance.new("Frame")
 local UICorner_11 = Instance.new("UICorner")
-local UIAspectRatioConstraint_6 = Instance.new("UIAspectRatioConstraint")
+local DiscordFrame = Instance.new("Frame")
+local UICorner_12 = Instance.new("UICorner")
+local Discord = Instance.new("TextLabel")
+local UICorner_13 = Instance.new("UICorner")
+local UIAspectRatioConstraint_13 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_8 = Instance.new("UITextSizeConstraint")
+local CopyButton = Instance.new("TextButton")
+local UICorner_14 = Instance.new("UICorner")
+local UIGradient = Instance.new("UIGradient")
+local UIAspectRatioConstraint_14 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_9 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_15 = Instance.new("UIAspectRatioConstraint")
+local FounderFrame = Instance.new("Frame")
+local UICorner_15 = Instance.new("UICorner")
+local TextLabel = Instance.new("TextLabel")
+local UICorner_16 = Instance.new("UICorner")
+local UIAspectRatioConstraint_16 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_10 = Instance.new("UITextSizeConstraint")
+local raiwesy_2 = Instance.new("Frame")
+local UICorner_17 = Instance.new("UICorner")
+local ImageLabel = Instance.new("ImageLabel")
+local UICorner_18 = Instance.new("UICorner")
+local UIAspectRatioConstraint_17 = Instance.new("UIAspectRatioConstraint")
+local FounderName = Instance.new("TextLabel")
+local UIAspectRatioConstraint_18 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_11 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_19 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_20 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_21 = Instance.new("UIAspectRatioConstraint")
+local Toolbar = Instance.new("Frame")
+local UICorner_19 = Instance.new("UICorner")
+local CULabel = Instance.new("TextLabel")
+local UITextSizeConstraint_12 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_22 = Instance.new("UIAspectRatioConstraint")
+local Close_2 = Instance.new("ImageButton")
+local UICorner_20 = Instance.new("UICorner")
+local UIAspectRatioConstraint_23 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_24 = Instance.new("UIAspectRatioConstraint")
+local StatsFrame = Instance.new("Frame")
+local UICorner_21 = Instance.new("UICorner")
+local UIAspectRatioConstraint_25 = Instance.new("UIAspectRatioConstraint")
+local PlayerName = Instance.new("TextLabel")
+local UITextSizeConstraint_13 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_26 = Instance.new("UIAspectRatioConstraint")
+local Stats = Instance.new("Frame")
+local UICorner_22 = Instance.new("UICorner")
+local RGSLabel = Instance.new("TextLabel")
+local UICorner_23 = Instance.new("UICorner")
+local UIAspectRatioConstraint_27 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_14 = Instance.new("UITextSizeConstraint")
+local LevelStat = Instance.new("TextLabel")
+local UICorner_24 = Instance.new("UICorner")
+local UIAspectRatioConstraint_28 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_15 = Instance.new("UITextSizeConstraint")
+local YenStat = Instance.new("TextLabel")
+local UICorner_25 = Instance.new("UICorner")
+local UIAspectRatioConstraint_29 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_16 = Instance.new("UITextSizeConstraint")
+local RepStat = Instance.new("TextLabel")
+local UICorner_26 = Instance.new("UICorner")
+local UIAspectRatioConstraint_30 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_17 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_31 = Instance.new("UIAspectRatioConstraint")
+local Toolbar_2 = Instance.new("Frame")
+local UICorner_27 = Instance.new("UICorner")
+local CULabel_2 = Instance.new("TextLabel")
+local UITextSizeConstraint_18 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_32 = Instance.new("UIAspectRatioConstraint")
+local Close_3 = Instance.new("ImageButton")
+local UICorner_28 = Instance.new("UICorner")
+local UIAspectRatioConstraint_33 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_34 = Instance.new("UIAspectRatioConstraint")
+local OpenButton = Instance.new("ImageButton")
+local UICorner_29 = Instance.new("UICorner")
+local UIAspectRatioConstraint_35 = Instance.new("UIAspectRatioConstraint")
 
 --Properties:
 
@@ -48,11 +131,11 @@ ScreenGui.ResetOnSpawn = false
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-MainFrame.BackgroundTransparency = 0.200
+MainFrame.BackgroundTransparency = 0.450
 MainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 MainFrame.BorderSizePixel = 0
-MainFrame.Position = UDim2.new(0.319064438, 0, 0.109311745, 0)
-MainFrame.Size = UDim2.new(0.361871153, 0, 0.781376541, 0)
+MainFrame.Position = UDim2.new(0.354254633, 0, 0.179016978, 0)
+MainFrame.Size = UDim2.new(0.290621936, 0, 0.641377032, 0)
 
 UICorner.CornerRadius = UDim.new(0, 12)
 UICorner.Parent = MainFrame
@@ -60,9 +143,10 @@ UICorner.Parent = MainFrame
 ToolBar.Name = "ToolBar"
 ToolBar.Parent = MainFrame
 ToolBar.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ToolBar.BackgroundTransparency = 0.250
 ToolBar.BorderColor3 = Color3.fromRGB(0, 0, 0)
 ToolBar.BorderSizePixel = 0
-ToolBar.Size = UDim2.new(1, 0, 0.134715021, 0)
+ToolBar.Size = UDim2.new(0.999999881, 0, 0.134715006, 0)
 
 UICorner_2.CornerRadius = UDim.new(0, 6)
 UICorner_2.Parent = ToolBar
@@ -73,14 +157,21 @@ PLuacoreText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 PLuacoreText.BackgroundTransparency = 1.000
 PLuacoreText.BorderColor3 = Color3.fromRGB(0, 0, 0)
 PLuacoreText.BorderSizePixel = 0
-PLuacoreText.Position = UDim2.new(0.0292682927, 0, 0.0192307699, 0)
-PLuacoreText.Size = UDim2.new(0, 120, 0, 50)
+PLuacoreText.Position = UDim2.new(0.0292686261, 0, 0.0192308128, 0)
+PLuacoreText.Size = UDim2.new(0.453658044, 0, 0.980769277, 0)
 PLuacoreText.Font = Enum.Font.IndieFlower
 PLuacoreText.Text = "Project Luacore"
 PLuacoreText.TextColor3 = Color3.fromRGB(255, 255, 255)
-PLuacoreText.TextSize = 25.000
+PLuacoreText.TextScaled = true
+PLuacoreText.TextSize = 21.000
 PLuacoreText.TextWrapped = true
 PLuacoreText.TextXAlignment = Enum.TextXAlignment.Left
+
+UIAspectRatioConstraint.Parent = PLuacoreText
+UIAspectRatioConstraint.AspectRatio = 3.647
+
+UITextSizeConstraint.Parent = PLuacoreText
+UITextSizeConstraint.MaxTextSize = 21
 
 Close.Name = "Close"
 Close.Parent = ToolBar
@@ -94,6 +185,9 @@ Close.ScaleType = Enum.ScaleType.Fit
 
 UICorner_3.Parent = Close
 
+UIAspectRatioConstraint_2.Parent = Close
+UIAspectRatioConstraint_2.AspectRatio = 1.002
+
 raiwesy.Name = "raiwesy"
 raiwesy.Parent = ToolBar
 raiwesy.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -101,13 +195,21 @@ raiwesy.BackgroundTransparency = 1.000
 raiwesy.BorderColor3 = Color3.fromRGB(0, 0, 0)
 raiwesy.BorderSizePixel = 0
 raiwesy.Position = UDim2.new(0.336585373, 0, 0, 0)
-raiwesy.Size = UDim2.new(0, 60, 0, 52)
+raiwesy.Size = UDim2.new(0.146341443, 0, 1.00000012, 0)
 raiwesy.Font = Enum.Font.Cartoon
 raiwesy.Text = "@raiwesy"
-raiwesy.TextColor3 = Color3.fromRGB(31, 31, 31)
+raiwesy.TextColor3 = Color3.fromRGB(212, 212, 212)
+raiwesy.TextScaled = true
 raiwesy.TextSize = 15.000
+raiwesy.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
 raiwesy.TextWrapped = true
 raiwesy.TextXAlignment = Enum.TextXAlignment.Left
+
+UIAspectRatioConstraint_3.Parent = raiwesy
+UIAspectRatioConstraint_3.AspectRatio = 1.154
+
+UITextSizeConstraint_2.Parent = raiwesy
+UITextSizeConstraint_2.MaxTextSize = 16
 
 Minimize.Name = "Minimize"
 Minimize.Parent = ToolBar
@@ -121,8 +223,11 @@ Minimize.ScaleType = Enum.ScaleType.Fit
 
 UICorner_4.Parent = Minimize
 
-UIAspectRatioConstraint.Parent = ToolBar
-UIAspectRatioConstraint.AspectRatio = 7.885
+UIAspectRatioConstraint_4.Parent = Minimize
+UIAspectRatioConstraint_4.AspectRatio = 1.002
+
+UIAspectRatioConstraint_5.Parent = ToolBar
+UIAspectRatioConstraint_5.AspectRatio = 7.885
 
 HacksFrame.Name = "HacksFrame"
 HacksFrame.Parent = MainFrame
@@ -131,7 +236,7 @@ HacksFrame.BackgroundTransparency = 0.500
 HacksFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 HacksFrame.BorderSizePixel = 0
 HacksFrame.Position = UDim2.new(0.117073171, 0, 0.33765161, 0)
-HacksFrame.Size = UDim2.new(0.763414681, 0, 0.510362685, 0)
+HacksFrame.Size = UDim2.new(0.763414562, 0, 0.510362685, 0)
 
 UICorner_5.CornerRadius = UDim.new(0, 12)
 UICorner_5.Parent = HacksFrame
@@ -142,7 +247,7 @@ WHK.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 WHK.BorderColor3 = Color3.fromRGB(0, 0, 0)
 WHK.BorderSizePixel = 0
 WHK.Position = UDim2.new(0.0901639387, 0, 0.395356625, 0)
-WHK.Size = UDim2.new(0.819672108, 0, 0.204918027, 0)
+WHK.Size = UDim2.new(0.819672108, 0, 0.204918012, 0)
 WHK.Font = Enum.Font.Unknown
 WHK.Text = "Webhook"
 WHK.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -153,8 +258,11 @@ WHK.TextWrapped = true
 UICorner_6.CornerRadius = UDim.new(0, 5)
 UICorner_6.Parent = WHK
 
-UITextSizeConstraint.Parent = WHK
-UITextSizeConstraint.MaxTextSize = 14
+UITextSizeConstraint_3.Parent = WHK
+UITextSizeConstraint_3.MaxTextSize = 14
+
+UIAspectRatioConstraint_6.Parent = WHK
+UIAspectRatioConstraint_6.AspectRatio = 6.355
 
 Z4GS.Name = "Z4GS"
 Z4GS.Parent = HacksFrame
@@ -162,7 +270,7 @@ Z4GS.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 Z4GS.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Z4GS.BorderSizePixel = 0
 Z4GS.Position = UDim2.new(0.0901639387, 0, 0.153553292, 0)
-Z4GS.Size = UDim2.new(0.819672108, 0, 0.204918027, 0)
+Z4GS.Size = UDim2.new(0.819672108, 0, 0.204918012, 0)
 Z4GS.Font = Enum.Font.Unknown
 Z4GS.Text = "Z4GS"
 Z4GS.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -173,8 +281,11 @@ Z4GS.TextWrapped = true
 UICorner_7.CornerRadius = UDim.new(0, 5)
 UICorner_7.Parent = Z4GS
 
-UITextSizeConstraint_2.Parent = Z4GS
-UITextSizeConstraint_2.MaxTextSize = 14
+UITextSizeConstraint_4.Parent = Z4GS
+UITextSizeConstraint_4.MaxTextSize = 14
+
+UIAspectRatioConstraint_7.Parent = Z4GS
+UIAspectRatioConstraint_7.AspectRatio = 6.355
 
 IYield.Name = "IYield"
 IYield.Parent = HacksFrame
@@ -193,11 +304,14 @@ IYield.TextWrapped = true
 UICorner_8.CornerRadius = UDim.new(0, 5)
 UICorner_8.Parent = IYield
 
-UITextSizeConstraint_3.Parent = IYield
-UITextSizeConstraint_3.MaxTextSize = 14
+UITextSizeConstraint_5.Parent = IYield
+UITextSizeConstraint_5.MaxTextSize = 14
 
-UIAspectRatioConstraint_2.Parent = HacksFrame
-UIAspectRatioConstraint_2.AspectRatio = 1.589
+UIAspectRatioConstraint_8.Parent = IYield
+UIAspectRatioConstraint_8.AspectRatio = 6.353
+
+UIAspectRatioConstraint_9.Parent = HacksFrame
+UIAspectRatioConstraint_9.AspectRatio = 1.589
 
 GameNameText.Name = "GameNameText"
 GameNameText.Parent = MainFrame
@@ -206,7 +320,7 @@ GameNameText.BackgroundTransparency = 0.500
 GameNameText.BorderColor3 = Color3.fromRGB(0, 0, 0)
 GameNameText.BorderSizePixel = 0
 GameNameText.Position = UDim2.new(0.256097555, 0, 0.171014488, 0)
-GameNameText.Size = UDim2.new(0.48780489, 0, 0.129533678, 0)
+GameNameText.Size = UDim2.new(0.4878048, 0, 0.129533663, 0)
 GameNameText.Font = Enum.Font.Unknown
 GameNameText.Text = "Ro Ghoul"
 GameNameText.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -217,11 +331,11 @@ GameNameText.TextWrapped = true
 UICorner_9.CornerRadius = UDim.new(0, 12)
 UICorner_9.Parent = GameNameText
 
-UIAspectRatioConstraint_3.Parent = GameNameText
-UIAspectRatioConstraint_3.AspectRatio = 4.000
+UIAspectRatioConstraint_10.Parent = GameNameText
+UIAspectRatioConstraint_10.AspectRatio = 4.000
 
-UITextSizeConstraint_4.Parent = GameNameText
-UITextSizeConstraint_4.MaxTextSize = 21
+UITextSizeConstraint_6.Parent = GameNameText
+UITextSizeConstraint_6.MaxTextSize = 21
 
 Rejoin.Name = "Rejoin"
 Rejoin.Parent = MainFrame
@@ -229,7 +343,7 @@ Rejoin.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 Rejoin.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Rejoin.BorderSizePixel = 0
 Rejoin.Position = UDim2.new(0.419432193, 0, 0.865988553, 0)
-Rejoin.Size = UDim2.new(0.158696473, 0, 0.0939424336, 0)
+Rejoin.Size = UDim2.new(0.158696458, 0, 0.0939424261, 0)
 Rejoin.Font = Enum.Font.Unknown
 Rejoin.Text = "Rejoin"
 Rejoin.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -240,14 +354,430 @@ Rejoin.TextWrapped = true
 UICorner_10.CornerRadius = UDim.new(0, 12)
 UICorner_10.Parent = Rejoin
 
-UITextSizeConstraint_5.Parent = Rejoin
-UITextSizeConstraint_5.MaxTextSize = 14
+UITextSizeConstraint_7.Parent = Rejoin
+UITextSizeConstraint_7.MaxTextSize = 14
 
-UIAspectRatioConstraint_4.Parent = Rejoin
-UIAspectRatioConstraint_4.AspectRatio = 1.794
+UIAspectRatioConstraint_11.Parent = Rejoin
+UIAspectRatioConstraint_11.AspectRatio = 1.794
 
-UIAspectRatioConstraint_5.Parent = MainFrame
-UIAspectRatioConstraint_5.AspectRatio = 1.062
+UIAspectRatioConstraint_12.Parent = MainFrame
+UIAspectRatioConstraint_12.AspectRatio = 1.062
+
+ContactFrame.Name = "ContactFrame"
+ContactFrame.Parent = MainFrame
+ContactFrame.AnchorPoint = Vector2.new(0.5, 0)
+ContactFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ContactFrame.BackgroundTransparency = 0.500
+ContactFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ContactFrame.BorderSizePixel = 0
+ContactFrame.Position = UDim2.new(1.3313899, 0, 0.19559072, 0)
+ContactFrame.Size = UDim2.new(0.617476404, 0, 0.622312725, 0)
+
+UICorner_11.CornerRadius = UDim.new(0, 12)
+UICorner_11.Parent = ContactFrame
+
+DiscordFrame.Name = "DiscordFrame"
+DiscordFrame.Parent = ContactFrame
+DiscordFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+DiscordFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+DiscordFrame.BackgroundTransparency = 0.300
+DiscordFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+DiscordFrame.BorderSizePixel = 0
+DiscordFrame.Position = UDim2.new(0.5, 0, 0.377450973, 0)
+DiscordFrame.Size = UDim2.new(0.874418616, 0, 0.196078435, 0)
+
+UICorner_12.CornerRadius = UDim.new(0, 5)
+UICorner_12.Parent = DiscordFrame
+
+Discord.Name = "Discord"
+Discord.Parent = DiscordFrame
+Discord.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+Discord.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Discord.BorderSizePixel = 0
+Discord.Size = UDim2.new(0.606382966, 0, 0.974999964, 0)
+Discord.Font = Enum.Font.Unknown
+Discord.Text = "Discord"
+Discord.TextColor3 = Color3.fromRGB(255, 255, 255)
+Discord.TextScaled = true
+Discord.TextSize = 14.000
+Discord.TextWrapped = true
+
+UICorner_13.CornerRadius = UDim.new(0, 5)
+UICorner_13.Parent = Discord
+
+UIAspectRatioConstraint_13.Parent = Discord
+UIAspectRatioConstraint_13.AspectRatio = 2.923
+
+UITextSizeConstraint_8.Parent = Discord
+UITextSizeConstraint_8.MaxTextSize = 14
+
+CopyButton.Name = "CopyButton"
+CopyButton.Parent = DiscordFrame
+CopyButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CopyButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CopyButton.BorderSizePixel = 0
+CopyButton.Position = UDim2.new(0.658115447, 0, 0.107775114, 0)
+CopyButton.Size = UDim2.new(0.308510631, 0, 0.775000036, 0)
+CopyButton.Font = Enum.Font.FredokaOne
+CopyButton.Text = "Copy"
+CopyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CopyButton.TextScaled = true
+CopyButton.TextSize = 14.000
+CopyButton.TextStrokeTransparency = 0.000
+CopyButton.TextWrapped = true
+
+UICorner_14.CornerRadius = UDim.new(0, 5)
+UICorner_14.Parent = CopyButton
+
+UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(26, 179, 15)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(187, 255, 0))}
+UIGradient.Parent = CopyButton
+
+UIAspectRatioConstraint_14.Parent = CopyButton
+UIAspectRatioConstraint_14.AspectRatio = 1.871
+
+UITextSizeConstraint_9.Parent = CopyButton
+UITextSizeConstraint_9.MaxTextSize = 14
+
+UIAspectRatioConstraint_15.Parent = DiscordFrame
+UIAspectRatioConstraint_15.AspectRatio = 4.700
+
+FounderFrame.Name = "FounderFrame"
+FounderFrame.Parent = ContactFrame
+FounderFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+FounderFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+FounderFrame.BackgroundTransparency = 0.300
+FounderFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+FounderFrame.BorderSizePixel = 0
+FounderFrame.Position = UDim2.new(0.5, 0, 0.724460244, 0)
+FounderFrame.Size = UDim2.new(0.874418557, 0, 0.387254894, 0)
+
+UICorner_15.CornerRadius = UDim.new(0, 5)
+UICorner_15.Parent = FounderFrame
+
+TextLabel.Parent = FounderFrame
+TextLabel.BackgroundColor3 = Color3.fromRGB(39, 39, 39)
+TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.BorderSizePixel = 0
+TextLabel.Position = UDim2.new(0, 0, -0.0066863969, 0)
+TextLabel.Size = UDim2.new(1, 0, 0.303797454, 0)
+TextLabel.Font = Enum.Font.FredokaOne
+TextLabel.Text = "Founder"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextScaled = true
+TextLabel.TextSize = 14.000
+TextLabel.TextWrapped = true
+
+UICorner_16.CornerRadius = UDim.new(0, 5)
+UICorner_16.Parent = TextLabel
+
+UIAspectRatioConstraint_16.Parent = TextLabel
+UIAspectRatioConstraint_16.AspectRatio = 7.833
+
+UITextSizeConstraint_10.Parent = TextLabel
+UITextSizeConstraint_10.MaxTextSize = 14
+
+raiwesy_2.Name = "raiwesy"
+raiwesy_2.Parent = FounderFrame
+raiwesy_2.AnchorPoint = Vector2.new(0.5, 0.5)
+raiwesy_2.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+raiwesy_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+raiwesy_2.BorderSizePixel = 0
+raiwesy_2.Position = UDim2.new(0.49661094, 0, 0.626582265, 0)
+raiwesy_2.Size = UDim2.new(0.617021263, 0, 0.481012642, 0)
+
+UICorner_17.CornerRadius = UDim.new(0, 5)
+UICorner_17.Parent = raiwesy_2
+
+ImageLabel.Parent = raiwesy_2
+ImageLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ImageLabel.BackgroundTransparency = 1.000
+ImageLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ImageLabel.BorderSizePixel = 0
+ImageLabel.Position = UDim2.new(0.0460000001, 0, 0.0900000036, 0)
+ImageLabel.Size = UDim2.new(0.275862068, 0, 0.842105269, 0)
+ImageLabel.Image = "rbxassetid://16578138757"
+ImageLabel.ScaleType = Enum.ScaleType.Crop
+
+UICorner_18.CornerRadius = UDim.new(0, 90)
+UICorner_18.Parent = ImageLabel
+
+UIAspectRatioConstraint_17.Parent = ImageLabel
+
+FounderName.Name = "FounderName"
+FounderName.Parent = raiwesy_2
+FounderName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+FounderName.BackgroundTransparency = 1.000
+FounderName.BorderColor3 = Color3.fromRGB(0, 0, 0)
+FounderName.BorderSizePixel = 0
+FounderName.Position = UDim2.new(0.323448449, 0, 0.184315726, 0)
+FounderName.Size = UDim2.new(0.594827533, 0, 0.578947306, 0)
+FounderName.Font = Enum.Font.FredokaOne
+FounderName.Text = "@raiwesy"
+FounderName.TextColor3 = Color3.fromRGB(255, 255, 255)
+FounderName.TextScaled = true
+FounderName.TextSize = 14.000
+FounderName.TextWrapped = true
+
+UIAspectRatioConstraint_18.Parent = FounderName
+UIAspectRatioConstraint_18.AspectRatio = 3.136
+
+UITextSizeConstraint_11.Parent = FounderName
+UITextSizeConstraint_11.MaxTextSize = 14
+
+UIAspectRatioConstraint_19.Parent = raiwesy_2
+UIAspectRatioConstraint_19.AspectRatio = 3.053
+
+UIAspectRatioConstraint_20.Parent = FounderFrame
+UIAspectRatioConstraint_20.AspectRatio = 2.380
+
+UIAspectRatioConstraint_21.Parent = ContactFrame
+UIAspectRatioConstraint_21.AspectRatio = 1.054
+
+Toolbar.Name = "Toolbar"
+Toolbar.Parent = ContactFrame
+Toolbar.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+Toolbar.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Toolbar.BorderSizePixel = 0
+Toolbar.Position = UDim2.new(2.95242444e-07, 0, -0.00509785116, 0)
+Toolbar.Size = UDim2.new(1.0013113, 0, 0.249806151, 0)
+
+UICorner_19.CornerRadius = UDim.new(0, 5)
+UICorner_19.Parent = Toolbar
+
+CULabel.Name = "CULabel"
+CULabel.Parent = Toolbar
+CULabel.AnchorPoint = Vector2.new(0.5, 0)
+CULabel.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+CULabel.BackgroundTransparency = 1.000
+CULabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CULabel.BorderSizePixel = 0
+CULabel.Position = UDim2.new(0.451233506, 0, -0.00663103396, 0)
+CULabel.Size = UDim2.new(0.622273743, 0, 1.00819135, 0)
+CULabel.Font = Enum.Font.FredokaOne
+CULabel.Text = "Contact Us"
+CULabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+CULabel.TextScaled = true
+CULabel.TextSize = 23.000
+CULabel.TextWrapped = true
+
+UITextSizeConstraint_12.Parent = CULabel
+UITextSizeConstraint_12.MaxTextSize = 23
+
+UIAspectRatioConstraint_22.Parent = CULabel
+UIAspectRatioConstraint_22.AspectRatio = 2.607
+
+Close_2.Name = "Close"
+Close_2.Parent = Toolbar
+Close_2.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+Close_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Close_2.BorderSizePixel = 0
+Close_2.Position = UDim2.new(0.799616277, 0, 0.144999608, 0)
+Close_2.Size = UDim2.new(0.165351391, 0, 0.694148183, 0)
+Close_2.Image = "http://www.roblox.com/asset/?id=6031094678"
+Close_2.ScaleType = Enum.ScaleType.Fit
+
+UICorner_20.Parent = Close_2
+
+UIAspectRatioConstraint_23.Parent = Close_2
+UIAspectRatioConstraint_23.AspectRatio = 1.006
+
+UIAspectRatioConstraint_24.Parent = Toolbar
+UIAspectRatioConstraint_24.AspectRatio = 4.224
+
+StatsFrame.Name = "StatsFrame"
+StatsFrame.Parent = MainFrame
+StatsFrame.AnchorPoint = Vector2.new(0.5, 0)
+StatsFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+StatsFrame.BackgroundTransparency = 0.500
+StatsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+StatsFrame.BorderSizePixel = 0
+StatsFrame.Position = UDim2.new(-0.329630315, 0, 0.19559072, 0)
+StatsFrame.Size = UDim2.new(0.617476404, 0, 0.622312725, 0)
+
+UICorner_21.CornerRadius = UDim.new(0, 12)
+UICorner_21.Parent = StatsFrame
+
+UIAspectRatioConstraint_25.Parent = StatsFrame
+UIAspectRatioConstraint_25.AspectRatio = 1.054
+
+PlayerName.Name = "PlayerName"
+PlayerName.Parent = StatsFrame
+PlayerName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+PlayerName.BackgroundTransparency = 1.000
+PlayerName.BorderColor3 = Color3.fromRGB(0, 0, 0)
+PlayerName.BorderSizePixel = 0
+PlayerName.Position = UDim2.new(3.67140913e-08, 0, 0.243440166, 0)
+PlayerName.Size = UDim2.new(0.996123135, 0, 0.106505074, 0)
+PlayerName.Font = Enum.Font.FredokaOne
+PlayerName.Text = "-PlayerName-"
+PlayerName.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlayerName.TextScaled = true
+PlayerName.TextSize = 17.000
+PlayerName.TextWrapped = true
+
+UITextSizeConstraint_13.Parent = PlayerName
+UITextSizeConstraint_13.MaxTextSize = 17
+
+UIAspectRatioConstraint_26.Parent = PlayerName
+UIAspectRatioConstraint_26.AspectRatio = 9.857
+
+Stats.Name = "Stats"
+Stats.Parent = StatsFrame
+Stats.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Stats.BackgroundTransparency = 0.300
+Stats.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Stats.BorderSizePixel = 0
+Stats.Position = UDim2.new(0.0577463098, 0, 0.370231926, 0)
+Stats.Size = UDim2.new(0.875818431, 0, 0.583242059, 0)
+
+UICorner_22.CornerRadius = UDim.new(0, 5)
+UICorner_22.Parent = Stats
+
+RGSLabel.Name = "RGSLabel"
+RGSLabel.Parent = Stats
+RGSLabel.BackgroundColor3 = Color3.fromRGB(39, 39, 39)
+RGSLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+RGSLabel.BorderSizePixel = 0
+RGSLabel.Position = UDim2.new(0, 0, -0.00668626418, 0)
+RGSLabel.Size = UDim2.new(1, 0, 0.202035144, 0)
+RGSLabel.Font = Enum.Font.FredokaOne
+RGSLabel.Text = "Ro Ghoul Stats"
+RGSLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+RGSLabel.TextScaled = true
+RGSLabel.TextSize = 14.000
+RGSLabel.TextWrapped = true
+
+UICorner_23.CornerRadius = UDim.new(0, 5)
+UICorner_23.Parent = RGSLabel
+
+UIAspectRatioConstraint_27.Parent = RGSLabel
+UIAspectRatioConstraint_27.AspectRatio = 7.833
+
+UITextSizeConstraint_14.Parent = RGSLabel
+UITextSizeConstraint_14.MaxTextSize = 14
+
+LevelStat.Name = "LevelStat"
+LevelStat.Parent = Stats
+LevelStat.BackgroundColor3 = Color3.fromRGB(43, 43, 43)
+LevelStat.BorderColor3 = Color3.fromRGB(0, 0, 0)
+LevelStat.BorderSizePixel = 0
+LevelStat.Position = UDim2.new(0.214285716, 0, 0.275134265, 0)
+LevelStat.Size = UDim2.new(0.565934062, 0, 0.191304341, 0)
+LevelStat.Font = Enum.Font.FredokaOne
+LevelStat.Text = "-LevelStat-"
+LevelStat.TextColor3 = Color3.fromRGB(255, 255, 255)
+LevelStat.TextScaled = true
+LevelStat.TextSize = 14.000
+LevelStat.TextWrapped = true
+
+UICorner_24.CornerRadius = UDim.new(0, 5)
+UICorner_24.Parent = LevelStat
+
+UIAspectRatioConstraint_28.Parent = LevelStat
+UIAspectRatioConstraint_28.AspectRatio = 4.682
+
+UITextSizeConstraint_15.Parent = LevelStat
+UITextSizeConstraint_15.MaxTextSize = 14
+
+YenStat.Name = "YenStat"
+YenStat.Parent = Stats
+YenStat.BackgroundColor3 = Color3.fromRGB(43, 43, 43)
+YenStat.BorderColor3 = Color3.fromRGB(0, 0, 0)
+YenStat.BorderSizePixel = 0
+YenStat.Position = UDim2.new(0.214285716, 0, 0.5053249, 0)
+YenStat.Size = UDim2.new(0.565934062, 0, 0.191304341, 0)
+YenStat.Font = Enum.Font.FredokaOne
+YenStat.Text = "-YenStat-"
+YenStat.TextColor3 = Color3.fromRGB(255, 255, 255)
+YenStat.TextScaled = true
+YenStat.TextSize = 14.000
+YenStat.TextWrapped = true
+
+UICorner_25.CornerRadius = UDim.new(0, 5)
+UICorner_25.Parent = YenStat
+
+UIAspectRatioConstraint_29.Parent = YenStat
+UIAspectRatioConstraint_29.AspectRatio = 4.682
+
+UITextSizeConstraint_16.Parent = YenStat
+UITextSizeConstraint_16.MaxTextSize = 14
+
+RepStat.Name = "RepStat"
+RepStat.Parent = Stats
+RepStat.BackgroundColor3 = Color3.fromRGB(43, 43, 43)
+RepStat.BorderColor3 = Color3.fromRGB(0, 0, 0)
+RepStat.BorderSizePixel = 0
+RepStat.Position = UDim2.new(0.214285716, 0, 0.740107536, 0)
+RepStat.Size = UDim2.new(0.565934062, 0, 0.191304341, 0)
+RepStat.Font = Enum.Font.FredokaOne
+RepStat.Text = "-RepStat-"
+RepStat.TextColor3 = Color3.fromRGB(255, 255, 255)
+RepStat.TextScaled = true
+RepStat.TextSize = 14.000
+RepStat.TextWrapped = true
+
+UICorner_26.CornerRadius = UDim.new(0, 5)
+UICorner_26.Parent = RepStat
+
+UIAspectRatioConstraint_30.Parent = RepStat
+UIAspectRatioConstraint_30.AspectRatio = 4.682
+
+UITextSizeConstraint_17.Parent = RepStat
+UITextSizeConstraint_17.MaxTextSize = 14
+
+UIAspectRatioConstraint_31.Parent = Stats
+UIAspectRatioConstraint_31.AspectRatio = 1.583
+
+Toolbar_2.Name = "Toolbar"
+Toolbar_2.Parent = StatsFrame
+Toolbar_2.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+Toolbar_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Toolbar_2.BorderSizePixel = 0
+Toolbar_2.Position = UDim2.new(2.95242444e-07, 0, -0.00509785116, 0)
+Toolbar_2.Size = UDim2.new(1.0013113, 0, 0.249806151, 0)
+
+UICorner_27.CornerRadius = UDim.new(0, 5)
+UICorner_27.Parent = Toolbar_2
+
+CULabel_2.Name = "CULabel"
+CULabel_2.Parent = Toolbar_2
+CULabel_2.AnchorPoint = Vector2.new(0.5, 0)
+CULabel_2.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+CULabel_2.BackgroundTransparency = 1.000
+CULabel_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CULabel_2.BorderSizePixel = 0
+CULabel_2.Position = UDim2.new(0.451233506, 0, -0.00663103396, 0)
+CULabel_2.Size = UDim2.new(0.622273743, 0, 1.00819135, 0)
+CULabel_2.Font = Enum.Font.FredokaOne
+CULabel_2.Text = "Stats"
+CULabel_2.TextColor3 = Color3.fromRGB(255, 255, 255)
+CULabel_2.TextScaled = true
+CULabel_2.TextSize = 23.000
+CULabel_2.TextWrapped = true
+
+UITextSizeConstraint_18.Parent = CULabel_2
+UITextSizeConstraint_18.MaxTextSize = 23
+
+UIAspectRatioConstraint_32.Parent = CULabel_2
+UIAspectRatioConstraint_32.AspectRatio = 2.607
+
+Close_3.Name = "Close"
+Close_3.Parent = Toolbar_2
+Close_3.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+Close_3.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Close_3.BorderSizePixel = 0
+Close_3.Position = UDim2.new(0.799616277, 0, 0.144999608, 0)
+Close_3.Size = UDim2.new(0.165351391, 0, 0.694148183, 0)
+Close_3.Image = "http://www.roblox.com/asset/?id=6031094678"
+Close_3.ScaleType = Enum.ScaleType.Fit
+
+UICorner_28.Parent = Close_3
+
+UIAspectRatioConstraint_33.Parent = Close_3
+UIAspectRatioConstraint_33.AspectRatio = 1.006
+
+UIAspectRatioConstraint_34.Parent = Toolbar_2
+UIAspectRatioConstraint_34.AspectRatio = 4.224
 
 OpenButton.Name = "OpenButton"
 OpenButton.Parent = ScreenGui
@@ -256,19 +786,19 @@ OpenButton.BackgroundTransparency = 0.350
 OpenButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 OpenButton.BorderSizePixel = 0
 OpenButton.Position = UDim2.new(0, 0, 0.41093117, 0)
-OpenButton.Size = UDim2.new(0.0547219776, 0, 0.125506073, 0)
+OpenButton.Size = UDim2.new(0.0439477004, 0, 0.103019103, 0)
 OpenButton.Visible = false
 OpenButton.Image = "rbxassetid://16519606293"
 OpenButton.ScaleType = Enum.ScaleType.Fit
 
-UICorner_11.CornerRadius = UDim.new(0, 30)
-UICorner_11.Parent = OpenButton
+UICorner_29.CornerRadius = UDim.new(0, 30)
+UICorner_29.Parent = OpenButton
 
-UIAspectRatioConstraint_6.Parent = OpenButton
+UIAspectRatioConstraint_35.Parent = OpenButton
 
 -- Scripts:
 
-local function IOUGGJ_fake_script() -- Close.LocalScript 
+local function KAUKFZO_fake_script() -- Close.LocalScript 
 	local script = Instance.new('LocalScript', Close)
 
 	local sum = script.Parent
@@ -277,8 +807,8 @@ local function IOUGGJ_fake_script() -- Close.LocalScript
 		sum.Parent.Parent.Frame.Visible = false 
 	end)
 end
-coroutine.wrap(IOUGGJ_fake_script)()
-local function FLCWH_fake_script() -- Minimize.LocalScript 
+coroutine.wrap(KAUKFZO_fake_script)()
+local function OCHI_fake_script() -- Minimize.LocalScript 
 	local script = Instance.new('LocalScript', Minimize)
 
 	local sum = script.Parent
@@ -288,8 +818,8 @@ local function FLCWH_fake_script() -- Minimize.LocalScript
 		sum.Parent.Parent.Parent.OpenButton.Visible = true
 	end)
 end
-coroutine.wrap(FLCWH_fake_script)()
-local function NLXPQ_fake_script() -- WHK.LocalScript 
+coroutine.wrap(OCHI_fake_script)()
+local function QQPE_fake_script() -- WHK.LocalScript 
 	local script = Instance.new('LocalScript', WHK)
 
 	local sum = script.Parent
@@ -298,8 +828,8 @@ local function NLXPQ_fake_script() -- WHK.LocalScript
 		loadstring(game:HttpGet('https://raw.githubusercontent.com/StrongBomber/projectluacore/main/roghoulwhk'))()
 	end)
 end
-coroutine.wrap(NLXPQ_fake_script)()
-local function NAKJ_fake_script() -- Z4GS.LocalScript 
+coroutine.wrap(QQPE_fake_script)()
+local function JITNO_fake_script() -- Z4GS.LocalScript 
 	local script = Instance.new('LocalScript', Z4GS)
 
 	local sum = script.Parent
@@ -841,8 +1371,8 @@ local function NAKJ_fake_script() -- Z4GS.LocalScript
 		end
 	end)
 end
-coroutine.wrap(NAKJ_fake_script)()
-local function DILVZ_fake_script() -- IYield.LocalScript 
+coroutine.wrap(JITNO_fake_script)()
+local function VRAAHW_fake_script() -- IYield.LocalScript 
 	local script = Instance.new('LocalScript', IYield)
 
 	local sum = script.Parent
@@ -1025,8 +1555,8 @@ local function DILVZ_fake_script() -- IYield.LocalScript
 	
 	end)
 end
-coroutine.wrap(DILVZ_fake_script)()
-local function OWMSNZA_fake_script() -- Rejoin.LocalScript 
+coroutine.wrap(VRAAHW_fake_script)()
+local function EKOV_fake_script() -- Rejoin.LocalScript 
 	local script = Instance.new('LocalScript', Rejoin)
 
 	print("Rejoining... Made By Raiwesy")
@@ -1037,8 +1567,73 @@ local function OWMSNZA_fake_script() -- Rejoin.LocalScript
 	end)
 	
 end
-coroutine.wrap(OWMSNZA_fake_script)()
-local function HJCMZH_fake_script() -- OpenButton.LocalScript 
+coroutine.wrap(EKOV_fake_script)()
+local function ZIRZKOI_fake_script() -- CopyButton.LocalScript 
+	local script = Instance.new('LocalScript', CopyButton)
+
+	local butt = script.Parent
+	
+	local copy = "https://discord.gg/7MyaeZ6bck"
+	
+	butt.MouseButton1Click:Connect(function(plr) 
+		setclipboard(tostring(copy)) 
+		
+			wait(1)
+			butt.Text = "Copied"
+		
+		end
+	
+			wait(2)
+			butt.Text = "Copy"
+		end
+	end)
+end
+coroutine.wrap(ZIRZKOI_fake_script)()
+local function YLNZ_fake_script() -- Close_2.LocalScript 
+	local script = Instance.new('LocalScript', Close_2)
+
+	local sum = script.Parent
+	
+	sum.MouseButton1Click:Connect(function()
+		sum.Parent.Parent.Parent.ContactFrame.Visible = false 
+	end)
+end
+coroutine.wrap(YLNZ_fake_script)()
+local function WXMLKC_fake_script() -- PlayerName.LocalScript 
+	local script = Instance.new('LocalScript', PlayerName)
+
+	script.Parent.Text = game:GetService("Players").LocalPlayer.Name
+end
+coroutine.wrap(WXMLKC_fake_script)()
+local function ITJHQHZ_fake_script() -- LevelStat.LocalScript 
+	local script = Instance.new('LocalScript', LevelStat)
+
+	script.Parent.Text = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.LevelLabel.Text
+end
+coroutine.wrap(ITJHQHZ_fake_script)()
+local function CFSSAX_fake_script() -- YenStat.LocalScript 
+	local script = Instance.new('LocalScript', YenStat)
+
+	script.Parent.Text = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.YenLabel.Text
+end
+coroutine.wrap(CFSSAX_fake_script)()
+local function OGEH_fake_script() -- RepStat.LocalScript 
+	local script = Instance.new('LocalScript', RepStat)
+
+	script.Parent.Text = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.ReputationLabel.Text
+end
+coroutine.wrap(OGEH_fake_script)()
+local function NPYC_fake_script() -- Close_3.LocalScript 
+	local script = Instance.new('LocalScript', Close_3)
+
+	local sum = script.Parent
+	
+	sum.MouseButton1Click:Connect(function()
+		sum.Parent.Parent.Parent.StatsFrame.Visible = false 
+	end)
+end
+coroutine.wrap(NPYC_fake_script)()
+local function BTEFTLH_fake_script() -- OpenButton.LocalScript 
 	local script = Instance.new('LocalScript', OpenButton)
 
 	local sum = script.Parent
@@ -1048,4 +1643,4 @@ local function HJCMZH_fake_script() -- OpenButton.LocalScript
 		sum.Parent.OpenButton.Visible = false 
 	end)
 end
-coroutine.wrap(HJCMZH_fake_script)()
+coroutine.wrap(BTEFTLH_fake_script)()
