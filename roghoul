@@ -798,7 +798,7 @@ UIAspectRatioConstraint_35.Parent = OpenButton
 
 -- Scripts:
 
-local function BNOWR_fake_script() -- Close.LocalScript 
+local function AFYAV_fake_script() -- Close.LocalScript 
 	local script = Instance.new('LocalScript', Close)
 
 	local sum = script.Parent
@@ -807,8 +807,8 @@ local function BNOWR_fake_script() -- Close.LocalScript
 		sum.Parent.Parent.Parent.MainFrame.Visible = false 
 	end)
 end
-coroutine.wrap(BNOWR_fake_script)()
-local function HUZWC_fake_script() -- Minimize.LocalScript 
+coroutine.wrap(AFYAV_fake_script)()
+local function RQFK_fake_script() -- Minimize.LocalScript 
 	local script = Instance.new('LocalScript', Minimize)
 
 	local sum = script.Parent
@@ -818,8 +818,8 @@ local function HUZWC_fake_script() -- Minimize.LocalScript
 		sum.Parent.Parent.Parent.OpenButton.Visible = true
 	end)
 end
-coroutine.wrap(HUZWC_fake_script)()
-local function NGNVG_fake_script() -- WHK.LocalScript 
+coroutine.wrap(RQFK_fake_script)()
+local function GRRRZ_fake_script() -- WHK.LocalScript 
 	local script = Instance.new('LocalScript', WHK)
 
 	local sum = script.Parent
@@ -828,8 +828,8 @@ local function NGNVG_fake_script() -- WHK.LocalScript
 		loadstring(game:HttpGet('https://raw.githubusercontent.com/StrongBomber/projectluacore/main/roghoulwhk'))()
 	end)
 end
-coroutine.wrap(NGNVG_fake_script)()
-local function VCGAF_fake_script() -- Z4GS.LocalScript 
+coroutine.wrap(GRRRZ_fake_script)()
+local function ACNTSR_fake_script() -- Z4GS.LocalScript 
 	local script = Instance.new('LocalScript', Z4GS)
 
 	local sum = script.Parent
@@ -1371,8 +1371,8 @@ local function VCGAF_fake_script() -- Z4GS.LocalScript
 		end
 	end)
 end
-coroutine.wrap(VCGAF_fake_script)()
-local function OZAXQ_fake_script() -- IYield.LocalScript 
+coroutine.wrap(ACNTSR_fake_script)()
+local function VLUDDNX_fake_script() -- IYield.LocalScript 
 	local script = Instance.new('LocalScript', IYield)
 
 	local sum = script.Parent
@@ -1555,8 +1555,8 @@ local function OZAXQ_fake_script() -- IYield.LocalScript
 	
 	end)
 end
-coroutine.wrap(OZAXQ_fake_script)()
-local function UIZDVGC_fake_script() -- Rejoin.LocalScript 
+coroutine.wrap(VLUDDNX_fake_script)()
+local function VACWWNS_fake_script() -- Rejoin.LocalScript 
 	local script = Instance.new('LocalScript', Rejoin)
 
 	print("Rejoining... Made By Raiwesy")
@@ -1567,29 +1567,8 @@ local function UIZDVGC_fake_script() -- Rejoin.LocalScript
 	end)
 	
 end
-coroutine.wrap(UIZDVGC_fake_script)()
-local function YHIY_fake_script() -- CopyButton.LocalScript 
-	local script = Instance.new('LocalScript', CopyButton)
-
-	local butt = script.Parent
-	
-	local copy = "https://discord.gg/7MyaeZ6bck"
-	
-	butt.MouseButton1Click:Connect(function(plr) 
-		setclipboard(tostring(copy)) 
-		
-			wait(1)
-			butt.Text = "Copied"
-		
-		end
-	
-			wait(2)
-			butt.Text = "Copy"
-		end
-	end)
-end
-coroutine.wrap(YHIY_fake_script)()
-local function FSOFU_fake_script() -- Close_2.LocalScript 
+coroutine.wrap(VACWWNS_fake_script)()
+local function LSYZL_fake_script() -- Close_2.LocalScript 
 	local script = Instance.new('LocalScript', Close_2)
 
 	local sum = script.Parent
@@ -1598,32 +1577,32 @@ local function FSOFU_fake_script() -- Close_2.LocalScript
 		sum.Parent.Parent.Parent.ContactFrame.Visible = false 
 	end)
 end
-coroutine.wrap(FSOFU_fake_script)()
-local function BQGMLUV_fake_script() -- PlayerName.LocalScript 
+coroutine.wrap(LSYZL_fake_script)()
+local function MMRV_fake_script() -- PlayerName.LocalScript 
 	local script = Instance.new('LocalScript', PlayerName)
 
 	script.Parent.Text = game:GetService("Players").LocalPlayer.Name
 end
-coroutine.wrap(BQGMLUV_fake_script)()
-local function ZIDL_fake_script() -- LevelStat.LocalScript 
+coroutine.wrap(MMRV_fake_script)()
+local function DBMI_fake_script() -- LevelStat.LocalScript 
 	local script = Instance.new('LocalScript', LevelStat)
 
 	script.Parent.Text = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.LevelLabel.Text
 end
-coroutine.wrap(ZIDL_fake_script)()
-local function MVCYKI_fake_script() -- YenStat.LocalScript 
+coroutine.wrap(DBMI_fake_script)()
+local function URXD_fake_script() -- YenStat.LocalScript 
 	local script = Instance.new('LocalScript', YenStat)
 
 	script.Parent.Text = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.YenLabel.Text
 end
-coroutine.wrap(MVCYKI_fake_script)()
-local function JJBXT_fake_script() -- RepStat.LocalScript 
+coroutine.wrap(URXD_fake_script)()
+local function UPVHYS_fake_script() -- RepStat.LocalScript 
 	local script = Instance.new('LocalScript', RepStat)
 
 	script.Parent.Text = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.ReputationLabel.Text
 end
-coroutine.wrap(JJBXT_fake_script)()
-local function ENBP_fake_script() -- Close_3.LocalScript 
+coroutine.wrap(UPVHYS_fake_script)()
+local function DYBQLAO_fake_script() -- Close_3.LocalScript 
 	local script = Instance.new('LocalScript', Close_3)
 
 	local sum = script.Parent
@@ -1632,8 +1611,8 @@ local function ENBP_fake_script() -- Close_3.LocalScript
 		sum.Parent.Parent.Parent.StatsFrame.Visible = false 
 	end)
 end
-coroutine.wrap(ENBP_fake_script)()
-local function FLPMP_fake_script() -- OpenButton.LocalScript 
+coroutine.wrap(DYBQLAO_fake_script)()
+local function SGWUVW_fake_script() -- OpenButton.LocalScript 
 	local script = Instance.new('LocalScript', OpenButton)
 
 	local sum = script.Parent
@@ -1643,4 +1622,4 @@ local function FLPMP_fake_script() -- OpenButton.LocalScript
 		sum.Parent.OpenButton.Visible = false 
 	end)
 end
-coroutine.wrap(FLPMP_fake_script)()
+coroutine.wrap(SGWUVW_fake_script)()
