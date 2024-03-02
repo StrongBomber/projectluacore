@@ -790,6 +790,10 @@ OpenButton.Size = UDim2.new(0.0439477004, 0, 0.103019103, 0)
 OpenButton.Visible = false
 OpenButton.Image = "rbxassetid://16519606293"
 OpenButton.ScaleType = Enum.ScaleType.Fit
+OpenButton.MouseButton1Click:Connect(function()
+	sum.Parent.MainFrame.Visible = true 
+	sum.Parent.OpenButton.Visible = false 
+end)
 
 UICorner_29.CornerRadius = UDim.new(0, 30)
 UICorner_29.Parent = OpenButton
@@ -1611,15 +1615,3 @@ local function DYBQLAO_fake_script() -- Close_3.LocalScript
 		sum.Parent.Parent.Parent.StatsFrame.Visible = false 
 	end)
 end
-coroutine.wrap(DYBQLAO_fake_script)()
-local function SGWUVW_fake_script() -- OpenButton.LocalScript 
-	local script = Instance.new('LocalScript', OpenButton)
-
-	local sum = script.Parent
-	
-	sum.MouseButton1Click:Connect(function()
-		sum.Parent.MainFrame.Visible = true 
-		sum.Parent.OpenButton.Visible = false 
-	end)
-end
-coroutine.wrap(SGWUVW_fake_script)()
