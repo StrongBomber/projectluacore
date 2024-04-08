@@ -1,0 +1,485 @@
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local TopLabel = Instance.new("TextLabel")
+local UICorner_2 = Instance.new("UICorner")
+local version = Instance.new("TextLabel")
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
+local UITextSizeConstraint_2 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
+local ProfileFrame = Instance.new("Frame")
+local UICorner_3 = Instance.new("UICorner")
+local AvatarImage = Instance.new("ImageLabel")
+local UICorner_4 = Instance.new("UICorner")
+local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
+local WelcomeLabel = Instance.new("TextLabel")
+local UIAspectRatioConstraint_4 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_3 = Instance.new("UITextSizeConstraint")
+local PlayerName = Instance.new("TextLabel")
+local UIAspectRatioConstraint_5 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_4 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_6 = Instance.new("UIAspectRatioConstraint")
+local UpdatesFrame = Instance.new("Frame")
+local UICorner_5 = Instance.new("UICorner")
+local UpdatesLabel = Instance.new("TextLabel")
+local UICorner_6 = Instance.new("UICorner")
+local UIAspectRatioConstraint_7 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_5 = Instance.new("UITextSizeConstraint")
+local UpdateLogs = Instance.new("TextLabel")
+local UIAspectRatioConstraint_8 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_6 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_9 = Instance.new("UIAspectRatioConstraint")
+local ToolsFrame = Instance.new("Frame")
+local UICorner_7 = Instance.new("UICorner")
+local RejoinButton = Instance.new("TextButton")
+local UICorner_8 = Instance.new("UICorner")
+local UIAspectRatioConstraint_10 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_7 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_11 = Instance.new("UIAspectRatioConstraint")
+local TaxiBossAutoFarmButton = Instance.new("TextButton")
+local UICorner_9 = Instance.new("UICorner")
+local UIAspectRatioConstraint_12 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_8 = Instance.new("UITextSizeConstraint")
+local CreditsLabel = Instance.new("TextLabel")
+local UITextSizeConstraint_9 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_13 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_14 = Instance.new("UIAspectRatioConstraint")
+local MinimizeButton = Instance.new("ImageButton")
+local UIAspectRatioConstraint_15 = Instance.new("UIAspectRatioConstraint")
+local CloseButton = Instance.new("ImageButton")
+local UIAspectRatioConstraint_16 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_17 = Instance.new("UIAspectRatioConstraint")
+local OpenButton = Instance.new("ImageButton")
+local UICorner_10 = Instance.new("UICorner")
+local UIAspectRatioConstraint_18 = Instance.new("UIAspectRatioConstraint")
+
+--Properties:
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
+MainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.269331008, 0, 0.190283403, 0)
+MainFrame.Size = UDim2.new(0.472419888, 0, 0.508454382, 0)
+
+UICorner.CornerRadius = UDim.new(0, 15)
+UICorner.Parent = MainFrame
+
+TopLabel.Name = "TopLabel"
+TopLabel.Parent = MainFrame
+TopLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+TopLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TopLabel.BorderSizePixel = 0
+TopLabel.Size = UDim2.new(1, 0, 0.16393441, 0)
+TopLabel.Font = Enum.Font.GothamBold
+TopLabel.Text = "   Project Luacore "
+TopLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TopLabel.TextScaled = true
+TopLabel.TextSize = 15.000
+TopLabel.TextWrapped = true
+TopLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+UICorner_2.CornerRadius = UDim.new(0, 7)
+UICorner_2.Parent = TopLabel
+
+version.Name = "version"
+version.Parent = TopLabel
+version.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+version.BackgroundTransparency = 1.000
+version.BorderColor3 = Color3.fromRGB(0, 0, 0)
+version.BorderSizePixel = 0
+version.Position = UDim2.new(0.24482125, 0, 0.24000001, 0)
+version.Size = UDim2.new(0.377000004, 0, 0.49000001, 0)
+version.Font = Enum.Font.Cartoon
+version.Text = "v0.5.5"
+version.TextColor3 = Color3.fromRGB(106, 106, 106)
+version.TextScaled = true
+version.TextSize = 14.000
+version.TextWrapped = true
+version.TextXAlignment = Enum.TextXAlignment.Left
+
+UIAspectRatioConstraint.Parent = version
+UIAspectRatioConstraint.AspectRatio = 8.264
+
+UITextSizeConstraint.Parent = version
+UITextSizeConstraint.MaxTextSize = 14
+
+UITextSizeConstraint_2.Parent = TopLabel
+UITextSizeConstraint_2.MaxTextSize = 15
+
+UIAspectRatioConstraint_2.Parent = TopLabel
+UIAspectRatioConstraint_2.AspectRatio = 10.741
+
+ProfileFrame.Name = "ProfileFrame"
+ProfileFrame.Parent = MainFrame
+ProfileFrame.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+ProfileFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ProfileFrame.BorderSizePixel = 0
+ProfileFrame.Position = UDim2.new(0.0306137595, 0, 0.209297955, 0)
+ProfileFrame.Size = UDim2.new(0.549905837, 0, 0.26557377, 0)
+
+UICorner_3.CornerRadius = UDim.new(0, 7)
+UICorner_3.Parent = ProfileFrame
+
+AvatarImage.Name = "AvatarImage"
+AvatarImage.Parent = ProfileFrame
+AvatarImage.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+AvatarImage.BackgroundTransparency = 1.000
+AvatarImage.BorderColor3 = Color3.fromRGB(0, 0, 0)
+AvatarImage.BorderSizePixel = 0
+AvatarImage.Position = UDim2.new(0.0410958901, 0, 0.172839507, 0)
+AvatarImage.Size = UDim2.new(0.178082198, 0, 0.641975224, 0)
+AvatarImage.ZIndex = 5
+AvatarImage.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+AvatarImage.ScaleType = Enum.ScaleType.Tile
+
+UICorner_4.CornerRadius = UDim.new(1, 0)
+UICorner_4.Parent = AvatarImage
+
+UIAspectRatioConstraint_3.Parent = AvatarImage
+UIAspectRatioConstraint_3.AspectRatio = 1.011
+
+WelcomeLabel.Name = "WelcomeLabel"
+WelcomeLabel.Parent = ProfileFrame
+WelcomeLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+WelcomeLabel.BackgroundTransparency = 1.000
+WelcomeLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+WelcomeLabel.BorderSizePixel = 0
+WelcomeLabel.Position = UDim2.new(0.239999995, 0, 0.0799999982, 0)
+WelcomeLabel.Size = UDim2.new(0.294252217, 0, 0.61728394, 0)
+WelcomeLabel.Font = Enum.Font.GothamBold
+WelcomeLabel.Text = "Welcome , "
+WelcomeLabel.TextColor3 = Color3.fromRGB(88, 88, 88)
+WelcomeLabel.TextScaled = true
+WelcomeLabel.TextSize = 14.000
+WelcomeLabel.TextWrapped = true
+WelcomeLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+UIAspectRatioConstraint_4.Parent = WelcomeLabel
+UIAspectRatioConstraint_4.AspectRatio = 1.738
+
+UITextSizeConstraint_3.Parent = WelcomeLabel
+UITextSizeConstraint_3.MaxTextSize = 14
+
+PlayerName.Name = "PlayerName"
+PlayerName.Parent = ProfileFrame
+PlayerName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+PlayerName.BackgroundTransparency = 1.000
+PlayerName.BorderColor3 = Color3.fromRGB(0, 0, 0)
+PlayerName.BorderSizePixel = 0
+PlayerName.Position = UDim2.new(0.239726022, 0, 0.283950627, 0)
+PlayerName.Size = UDim2.new(0.537671149, 0, 0.61728394, 0)
+PlayerName.Font = Enum.Font.Gotham
+PlayerName.Text = "ProjectLuacore"
+PlayerName.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlayerName.TextScaled = true
+PlayerName.TextSize = 12.000
+PlayerName.TextWrapped = true
+PlayerName.TextXAlignment = Enum.TextXAlignment.Left
+
+UIAspectRatioConstraint_5.Parent = PlayerName
+UIAspectRatioConstraint_5.AspectRatio = 3.176
+
+UITextSizeConstraint_4.Parent = PlayerName
+UITextSizeConstraint_4.MaxTextSize = 12
+
+UIAspectRatioConstraint_6.Parent = ProfileFrame
+UIAspectRatioConstraint_6.AspectRatio = 3.646
+
+UpdatesFrame.Name = "UpdatesFrame"
+UpdatesFrame.Parent = MainFrame
+UpdatesFrame.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+UpdatesFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+UpdatesFrame.BorderSizePixel = 0
+UpdatesFrame.Position = UDim2.new(0.0306137595, 0, 0.540445447, 0)
+UpdatesFrame.Size = UDim2.new(0.549905837, 0, 0.327868849, 0)
+
+UICorner_5.CornerRadius = UDim.new(0, 7)
+UICorner_5.Parent = UpdatesFrame
+
+UpdatesLabel.Name = "UpdatesLabel"
+UpdatesLabel.Parent = UpdatesFrame
+UpdatesLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+UpdatesLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+UpdatesLabel.BorderSizePixel = 0
+UpdatesLabel.Size = UDim2.new(1, 0, 0.25, 0)
+UpdatesLabel.Font = Enum.Font.GothamBold
+UpdatesLabel.Text = "Updates"
+UpdatesLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+UpdatesLabel.TextScaled = true
+UpdatesLabel.TextSize = 13.000
+UpdatesLabel.TextWrapped = true
+
+UICorner_6.CornerRadius = UDim.new(0, 5)
+UICorner_6.Parent = UpdatesLabel
+
+UIAspectRatioConstraint_7.Parent = UpdatesLabel
+UIAspectRatioConstraint_7.AspectRatio = 11.813
+
+UITextSizeConstraint_5.Parent = UpdatesLabel
+UITextSizeConstraint_5.MaxTextSize = 13
+
+UpdateLogs.Name = "UpdateLogs"
+UpdateLogs.Parent = UpdatesFrame
+UpdateLogs.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+UpdateLogs.BackgroundTransparency = 1.000
+UpdateLogs.BorderColor3 = Color3.fromRGB(0, 0, 0)
+UpdateLogs.BorderSizePixel = 0
+UpdateLogs.Position = UDim2.new(0.0205479451, 0, 0.25, 0)
+UpdateLogs.Size = UDim2.new(0.979452074, 0, 0.75, 0)
+UpdateLogs.Font = Enum.Font.Gotham
+UpdateLogs.Text = "v0.2 - Profile Info\\nv0.5.5 - Updated Fonts"
+UpdateLogs.TextColor3 = Color3.fromRGB(255, 255, 255)
+UpdateLogs.TextScaled = true
+UpdateLogs.TextSize = 11.000
+UpdateLogs.TextWrapped = true
+UpdateLogs.TextXAlignment = Enum.TextXAlignment.Left
+UpdateLogs.TextYAlignment = Enum.TextYAlignment.Top
+
+UIAspectRatioConstraint_8.Parent = UpdateLogs
+UIAspectRatioConstraint_8.AspectRatio = 3.857
+
+UITextSizeConstraint_6.Parent = UpdateLogs
+UITextSizeConstraint_6.MaxTextSize = 11
+
+UIAspectRatioConstraint_9.Parent = UpdatesFrame
+UIAspectRatioConstraint_9.AspectRatio = 2.953
+
+ToolsFrame.Name = "ToolsFrame"
+ToolsFrame.Parent = MainFrame
+ToolsFrame.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+ToolsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ToolsFrame.BorderSizePixel = 0
+ToolsFrame.Position = UDim2.new(0.621950805, 0, 0.209297955, 0)
+ToolsFrame.Size = UDim2.new(0.344632775, 0, 0.740983605, 0)
+
+UICorner_7.CornerRadius = UDim.new(0, 15)
+UICorner_7.Parent = ToolsFrame
+
+RejoinButton.Name = "RejoinButton"
+RejoinButton.Parent = ToolsFrame
+RejoinButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+RejoinButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+RejoinButton.BorderSizePixel = 0
+RejoinButton.Position = UDim2.new(0.256830603, 0, 0.800884962, 0)
+RejoinButton.Size = UDim2.new(0.48087433, 0, 0.168141589, 0)
+RejoinButton.Font = Enum.Font.GothamBold
+RejoinButton.Text = "Rejoin"
+RejoinButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+RejoinButton.TextScaled = true
+RejoinButton.TextSize = 12.000
+RejoinButton.TextWrapped = true
+
+UICorner_8.CornerRadius = UDim.new(0, 10)
+UICorner_8.Parent = RejoinButton
+
+UIAspectRatioConstraint_10.Parent = RejoinButton
+UIAspectRatioConstraint_10.AspectRatio = 2.342
+
+UITextSizeConstraint_7.Parent = RejoinButton
+UITextSizeConstraint_7.MaxTextSize = 12
+
+UIAspectRatioConstraint_11.Parent = ToolsFrame
+UIAspectRatioConstraint_11.AspectRatio = 0.819
+
+TaxiBossAutoFarmButton.Name = "TaxiBossAutoFarmButton"
+TaxiBossAutoFarmButton.Parent = ToolsFrame
+TaxiBossAutoFarmButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+TaxiBossAutoFarmButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TaxiBossAutoFarmButton.BorderSizePixel = 0
+TaxiBossAutoFarmButton.Position = UDim2.new(0.147151455, 0, 0.0284172408, 0)
+TaxiBossAutoFarmButton.Size = UDim2.new(0.69475019, 0, 0.242924988, 0)
+TaxiBossAutoFarmButton.Font = Enum.Font.GothamBold
+TaxiBossAutoFarmButton.Text = "Taxi Boss"
+TaxiBossAutoFarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+TaxiBossAutoFarmButton.TextScaled = true
+TaxiBossAutoFarmButton.TextSize = 12.000
+TaxiBossAutoFarmButton.TextWrapped = true
+
+UICorner_9.CornerRadius = UDim.new(0, 10)
+UICorner_9.Parent = TaxiBossAutoFarmButton
+
+UIAspectRatioConstraint_12.Parent = TaxiBossAutoFarmButton
+UIAspectRatioConstraint_12.AspectRatio = 2.342
+
+UITextSizeConstraint_8.Parent = TaxiBossAutoFarmButton
+UITextSizeConstraint_8.MaxTextSize = 12
+
+CreditsLabel.Name = "CreditsLabel"
+CreditsLabel.Parent = MainFrame
+CreditsLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CreditsLabel.BackgroundTransparency = 1.000
+CreditsLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CreditsLabel.BorderSizePixel = 0
+CreditsLabel.Position = UDim2.new(-6.02597154e-08, 0, 0.921311498, 0)
+CreditsLabel.Size = UDim2.new(0.12451534, 0, 0.0657734871, 0)
+CreditsLabel.Font = Enum.Font.SourceSansBold
+CreditsLabel.Text = "@raiwesy"
+CreditsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+CreditsLabel.TextScaled = true
+CreditsLabel.TextSize = 14.000
+CreditsLabel.TextWrapped = true
+
+UITextSizeConstraint_9.Parent = CreditsLabel
+UITextSizeConstraint_9.MaxTextSize = 14
+
+UIAspectRatioConstraint_13.Parent = CreditsLabel
+UIAspectRatioConstraint_13.AspectRatio = 3.333
+
+UIAspectRatioConstraint_14.Parent = MainFrame
+UIAspectRatioConstraint_14.AspectRatio = 1.761
+
+MinimizeButton.Name = "MinimizeButton"
+MinimizeButton.Parent = MainFrame
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton.BackgroundTransparency = 1.000
+MinimizeButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+MinimizeButton.BorderSizePixel = 0
+MinimizeButton.Position = UDim2.new(0.845000029, 0, 0.0130000003, 0)
+MinimizeButton.Size = UDim2.new(0.075598605, 0, 0.133113012, 0)
+MinimizeButton.Image = "rbxassetid://2777726146"
+
+UIAspectRatioConstraint_15.Parent = MinimizeButton
+
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = MainFrame
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.BackgroundTransparency = 1.000
+CloseButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CloseButton.BorderSizePixel = 0
+CloseButton.Position = UDim2.new(0.911036849, 0, 0.0133113004, 0)
+CloseButton.Size = UDim2.new(0.075598605, 0, 0.133113012, 0)
+CloseButton.Image = "rbxassetid://2777727756"
+
+UIAspectRatioConstraint_16.Parent = CloseButton
+
+UIAspectRatioConstraint_17.Parent = ScreenGui
+UIAspectRatioConstraint_17.AspectRatio = 1.895
+
+OpenButton.Name = "OpenButton"
+OpenButton.Parent = ScreenGui
+OpenButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+OpenButton.BackgroundTransparency = 0.500
+OpenButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+OpenButton.BorderSizePixel = 0
+OpenButton.Position = UDim2.new(0.46875, 0, 0, 0)
+OpenButton.Size = UDim2.new(0.0625, 0, 0.118443318, 0)
+OpenButton.Visible = false
+OpenButton.Image = "rbxassetid://17067378926"
+OpenButton.ScaleType = Enum.ScaleType.Fit
+
+UICorner_10.CornerRadius = UDim.new(1, 0)
+UICorner_10.Parent = OpenButton
+
+UIAspectRatioConstraint_18.Parent = OpenButton
+
+-- Scripts:
+
+local function SNINDAT_fake_script() -- AvatarImage.LocalScript 
+	local script = Instance.new('LocalScript', AvatarImage)
+
+	local imageLabel = script.Parent
+	
+	
+	local playerId = game.Players.LocalPlayer.UserId
+	local imageUrl = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. tostring(playerId) .. "&width=420&height=420&format=png"
+	
+	
+	imageLabel.Image = imageUrl
+	
+end
+coroutine.wrap(SNINDAT_fake_script)()
+local function EKCR_fake_script() -- PlayerName.LocalScript 
+	local script = Instance.new('LocalScript', PlayerName)
+
+	local label = script.Parent
+	
+	label.Text = game.Players.LocalPlayer.Name
+	
+end
+coroutine.wrap(EKCR_fake_script)()
+local function LNTQMR_fake_script() -- RejoinButton.LocalScript 
+	local script = Instance.new('LocalScript', RejoinButton)
+
+	script.Parent.MouseButton1Click:Connect(function()
+	
+		local TeleportService = game:GetService("TeleportService")
+	
+		-- Oyuna yeniden katılmak için fonksiyon
+		local function RejoinGame()
+			local success, errorMessage = pcall(function()
+				local gameId = game.GameId
+				if gameId then
+					TeleportService:TeleportToGameInstance(gameId, game.Players.LocalPlayer)
+				else
+					warn("Oyun ID'si bulunamadı.")
+				end
+			end)
+	
+			if not success then
+				warn("Yeniden katılma başarısız: " .. errorMessage)
+			end
+		end
+	
+		-- Belirli bir süre sonra otomatik olarak yeniden katılma
+		wait(1) -- Örnek olarak, 10 saniye sonra yeniden katılma yapılacak
+		RejoinGame()
+	
+	
+	end)
+end
+coroutine.wrap(LNTQMR_fake_script)()
+local function ZJHXVFD_fake_script() -- TaxiBossAutoFarmButton.LocalScript 
+	local script = Instance.new('LocalScript', TaxiBossAutoFarmButton)
+
+	script.Parent.MouseButton1Click:Connect(function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/StrongBomber/projectluacore/main/taxiboss.lua')()
+	end)
+end
+coroutine.wrap(ZJHXVFD_fake_script)()
+local function RQRVENF_fake_script() -- MinimizeButton.LocalScript 
+	local script = Instance.new('LocalScript', MinimizeButton)
+
+	local Frame = script.Parent.Parent.Parent.MainFrame
+	local OpenB = script.Parent.Parent.Parent.OpenButton
+	
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		Frame.Visible = false
+		OpenB.Visible = true
+	end)
+end
+coroutine.wrap(RQRVENF_fake_script)()
+local function LBTTK_fake_script() -- CloseButton.LocalScript 
+	local script = Instance.new('LocalScript', CloseButton)
+
+	local Frame = script.Parent.Parent.Parent.MainFrame
+	
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		Frame:Destroy()
+	end)
+end
+coroutine.wrap(LBTTK_fake_script)()
+local function WPKMX_fake_script() -- OpenButton.LocalScript 
+	local script = Instance.new('LocalScript', OpenButton)
+
+	local Frame = script.Parent.Parent.MainFrame
+	local OpenB = script.Parent
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		Frame.Visible = true
+		OpenB.Visible = false
+	end)
+end
+coroutine.wrap(WPKMX_fake_script)()
