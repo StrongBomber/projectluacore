@@ -4,79 +4,129 @@
 -- Instances:
 
 local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
+local ScriptsFrame = Instance.new("Frame")
 local UICorner = Instance.new("UICorner")
 local TopLabel = Instance.new("TextLabel")
 local UICorner_2 = Instance.new("UICorner")
-local version = Instance.new("TextLabel")
-local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
 local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+local CreditsLabel = Instance.new("TextLabel")
 local UITextSizeConstraint_2 = Instance.new("UITextSizeConstraint")
 local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
-local ProfileFrame = Instance.new("Frame")
-local UICorner_3 = Instance.new("UICorner")
-local AvatarImage = Instance.new("ImageLabel")
-local UICorner_4 = Instance.new("UICorner")
 local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
-local WelcomeLabel = Instance.new("TextLabel")
+local MinimizeButton = Instance.new("ImageButton")
 local UIAspectRatioConstraint_4 = Instance.new("UIAspectRatioConstraint")
-local UITextSizeConstraint_3 = Instance.new("UITextSizeConstraint")
-local PlayerName = Instance.new("TextLabel")
+local CloseButton = Instance.new("ImageButton")
 local UIAspectRatioConstraint_5 = Instance.new("UIAspectRatioConstraint")
-local UITextSizeConstraint_4 = Instance.new("UITextSizeConstraint")
+local Scripts = Instance.new("Frame")
+local Hack1 = Instance.new("Frame")
+local UIGradient = Instance.new("UIGradient")
+local UICorner_3 = Instance.new("UICorner")
+local GameThumbnail = Instance.new("ImageLabel")
+local UICorner_4 = Instance.new("UICorner")
 local UIAspectRatioConstraint_6 = Instance.new("UIAspectRatioConstraint")
-local UpdatesFrame = Instance.new("Frame")
-local UICorner_5 = Instance.new("UICorner")
-local UpdatesLabel = Instance.new("TextLabel")
-local UICorner_6 = Instance.new("UICorner")
+local GameName = Instance.new("TextLabel")
 local UIAspectRatioConstraint_7 = Instance.new("UIAspectRatioConstraint")
-local UITextSizeConstraint_5 = Instance.new("UITextSizeConstraint")
-local UpdateLogs = Instance.new("TextLabel")
+local UITextSizeConstraint_3 = Instance.new("UITextSizeConstraint")
+local RunButton = Instance.new("TextButton")
+local UICorner_5 = Instance.new("UICorner")
+local UIGradient_2 = Instance.new("UIGradient")
+local TextLabel = Instance.new("TextLabel")
 local UIAspectRatioConstraint_8 = Instance.new("UIAspectRatioConstraint")
-local UITextSizeConstraint_6 = Instance.new("UITextSizeConstraint")
+local UITextSizeConstraint_4 = Instance.new("UITextSizeConstraint")
 local UIAspectRatioConstraint_9 = Instance.new("UIAspectRatioConstraint")
-local ToolsFrame = Instance.new("Frame")
-local UICorner_7 = Instance.new("UICorner")
-local RejoinButton = Instance.new("TextButton")
-local UICorner_8 = Instance.new("UICorner")
+local UITextSizeConstraint_5 = Instance.new("UITextSizeConstraint")
 local UIAspectRatioConstraint_10 = Instance.new("UIAspectRatioConstraint")
-local UITextSizeConstraint_7 = Instance.new("UITextSizeConstraint")
+local TextLabel_2 = Instance.new("TextLabel")
 local UIAspectRatioConstraint_11 = Instance.new("UIAspectRatioConstraint")
-local TaxiBossAutoFarmButton = Instance.new("TextButton")
-local UICorner_9 = Instance.new("UICorner")
+local UITextSizeConstraint_6 = Instance.new("UITextSizeConstraint")
+local UICorner_6 = Instance.new("UICorner")
 local UIAspectRatioConstraint_12 = Instance.new("UIAspectRatioConstraint")
-local UITextSizeConstraint_8 = Instance.new("UITextSizeConstraint")
-local CreditsLabel = Instance.new("TextLabel")
-local UITextSizeConstraint_9 = Instance.new("UITextSizeConstraint")
+local HomeButton = Instance.new("ImageButton")
+local UICorner_7 = Instance.new("UICorner")
+local UIGradient_3 = Instance.new("UIGradient")
+local ImageLabel = Instance.new("ImageLabel")
 local UIAspectRatioConstraint_13 = Instance.new("UIAspectRatioConstraint")
 local UIAspectRatioConstraint_14 = Instance.new("UIAspectRatioConstraint")
-local MinimizeButton = Instance.new("ImageButton")
 local UIAspectRatioConstraint_15 = Instance.new("UIAspectRatioConstraint")
-local CloseButton = Instance.new("ImageButton")
-local UIAspectRatioConstraint_16 = Instance.new("UIAspectRatioConstraint")
-local UIAspectRatioConstraint_17 = Instance.new("UIAspectRatioConstraint")
 local OpenButton = Instance.new("ImageButton")
+local UICorner_8 = Instance.new("UICorner")
+local UIAspectRatioConstraint_16 = Instance.new("UIAspectRatioConstraint")
+local MainFrame = Instance.new("Frame")
+local UICorner_9 = Instance.new("UICorner")
+local TopLabel_2 = Instance.new("TextLabel")
 local UICorner_10 = Instance.new("UICorner")
+local UITextSizeConstraint_7 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_17 = Instance.new("UIAspectRatioConstraint")
+local ProfileFrame = Instance.new("Frame")
+local UICorner_11 = Instance.new("UICorner")
+local AvatarImage = Instance.new("ImageLabel")
+local UICorner_12 = Instance.new("UICorner")
 local UIAspectRatioConstraint_18 = Instance.new("UIAspectRatioConstraint")
+local WelcomeLabel = Instance.new("TextLabel")
+local UIAspectRatioConstraint_19 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_8 = Instance.new("UITextSizeConstraint")
+local PlayerName = Instance.new("TextLabel")
+local UIAspectRatioConstraint_20 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_9 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_21 = Instance.new("UIAspectRatioConstraint")
+local UpdatesFrame = Instance.new("Frame")
+local UICorner_13 = Instance.new("UICorner")
+local UpdatesLabel = Instance.new("TextLabel")
+local UICorner_14 = Instance.new("UICorner")
+local UIAspectRatioConstraint_22 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_10 = Instance.new("UITextSizeConstraint")
+local UpdateLogs = Instance.new("TextLabel")
+local UIAspectRatioConstraint_23 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_11 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_24 = Instance.new("UIAspectRatioConstraint")
+local ToolsFrame = Instance.new("Frame")
+local UICorner_15 = Instance.new("UICorner")
+local UIAspectRatioConstraint_25 = Instance.new("UIAspectRatioConstraint")
+local PlayerButton = Instance.new("ImageButton")
+local UICorner_16 = Instance.new("UICorner")
+local ImageLabel_2 = Instance.new("ImageLabel")
+local UICorner_17 = Instance.new("UICorner")
+local UIGradient_4 = Instance.new("UIGradient")
+local UIAspectRatioConstraint_26 = Instance.new("UIAspectRatioConstraint")
+local UIGradient_5 = Instance.new("UIGradient")
+local UIAspectRatioConstraint_27 = Instance.new("UIAspectRatioConstraint")
+local ScriptsButton = Instance.new("ImageButton")
+local UICorner_18 = Instance.new("UICorner")
+local ImageLabel_3 = Instance.new("ImageLabel")
+local UICorner_19 = Instance.new("UICorner")
+local UIGradient_6 = Instance.new("UIGradient")
+local UIAspectRatioConstraint_28 = Instance.new("UIAspectRatioConstraint")
+local UIGradient_7 = Instance.new("UIGradient")
+local UIAspectRatioConstraint_29 = Instance.new("UIAspectRatioConstraint")
+local CreditsLabel_2 = Instance.new("TextLabel")
+local UITextSizeConstraint_12 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_30 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_31 = Instance.new("UIAspectRatioConstraint")
+local MinimizeButton_2 = Instance.new("ImageButton")
+local UIAspectRatioConstraint_32 = Instance.new("UIAspectRatioConstraint")
+local CloseButton_2 = Instance.new("ImageButton")
+local UIAspectRatioConstraint_33 = Instance.new("UIAspectRatioConstraint")
 
 --Properties:
 
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-MainFrame.Name = "MainFrame"
-MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
-MainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-MainFrame.BorderSizePixel = 0
-MainFrame.Position = UDim2.new(0.269331008, 0, 0.190283403, 0)
-MainFrame.Size = UDim2.new(0.472419888, 0, 0.508454382, 0)
+ScriptsFrame.Name = "ScriptsFrame"
+ScriptsFrame.Parent = ScreenGui
+ScriptsFrame.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
+ScriptsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ScriptsFrame.BorderSizePixel = 0
+ScriptsFrame.Position = UDim2.new(0.269331008, 0, 0.190283403, 0)
+ScriptsFrame.Size = UDim2.new(0.472419888, 0, 0.508454382, 0)
+ScriptsFrame.Visible = false
 
 UICorner.CornerRadius = UDim.new(0, 15)
-UICorner.Parent = MainFrame
+UICorner.Parent = ScriptsFrame
 
 TopLabel.Name = "TopLabel"
-TopLabel.Parent = MainFrame
+TopLabel.Parent = ScriptsFrame
 TopLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 TopLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 TopLabel.BorderSizePixel = 0
@@ -92,33 +142,280 @@ TopLabel.TextXAlignment = Enum.TextXAlignment.Left
 UICorner_2.CornerRadius = UDim.new(0, 7)
 UICorner_2.Parent = TopLabel
 
-version.Name = "version"
-version.Parent = TopLabel
-version.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-version.BackgroundTransparency = 1.000
-version.BorderColor3 = Color3.fromRGB(0, 0, 0)
-version.BorderSizePixel = 0
-version.Position = UDim2.new(0.24482125, 0, 0.24000001, 0)
-version.Size = UDim2.new(0.377000004, 0, 0.49000001, 0)
-version.Font = Enum.Font.Cartoon
-version.Text = "v0.5.5"
-version.TextColor3 = Color3.fromRGB(106, 106, 106)
-version.TextScaled = true
-version.TextSize = 14.000
-version.TextWrapped = true
-version.TextXAlignment = Enum.TextXAlignment.Left
+UITextSizeConstraint.Parent = TopLabel
+UITextSizeConstraint.MaxTextSize = 15
 
-UIAspectRatioConstraint.Parent = version
-UIAspectRatioConstraint.AspectRatio = 8.264
+UIAspectRatioConstraint.Parent = TopLabel
+UIAspectRatioConstraint.AspectRatio = 10.741
 
-UITextSizeConstraint.Parent = version
-UITextSizeConstraint.MaxTextSize = 14
+CreditsLabel.Name = "CreditsLabel"
+CreditsLabel.Parent = ScriptsFrame
+CreditsLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CreditsLabel.BackgroundTransparency = 1.000
+CreditsLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CreditsLabel.BorderSizePixel = 0
+CreditsLabel.Position = UDim2.new(-6.02597154e-08, 0, 0.921311498, 0)
+CreditsLabel.Size = UDim2.new(0.12451534, 0, 0.0657734796, 0)
+CreditsLabel.Font = Enum.Font.SourceSansBold
+CreditsLabel.Text = "@raiwesy"
+CreditsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+CreditsLabel.TextScaled = true
+CreditsLabel.TextSize = 14.000
+CreditsLabel.TextWrapped = true
 
-UITextSizeConstraint_2.Parent = TopLabel
-UITextSizeConstraint_2.MaxTextSize = 15
+UITextSizeConstraint_2.Parent = CreditsLabel
+UITextSizeConstraint_2.MaxTextSize = 14
 
-UIAspectRatioConstraint_2.Parent = TopLabel
-UIAspectRatioConstraint_2.AspectRatio = 10.741
+UIAspectRatioConstraint_2.Parent = CreditsLabel
+UIAspectRatioConstraint_2.AspectRatio = 3.333
+
+UIAspectRatioConstraint_3.Parent = ScriptsFrame
+UIAspectRatioConstraint_3.AspectRatio = 1.761
+
+MinimizeButton.Name = "MinimizeButton"
+MinimizeButton.Parent = ScriptsFrame
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton.BackgroundTransparency = 1.000
+MinimizeButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+MinimizeButton.BorderSizePixel = 0
+MinimizeButton.Position = UDim2.new(0.845000029, 0, 0.0130000003, 0)
+MinimizeButton.Size = UDim2.new(0.075598605, 0, 0.133113012, 0)
+MinimizeButton.Image = "rbxassetid://2777726146"
+
+UIAspectRatioConstraint_4.Parent = MinimizeButton
+
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = ScriptsFrame
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.BackgroundTransparency = 1.000
+CloseButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CloseButton.BorderSizePixel = 0
+CloseButton.Position = UDim2.new(0.911036849, 0, 0.0133113004, 0)
+CloseButton.Size = UDim2.new(0.075598605, 0, 0.133113012, 0)
+CloseButton.Image = "rbxassetid://2777727756"
+
+UIAspectRatioConstraint_5.Parent = CloseButton
+
+Scripts.Name = "Scripts"
+Scripts.Parent = ScriptsFrame
+Scripts.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+Scripts.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Scripts.BorderSizePixel = 0
+Scripts.Position = UDim2.new(0.0472491868, 0, 0.206325322, 0)
+Scripts.Size = UDim2.new(0.905293286, 0, 0.665565014, 0)
+
+Hack1.Name = "Hack#1"
+Hack1.Parent = Scripts
+Hack1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Hack1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Hack1.BorderSizePixel = 0
+Hack1.Position = UDim2.new(0.0199574772, 0, 0.14945282, 0)
+Hack1.Size = UDim2.new(0.538622141, 0, 0.574999988, 0)
+
+UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(15, 15, 15)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(91, 91, 91))}
+UIGradient.Rotation = -90
+UIGradient.Parent = Hack1
+
+UICorner_3.CornerRadius = UDim.new(0, 9)
+UICorner_3.Parent = Hack1
+
+GameThumbnail.Name = "GameThumbnail"
+GameThumbnail.Parent = Hack1
+GameThumbnail.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+GameThumbnail.BorderColor3 = Color3.fromRGB(0, 0, 0)
+GameThumbnail.BorderSizePixel = 0
+GameThumbnail.Position = UDim2.new(0.0271317828, 0, 0.0695652142, 0)
+GameThumbnail.Size = UDim2.new(0.945736408, 0, 0.5826087, 0)
+GameThumbnail.Image = "rbxassetid://17077925726"
+GameThumbnail.ScaleType = Enum.ScaleType.Crop
+
+UICorner_4.Parent = GameThumbnail
+
+UIAspectRatioConstraint_6.Parent = GameThumbnail
+UIAspectRatioConstraint_6.AspectRatio = 3.642
+
+GameName.Name = "GameName"
+GameName.Parent = Hack1
+GameName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+GameName.BackgroundTransparency = 1.000
+GameName.BorderColor3 = Color3.fromRGB(0, 0, 0)
+GameName.BorderSizePixel = 0
+GameName.Position = UDim2.new(0.0348837227, 0, 0.652173936, 0)
+GameName.Size = UDim2.new(0.554263592, 0, 0.347826093, 0)
+GameName.Font = Enum.Font.FredokaOne
+GameName.Text = "Taxi Boss"
+GameName.TextColor3 = Color3.fromRGB(255, 255, 255)
+GameName.TextScaled = true
+GameName.TextSize = 16.000
+GameName.TextWrapped = true
+GameName.TextXAlignment = Enum.TextXAlignment.Left
+
+UIAspectRatioConstraint_7.Parent = GameName
+UIAspectRatioConstraint_7.AspectRatio = 3.575
+
+UITextSizeConstraint_3.Parent = GameName
+UITextSizeConstraint_3.MaxTextSize = 16
+
+RunButton.Name = "RunButton"
+RunButton.Parent = Hack1
+RunButton.Active = false
+RunButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+RunButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+RunButton.BorderSizePixel = 0
+RunButton.Position = UDim2.new(0.689922452, 0, 0.695652187, 0)
+RunButton.Selectable = false
+RunButton.Size = UDim2.new(0.282945722, 0, 0.252173871, 0)
+RunButton.Text = ""
+RunButton.TextScaled = true
+RunButton.TextWrapped = true
+
+UICorner_5.Parent = RunButton
+
+UIGradient_2.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(47, 255, 0)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(11, 143, 33))}
+UIGradient_2.Parent = RunButton
+
+TextLabel.Parent = RunButton
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.BorderSizePixel = 0
+TextLabel.Position = UDim2.new(0.246575341, 0, 0.275862068, 0)
+TextLabel.Size = UDim2.new(0.507302284, 0, 0.448676616, 0)
+TextLabel.Font = Enum.Font.FredokaOne
+TextLabel.Text = "Run"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextScaled = true
+TextLabel.TextSize = 14.000
+TextLabel.TextWrapped = true
+
+UIAspectRatioConstraint_8.Parent = TextLabel
+UIAspectRatioConstraint_8.AspectRatio = 2.846
+
+UITextSizeConstraint_4.Parent = TextLabel
+UITextSizeConstraint_4.MaxTextSize = 14
+
+UIAspectRatioConstraint_9.Parent = RunButton
+UIAspectRatioConstraint_9.AspectRatio = 2.517
+
+UITextSizeConstraint_5.Parent = RunButton
+UITextSizeConstraint_5.MaxTextSize = 8
+
+UIAspectRatioConstraint_10.Parent = Hack1
+UIAspectRatioConstraint_10.AspectRatio = 2.243
+
+TextLabel_2.Parent = Scripts
+TextLabel_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_2.BackgroundTransparency = 1.000
+TextLabel_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel_2.BorderSizePixel = 0
+TextLabel_2.Position = UDim2.new(0.0208768267, 0, 0.0350000001, 0)
+TextLabel_2.Size = UDim2.new(0.121085592, 0, 0.109999999, 0)
+TextLabel_2.Font = Enum.Font.FredokaOne
+TextLabel_2.Text = "Scripts"
+TextLabel_2.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_2.TextScaled = true
+TextLabel_2.TextSize = 19.000
+TextLabel_2.TextWrapped = true
+TextLabel_2.TextXAlignment = Enum.TextXAlignment.Left
+TextLabel_2.TextYAlignment = Enum.TextYAlignment.Top
+
+UIAspectRatioConstraint_11.Parent = TextLabel_2
+UIAspectRatioConstraint_11.AspectRatio = 2.636
+
+UITextSizeConstraint_6.Parent = TextLabel_2
+UITextSizeConstraint_6.MaxTextSize = 19
+
+UICorner_6.CornerRadius = UDim.new(0, 10)
+UICorner_6.Parent = Scripts
+
+UIAspectRatioConstraint_12.Parent = Scripts
+UIAspectRatioConstraint_12.AspectRatio = 2.395
+
+HomeButton.Name = "HomeButton"
+HomeButton.Parent = ScriptsFrame
+HomeButton.Active = false
+HomeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+HomeButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+HomeButton.BorderSizePixel = 0
+HomeButton.Position = UDim2.new(-0.202226207, 0, 0.0133112501, 0)
+HomeButton.Selectable = false
+HomeButton.Size = UDim2.new(0.188996509, 0, 0.332782477, 0)
+
+UICorner_7.CornerRadius = UDim.new(0, 15)
+UICorner_7.Parent = HomeButton
+
+UIGradient_3.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 157)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(140, 0, 255))}
+UIGradient_3.Rotation = 135
+UIGradient_3.Parent = HomeButton
+
+ImageLabel.Parent = HomeButton
+ImageLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ImageLabel.BackgroundTransparency = 1.000
+ImageLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ImageLabel.BorderSizePixel = 0
+ImageLabel.Position = UDim2.new(0.170000002, 0, 0.170000002, 0)
+ImageLabel.Size = UDim2.new(0.660000026, 0, 0.660000086, 0)
+ImageLabel.Image = "http://www.roblox.com/asset/?id=14219650242"
+ImageLabel.ScaleType = Enum.ScaleType.Fit
+
+UIAspectRatioConstraint_13.Parent = ImageLabel
+
+UIAspectRatioConstraint_14.Parent = HomeButton
+UIAspectRatioConstraint_14.AspectRatio = 1.000
+
+UIAspectRatioConstraint_15.Parent = ScreenGui
+UIAspectRatioConstraint_15.AspectRatio = 1.895
+
+OpenButton.Name = "OpenButton"
+OpenButton.Parent = ScreenGui
+OpenButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+OpenButton.BackgroundTransparency = 0.500
+OpenButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+OpenButton.BorderSizePixel = 0
+OpenButton.Position = UDim2.new(0.46875, 0, 0, 0)
+OpenButton.Size = UDim2.new(0.0625, 0, 0.118443318, 0)
+OpenButton.Visible = false
+OpenButton.Image = "rbxassetid://17067378926"
+OpenButton.ScaleType = Enum.ScaleType.Fit
+
+UICorner_8.CornerRadius = UDim.new(1, 0)
+UICorner_8.Parent = OpenButton
+
+UIAspectRatioConstraint_16.Parent = OpenButton
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
+MainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.269331008, 0, 0.190283403, 0)
+MainFrame.Size = UDim2.new(0.472419888, 0, 0.508454382, 0)
+
+UICorner_9.CornerRadius = UDim.new(0, 15)
+UICorner_9.Parent = MainFrame
+
+TopLabel_2.Name = "TopLabel"
+TopLabel_2.Parent = MainFrame
+TopLabel_2.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+TopLabel_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TopLabel_2.BorderSizePixel = 0
+TopLabel_2.Size = UDim2.new(1, 0, 0.16393441, 0)
+TopLabel_2.Font = Enum.Font.GothamBold
+TopLabel_2.Text = "   Project Luacore "
+TopLabel_2.TextColor3 = Color3.fromRGB(255, 255, 255)
+TopLabel_2.TextScaled = true
+TopLabel_2.TextSize = 15.000
+TopLabel_2.TextWrapped = true
+TopLabel_2.TextXAlignment = Enum.TextXAlignment.Left
+
+UICorner_10.CornerRadius = UDim.new(0, 7)
+UICorner_10.Parent = TopLabel_2
+
+UITextSizeConstraint_7.Parent = TopLabel_2
+UITextSizeConstraint_7.MaxTextSize = 15
+
+UIAspectRatioConstraint_17.Parent = TopLabel_2
+UIAspectRatioConstraint_17.AspectRatio = 10.741
 
 ProfileFrame.Name = "ProfileFrame"
 ProfileFrame.Parent = MainFrame
@@ -128,8 +425,8 @@ ProfileFrame.BorderSizePixel = 0
 ProfileFrame.Position = UDim2.new(0.0306137595, 0, 0.209297955, 0)
 ProfileFrame.Size = UDim2.new(0.549905837, 0, 0.26557377, 0)
 
-UICorner_3.CornerRadius = UDim.new(0, 7)
-UICorner_3.Parent = ProfileFrame
+UICorner_11.CornerRadius = UDim.new(0, 7)
+UICorner_11.Parent = ProfileFrame
 
 AvatarImage.Name = "AvatarImage"
 AvatarImage.Parent = ProfileFrame
@@ -143,11 +440,11 @@ AvatarImage.ZIndex = 5
 AvatarImage.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
 AvatarImage.ScaleType = Enum.ScaleType.Tile
 
-UICorner_4.CornerRadius = UDim.new(1, 0)
-UICorner_4.Parent = AvatarImage
+UICorner_12.CornerRadius = UDim.new(1, 0)
+UICorner_12.Parent = AvatarImage
 
-UIAspectRatioConstraint_3.Parent = AvatarImage
-UIAspectRatioConstraint_3.AspectRatio = 1.011
+UIAspectRatioConstraint_18.Parent = AvatarImage
+UIAspectRatioConstraint_18.AspectRatio = 1.011
 
 WelcomeLabel.Name = "WelcomeLabel"
 WelcomeLabel.Parent = ProfileFrame
@@ -165,11 +462,11 @@ WelcomeLabel.TextSize = 14.000
 WelcomeLabel.TextWrapped = true
 WelcomeLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-UIAspectRatioConstraint_4.Parent = WelcomeLabel
-UIAspectRatioConstraint_4.AspectRatio = 1.738
+UIAspectRatioConstraint_19.Parent = WelcomeLabel
+UIAspectRatioConstraint_19.AspectRatio = 1.738
 
-UITextSizeConstraint_3.Parent = WelcomeLabel
-UITextSizeConstraint_3.MaxTextSize = 14
+UITextSizeConstraint_8.Parent = WelcomeLabel
+UITextSizeConstraint_8.MaxTextSize = 14
 
 PlayerName.Name = "PlayerName"
 PlayerName.Parent = ProfileFrame
@@ -187,14 +484,14 @@ PlayerName.TextSize = 12.000
 PlayerName.TextWrapped = true
 PlayerName.TextXAlignment = Enum.TextXAlignment.Left
 
-UIAspectRatioConstraint_5.Parent = PlayerName
-UIAspectRatioConstraint_5.AspectRatio = 3.176
+UIAspectRatioConstraint_20.Parent = PlayerName
+UIAspectRatioConstraint_20.AspectRatio = 3.176
 
-UITextSizeConstraint_4.Parent = PlayerName
-UITextSizeConstraint_4.MaxTextSize = 12
+UITextSizeConstraint_9.Parent = PlayerName
+UITextSizeConstraint_9.MaxTextSize = 12
 
-UIAspectRatioConstraint_6.Parent = ProfileFrame
-UIAspectRatioConstraint_6.AspectRatio = 3.646
+UIAspectRatioConstraint_21.Parent = ProfileFrame
+UIAspectRatioConstraint_21.AspectRatio = 3.646
 
 UpdatesFrame.Name = "UpdatesFrame"
 UpdatesFrame.Parent = MainFrame
@@ -204,8 +501,8 @@ UpdatesFrame.BorderSizePixel = 0
 UpdatesFrame.Position = UDim2.new(0.0306137595, 0, 0.540445447, 0)
 UpdatesFrame.Size = UDim2.new(0.549905837, 0, 0.327868849, 0)
 
-UICorner_5.CornerRadius = UDim.new(0, 7)
-UICorner_5.Parent = UpdatesFrame
+UICorner_13.CornerRadius = UDim.new(0, 7)
+UICorner_13.Parent = UpdatesFrame
 
 UpdatesLabel.Name = "UpdatesLabel"
 UpdatesLabel.Parent = UpdatesFrame
@@ -220,14 +517,14 @@ UpdatesLabel.TextScaled = true
 UpdatesLabel.TextSize = 13.000
 UpdatesLabel.TextWrapped = true
 
-UICorner_6.CornerRadius = UDim.new(0, 5)
-UICorner_6.Parent = UpdatesLabel
+UICorner_14.CornerRadius = UDim.new(0, 5)
+UICorner_14.Parent = UpdatesLabel
 
-UIAspectRatioConstraint_7.Parent = UpdatesLabel
-UIAspectRatioConstraint_7.AspectRatio = 11.813
+UIAspectRatioConstraint_22.Parent = UpdatesLabel
+UIAspectRatioConstraint_22.AspectRatio = 11.813
 
-UITextSizeConstraint_5.Parent = UpdatesLabel
-UITextSizeConstraint_5.MaxTextSize = 13
+UITextSizeConstraint_10.Parent = UpdatesLabel
+UITextSizeConstraint_10.MaxTextSize = 13
 
 UpdateLogs.Name = "UpdateLogs"
 UpdateLogs.Parent = UpdatesFrame
@@ -246,14 +543,14 @@ UpdateLogs.TextWrapped = true
 UpdateLogs.TextXAlignment = Enum.TextXAlignment.Left
 UpdateLogs.TextYAlignment = Enum.TextYAlignment.Top
 
-UIAspectRatioConstraint_8.Parent = UpdateLogs
-UIAspectRatioConstraint_8.AspectRatio = 3.857
+UIAspectRatioConstraint_23.Parent = UpdateLogs
+UIAspectRatioConstraint_23.AspectRatio = 3.857
 
-UITextSizeConstraint_6.Parent = UpdateLogs
-UITextSizeConstraint_6.MaxTextSize = 11
+UITextSizeConstraint_11.Parent = UpdateLogs
+UITextSizeConstraint_11.MaxTextSize = 11
 
-UIAspectRatioConstraint_9.Parent = UpdatesFrame
-UIAspectRatioConstraint_9.AspectRatio = 2.953
+UIAspectRatioConstraint_24.Parent = UpdatesFrame
+UIAspectRatioConstraint_24.AspectRatio = 2.953
 
 ToolsFrame.Name = "ToolsFrame"
 ToolsFrame.Parent = MainFrame
@@ -263,129 +560,204 @@ ToolsFrame.BorderSizePixel = 0
 ToolsFrame.Position = UDim2.new(0.621950805, 0, 0.209297955, 0)
 ToolsFrame.Size = UDim2.new(0.344632775, 0, 0.740983605, 0)
 
-UICorner_7.CornerRadius = UDim.new(0, 15)
-UICorner_7.Parent = ToolsFrame
+UICorner_15.CornerRadius = UDim.new(0, 15)
+UICorner_15.Parent = ToolsFrame
 
-RejoinButton.Name = "RejoinButton"
-RejoinButton.Parent = ToolsFrame
-RejoinButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-RejoinButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-RejoinButton.BorderSizePixel = 0
-RejoinButton.Position = UDim2.new(0.256830603, 0, 0.800884962, 0)
-RejoinButton.Size = UDim2.new(0.48087433, 0, 0.168141589, 0)
-RejoinButton.Font = Enum.Font.GothamBold
-RejoinButton.Text = "Rejoin"
-RejoinButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-RejoinButton.TextScaled = true
-RejoinButton.TextSize = 12.000
-RejoinButton.TextWrapped = true
+UIAspectRatioConstraint_25.Parent = ToolsFrame
+UIAspectRatioConstraint_25.AspectRatio = 0.819
 
-UICorner_8.CornerRadius = UDim.new(0, 10)
-UICorner_8.Parent = RejoinButton
+PlayerButton.Name = "PlayerButton"
+PlayerButton.Parent = ToolsFrame
+PlayerButton.Active = false
+PlayerButton.BackgroundColor3 = Color3.fromRGB(88, 88, 88)
+PlayerButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+PlayerButton.BorderSizePixel = 0
+PlayerButton.Position = UDim2.new(0.257747859, 0, 0.529948771, 0)
+PlayerButton.Selectable = false
+PlayerButton.Size = UDim2.new(0.471623719, 0, 0.386233866, 0)
 
-UIAspectRatioConstraint_10.Parent = RejoinButton
-UIAspectRatioConstraint_10.AspectRatio = 2.342
+UICorner_16.CornerRadius = UDim.new(0, 10)
+UICorner_16.Parent = PlayerButton
 
-UITextSizeConstraint_7.Parent = RejoinButton
-UITextSizeConstraint_7.MaxTextSize = 12
+ImageLabel_2.Parent = PlayerButton
+ImageLabel_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ImageLabel_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ImageLabel_2.BorderSizePixel = 0
+ImageLabel_2.Position = UDim2.new(0.139232546, 0, 0.142093033, 0)
+ImageLabel_2.Size = UDim2.new(0.709302306, 0, 0.709302306, 0)
+ImageLabel_2.Image = "http://www.roblox.com/asset/?id=7992557358"
+ImageLabel_2.ScaleType = Enum.ScaleType.Fit
 
-UIAspectRatioConstraint_11.Parent = ToolsFrame
-UIAspectRatioConstraint_11.AspectRatio = 0.819
+UICorner_17.CornerRadius = UDim.new(0, 10)
+UICorner_17.Parent = ImageLabel_2
 
-TaxiBossAutoFarmButton.Name = "TaxiBossAutoFarmButton"
-TaxiBossAutoFarmButton.Parent = ToolsFrame
-TaxiBossAutoFarmButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-TaxiBossAutoFarmButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-TaxiBossAutoFarmButton.BorderSizePixel = 0
-TaxiBossAutoFarmButton.Position = UDim2.new(0.147151455, 0, 0.0284172408, 0)
-TaxiBossAutoFarmButton.Size = UDim2.new(0.69475019, 0, 0.242924988, 0)
-TaxiBossAutoFarmButton.Font = Enum.Font.GothamBold
-TaxiBossAutoFarmButton.Text = "Taxi Boss"
-TaxiBossAutoFarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-TaxiBossAutoFarmButton.TextScaled = true
-TaxiBossAutoFarmButton.TextSize = 12.000
-TaxiBossAutoFarmButton.TextWrapped = true
+UIGradient_4.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(247, 0, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(45, 0, 181))}
+UIGradient_4.Rotation = 90
+UIGradient_4.Parent = ImageLabel_2
 
-UICorner_9.CornerRadius = UDim.new(0, 10)
-UICorner_9.Parent = TaxiBossAutoFarmButton
+UIAspectRatioConstraint_26.Parent = ImageLabel_2
 
-UIAspectRatioConstraint_12.Parent = TaxiBossAutoFarmButton
-UIAspectRatioConstraint_12.AspectRatio = 2.342
+UIGradient_5.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(0, 0, 0)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(172, 162, 162))}
+UIGradient_5.Rotation = 135
+UIGradient_5.Parent = PlayerButton
 
-UITextSizeConstraint_8.Parent = TaxiBossAutoFarmButton
-UITextSizeConstraint_8.MaxTextSize = 12
+UIAspectRatioConstraint_27.Parent = PlayerButton
 
-CreditsLabel.Name = "CreditsLabel"
-CreditsLabel.Parent = MainFrame
-CreditsLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-CreditsLabel.BackgroundTransparency = 1.000
-CreditsLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-CreditsLabel.BorderSizePixel = 0
-CreditsLabel.Position = UDim2.new(-6.02597154e-08, 0, 0.921311498, 0)
-CreditsLabel.Size = UDim2.new(0.12451534, 0, 0.0657734871, 0)
-CreditsLabel.Font = Enum.Font.SourceSansBold
-CreditsLabel.Text = "@raiwesy"
-CreditsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-CreditsLabel.TextScaled = true
-CreditsLabel.TextSize = 14.000
-CreditsLabel.TextWrapped = true
+ScriptsButton.Name = "ScriptsButton"
+ScriptsButton.Parent = ToolsFrame
+ScriptsButton.Active = false
+ScriptsButton.BackgroundColor3 = Color3.fromRGB(88, 88, 88)
+ScriptsButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ScriptsButton.BorderSizePixel = 0
+ScriptsButton.Position = UDim2.new(0.263231844, 0, 0.0583841875, 0)
+ScriptsButton.Selectable = false
+ScriptsButton.Size = UDim2.new(0.471623719, 0, 0.386233866, 0)
 
-UITextSizeConstraint_9.Parent = CreditsLabel
-UITextSizeConstraint_9.MaxTextSize = 14
+UICorner_18.CornerRadius = UDim.new(0, 10)
+UICorner_18.Parent = ScriptsButton
 
-UIAspectRatioConstraint_13.Parent = CreditsLabel
-UIAspectRatioConstraint_13.AspectRatio = 3.333
+ImageLabel_3.Parent = ScriptsButton
+ImageLabel_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ImageLabel_3.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ImageLabel_3.BorderSizePixel = 0
+ImageLabel_3.Position = UDim2.new(0.139232546, 0, 0.142093033, 0)
+ImageLabel_3.Size = UDim2.new(0.709302306, 0, 0.709302306, 0)
+ImageLabel_3.Image = "http://www.roblox.com/asset/?id=11570626761"
+ImageLabel_3.ScaleType = Enum.ScaleType.Fit
 
-UIAspectRatioConstraint_14.Parent = MainFrame
-UIAspectRatioConstraint_14.AspectRatio = 1.761
+UICorner_19.CornerRadius = UDim.new(0, 10)
+UICorner_19.Parent = ImageLabel_3
 
-MinimizeButton.Name = "MinimizeButton"
-MinimizeButton.Parent = MainFrame
-MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-MinimizeButton.BackgroundTransparency = 1.000
-MinimizeButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-MinimizeButton.BorderSizePixel = 0
-MinimizeButton.Position = UDim2.new(0.845000029, 0, 0.0130000003, 0)
-MinimizeButton.Size = UDim2.new(0.075598605, 0, 0.133113012, 0)
-MinimizeButton.Image = "rbxassetid://2777726146"
+UIGradient_6.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(2, 255, 44)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(25, 81, 20))}
+UIGradient_6.Rotation = 90
+UIGradient_6.Parent = ImageLabel_3
 
-UIAspectRatioConstraint_15.Parent = MinimizeButton
+UIAspectRatioConstraint_28.Parent = ImageLabel_3
 
-CloseButton.Name = "CloseButton"
-CloseButton.Parent = MainFrame
-CloseButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.BackgroundTransparency = 1.000
-CloseButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-CloseButton.BorderSizePixel = 0
-CloseButton.Position = UDim2.new(0.911036849, 0, 0.0133113004, 0)
-CloseButton.Size = UDim2.new(0.075598605, 0, 0.133113012, 0)
-CloseButton.Image = "rbxassetid://2777727756"
+UIGradient_7.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(0, 0, 0)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(172, 162, 162))}
+UIGradient_7.Rotation = 135
+UIGradient_7.Parent = ScriptsButton
 
-UIAspectRatioConstraint_16.Parent = CloseButton
+UIAspectRatioConstraint_29.Parent = ScriptsButton
 
-UIAspectRatioConstraint_17.Parent = ScreenGui
-UIAspectRatioConstraint_17.AspectRatio = 1.895
+CreditsLabel_2.Name = "CreditsLabel"
+CreditsLabel_2.Parent = MainFrame
+CreditsLabel_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CreditsLabel_2.BackgroundTransparency = 1.000
+CreditsLabel_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CreditsLabel_2.BorderSizePixel = 0
+CreditsLabel_2.Position = UDim2.new(-6.02597154e-08, 0, 0.921311498, 0)
+CreditsLabel_2.Size = UDim2.new(0.12451534, 0, 0.0657734871, 0)
+CreditsLabel_2.Font = Enum.Font.SourceSansBold
+CreditsLabel_2.Text = "@raiwesy"
+CreditsLabel_2.TextColor3 = Color3.fromRGB(255, 255, 255)
+CreditsLabel_2.TextScaled = true
+CreditsLabel_2.TextSize = 14.000
+CreditsLabel_2.TextWrapped = true
 
-OpenButton.Name = "OpenButton"
-OpenButton.Parent = ScreenGui
-OpenButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-OpenButton.BackgroundTransparency = 0.500
-OpenButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-OpenButton.BorderSizePixel = 0
-OpenButton.Position = UDim2.new(0.46875, 0, 0, 0)
-OpenButton.Size = UDim2.new(0.0625, 0, 0.118443318, 0)
-OpenButton.Visible = false
-OpenButton.Image = "rbxassetid://17067378926"
-OpenButton.ScaleType = Enum.ScaleType.Fit
+UITextSizeConstraint_12.Parent = CreditsLabel_2
+UITextSizeConstraint_12.MaxTextSize = 14
 
-UICorner_10.CornerRadius = UDim.new(1, 0)
-UICorner_10.Parent = OpenButton
+UIAspectRatioConstraint_30.Parent = CreditsLabel_2
+UIAspectRatioConstraint_30.AspectRatio = 3.333
 
-UIAspectRatioConstraint_18.Parent = OpenButton
+UIAspectRatioConstraint_31.Parent = MainFrame
+UIAspectRatioConstraint_31.AspectRatio = 1.761
+
+MinimizeButton_2.Name = "MinimizeButton"
+MinimizeButton_2.Parent = MainFrame
+MinimizeButton_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton_2.BackgroundTransparency = 1.000
+MinimizeButton_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+MinimizeButton_2.BorderSizePixel = 0
+MinimizeButton_2.Position = UDim2.new(0.845000029, 0, 0.0130000003, 0)
+MinimizeButton_2.Size = UDim2.new(0.075598605, 0, 0.133113012, 0)
+MinimizeButton_2.Image = "rbxassetid://2777726146"
+
+UIAspectRatioConstraint_32.Parent = MinimizeButton_2
+
+CloseButton_2.Name = "CloseButton"
+CloseButton_2.Parent = MainFrame
+CloseButton_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton_2.BackgroundTransparency = 1.000
+CloseButton_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CloseButton_2.BorderSizePixel = 0
+CloseButton_2.Position = UDim2.new(0.911036849, 0, 0.0133113004, 0)
+CloseButton_2.Size = UDim2.new(0.075598605, 0, 0.133113012, 0)
+CloseButton_2.Image = "rbxassetid://2777727756"
+
+UIAspectRatioConstraint_33.Parent = CloseButton_2
 
 -- Scripts:
 
-local function SNINDAT_fake_script() -- AvatarImage.LocalScript 
+local function IFCLJXA_fake_script() -- MinimizeButton.LocalScript 
+	local script = Instance.new('LocalScript', MinimizeButton)
+
+	local Frame = script.Parent.Parent.Parent.ScriptsFrame
+	local OpenB = script.Parent.Parent.Parent.OpenButton
+	
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		Frame.Visible = false
+		OpenB.Visible = true
+	end)
+end
+coroutine.wrap(IFCLJXA_fake_script)()
+local function MGVH_fake_script() -- CloseButton.LocalScript 
+	local script = Instance.new('LocalScript', CloseButton)
+
+	local Frame = script.Parent.Parent.Parent.ScriptsFrame
+	
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		Frame:Destroy()
+	end)
+end
+coroutine.wrap(MGVH_fake_script)()
+local function XJAL_fake_script() -- RunButton.LocalScript 
+	local script = Instance.new('LocalScript', RunButton)
+
+	local Run = script.Parent
+	
+	Run.MouseButton1Click:Connect(function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/StrongBomber/projectluacore/main/taxiboss.lua"))()
+		-- Credits @Raiwesy
+	end)
+end
+coroutine.wrap(XJAL_fake_script)()
+local function DZRTJV_fake_script() -- HomeButton.LocalScript 
+	local script = Instance.new('LocalScript', HomeButton)
+
+	local ScriptFrame = script.Parent.Parent.Parent.ScriptsFrame
+	local Home  = script.Parent.Parent.Parent.MainFrame
+	local Button = script.Parent
+	
+	Button.MouseButton1Click:Connect(function()
+		ScriptFrame.Visible = false
+		Home.Visible = true
+	end)
+end
+coroutine.wrap(DZRTJV_fake_script)()
+local function YLWTJ_fake_script() -- OpenButton.LocalScript 
+	local script = Instance.new('LocalScript', OpenButton)
+
+	local ScriptFrame = script.Parent.Parent.ScriptsFrame
+	local Frame = script.Parent.Parent.MainFrame
+	local OpenB = script.Parent
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		if ScriptFrame.Visible == true then
+			ScriptFrame.Visible = false
+			OpenB.Visible = true
+		else
+			Frame.Visible = not Frame.Visible
+			OpenB.Visible = not Frame.Visible
+		end
+	end)
+	
+end
+coroutine.wrap(YLWTJ_fake_script)()
+local function SPPW_fake_script() -- AvatarImage.LocalScript 
 	local script = Instance.new('LocalScript', AvatarImage)
 
 	local imageLabel = script.Parent
@@ -398,8 +770,8 @@ local function SNINDAT_fake_script() -- AvatarImage.LocalScript
 	imageLabel.Image = imageUrl
 	
 end
-coroutine.wrap(SNINDAT_fake_script)()
-local function EKCR_fake_script() -- PlayerName.LocalScript 
+coroutine.wrap(SPPW_fake_script)()
+local function ODXLTXZ_fake_script() -- PlayerName.LocalScript 
 	local script = Instance.new('LocalScript', PlayerName)
 
 	local label = script.Parent
@@ -407,48 +779,22 @@ local function EKCR_fake_script() -- PlayerName.LocalScript
 	label.Text = game.Players.LocalPlayer.Name
 	
 end
-coroutine.wrap(EKCR_fake_script)()
-local function LNTQMR_fake_script() -- RejoinButton.LocalScript 
-	local script = Instance.new('LocalScript', RejoinButton)
+coroutine.wrap(ODXLTXZ_fake_script)()
+local function CKKP_fake_script() -- ScriptsButton.LocalScript 
+	local script = Instance.new('LocalScript', ScriptsButton)
 
-	script.Parent.MouseButton1Click:Connect(function()
+	local Button = script.Parent
+	local Home = script.Parent.Parent.Parent.Parent.MainFrame
+	local Scripts = script.Parent.Parent.Parent.Parent.ScriptsFrame
 	
-		local TeleportService = game:GetService("TeleportService")
-	
-		-- Oyuna yeniden katılmak için fonksiyon
-		local function RejoinGame()
-			local success, errorMessage = pcall(function()
-				local gameId = game.GameId
-				if gameId then
-					TeleportService:TeleportToGameInstance(gameId, game.Players.LocalPlayer)
-				else
-					warn("Oyun ID'si bulunamadı.")
-				end
-			end)
-	
-			if not success then
-				warn("Yeniden katılma başarısız: " .. errorMessage)
-			end
-		end
-	
-		-- Belirli bir süre sonra otomatik olarak yeniden katılma
-		wait(1) -- Örnek olarak, 10 saniye sonra yeniden katılma yapılacak
-		RejoinGame()
-	
-	
+	Button.MouseButton1Click:Connect(function()
+		Home.Visible = false
+		Scripts.Visible = true
 	end)
 end
-coroutine.wrap(LNTQMR_fake_script)()
-local function ZJHXVFD_fake_script() -- TaxiBossAutoFarmButton.LocalScript 
-	local script = Instance.new('LocalScript', TaxiBossAutoFarmButton)
-
-	script.Parent.MouseButton1Click:Connect(function()
-		loadstring(game:HttpGet('https://raw.githubusercontent.com/StrongBomber/projectluacore/main/taxiboss.lua')()
-	end)
-end
-coroutine.wrap(ZJHXVFD_fake_script)()
-local function RQRVENF_fake_script() -- MinimizeButton.LocalScript 
-	local script = Instance.new('LocalScript', MinimizeButton)
+coroutine.wrap(CKKP_fake_script)()
+local function TDGSNFR_fake_script() -- MinimizeButton_2.LocalScript 
+	local script = Instance.new('LocalScript', MinimizeButton_2)
 
 	local Frame = script.Parent.Parent.Parent.MainFrame
 	local OpenB = script.Parent.Parent.Parent.OpenButton
@@ -459,9 +805,9 @@ local function RQRVENF_fake_script() -- MinimizeButton.LocalScript
 		OpenB.Visible = true
 	end)
 end
-coroutine.wrap(RQRVENF_fake_script)()
-local function LBTTK_fake_script() -- CloseButton.LocalScript 
-	local script = Instance.new('LocalScript', CloseButton)
+coroutine.wrap(TDGSNFR_fake_script)()
+local function KOAF_fake_script() -- CloseButton_2.LocalScript 
+	local script = Instance.new('LocalScript', CloseButton_2)
 
 	local Frame = script.Parent.Parent.Parent.MainFrame
 	
@@ -470,16 +816,4 @@ local function LBTTK_fake_script() -- CloseButton.LocalScript
 		Frame:Destroy()
 	end)
 end
-coroutine.wrap(LBTTK_fake_script)()
-local function WPKMX_fake_script() -- OpenButton.LocalScript 
-	local script = Instance.new('LocalScript', OpenButton)
-
-	local Frame = script.Parent.Parent.MainFrame
-	local OpenB = script.Parent
-	
-	script.Parent.MouseButton1Click:Connect(function()
-		Frame.Visible = true
-		OpenB.Visible = false
-	end)
-end
-coroutine.wrap(WPKMX_fake_script)()
+coroutine.wrap(KOAF_fake_script)()
