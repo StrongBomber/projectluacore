@@ -27,7 +27,7 @@ warn("Anti Staff is now running")
     end)
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Marco8642/science/main/ui%20libs2", true))()
 local example = library:CreateWindow({
-  text = "Taxi Boss @raiwesy"
+  text = "@raiwesy"
 })
 example:AddToggle("Auto Collect Eggs", function(state)
 getfenv().eggs = (state and true or false)
@@ -797,13 +797,6 @@ end)
 example:AddButton("Remove Locked Area Barriers",function()
     game:GetService("Workspace").AreaLocked:Destroy()
 end)
-
--- Made By Raiwesy Good Games Players!!!
-example:AddButton("@raiwesy",function()
-    local copy = “Made By Raiwesy. Good Games!”
-    setclipboard(tostring(copy))
-end)
-
 example:AddToggle("Donut God", function(state)
 getfenv().donut = (state and true or false)
 while getfenv().donut do
