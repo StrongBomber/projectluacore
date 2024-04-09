@@ -813,9 +813,4 @@ local part = game.Players.LocalPlayer.Character.Humanoid.SeatPart
 part.RotVelocity = Vector3.new(0,part.RotVelocity.Y+10,0)
 end)
 end
-
-        while do
-            warn("Made By Raiwesy")
-            wait(5)
-        end
 end)
