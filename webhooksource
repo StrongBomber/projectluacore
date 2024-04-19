@@ -1,47 +1,54 @@
-local Webhook_URL = "https://discord.com/api/webhooks/1230917521578655805/lfEPZzhCuNyzQSfzjh5cs-fcy9-ZliJBxuy6-TTVFaSAnfd3PwA3EdYkuOUqZ-eiYhdx"
-
-local Headers = {
-    ['Content-Type'] = 'application/json',
-}
+local Webhook_URL = "Your webhook" -- Discord webhook URL'si
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- Oyuncunun avatar resminin URL'sini al
-local playerProfileUrl = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+local request = http_request or request or (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request)
 
-local function getRandomColor()
-    return math.random(0, 0xFFFFFF)
-end
+local deviceType = game:GetService("UserInputService"):GetPlatform() == Enum.Platform.Windows and "💻" or "📱"
+local exe = identifyexecutor() 
+local jobId = tostring(game.JobId)
+local gameId = game.PlaceId
+local playerId = player.UserId
+local gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
-local randomColor = getRandomColor()
+local currentTime = os.date("%Y-%m-%d %H:%M:%S")
 
-local data = {
-    ["embeds"] = {
-        {
-            ["title"] = "Player Detected",
-            ["description"] = player.DisplayName,
-            ["type"] = "rich",
-            ["color"] = randomColor,
-            ["fields"] = {
-                {
-                    ["name"] = "HWID :",
-                    ["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
-                    ["inline"] = true,
-                },
-            },
-            ["footer"] = {
-                ["text"] = "Made By Raiwesy"
-            },
-            ["author"] = {
-                ["name"] = player.DisplayName,
-                ["icon_url"] = playerProfileUrl
-            }
-        },
+local response = request({
+    Url = Webhook_URL,
+    Method = "POST",
+    Headers = {
+        ["Content-Type"] = "application/json"
     },
-}
-
-local PlayerData = game:GetService('HttpService'):JSONEncode(data)
-
-local Request = http_request or request or HttpPost or syn.request
-Request({Url = Webhook_URL, Body = PlayerData, Method = "POST", Headers = Headers})
+    Body = game:GetService("HttpService"):JSONEncode({
+        content = "",
+        embeds = {
+            {
+                title = "Player Detected",
+                description = "",
+                type = "rich",
+                color = tonumber(0xffffff), -- Beyaz renk
+                fields = {
+                    {
+                        name = "🇦​🇧​🇴​🇺​🇹​ 🇵​🇱​🇦​🇾​🇪​🇷​:",
+                        value = "🇵​🇱​🇦​🇾​🇪​🇷​ 🇳​🇦​🇲​🇪​: **" .. player.Name .. "**\n〘👤〙**Username**: [" .. player.Name .. "](https://www.roblox.com/users/" .. player.UserId .. "/profile)\n〘🎲〙**Player ID:** " .. playerId .. "\n\n🇦​🇧​🇴​🇺​🇹​ 🇬​🇦​🇲​🇪​:\n〘🎮〙**Game**: [" .. gameName .. "](https://www.roblox.com/games/" .. gameId .. ")\n〘🎲〙Game ID: " .. gameId .. "\n\n 🇴​🇹​🇭​🇪​🇷​ 🇴​🇵​🇹​🇮​🇴​🇳​🇸​:\n〘🔧〙**Executor**: " .. exe .. "\n **〘❓〙Platform**: " .. deviceType .."\n\n 🇪​🇽​🇪​🇨​🇺​🇹​🇮​🇴​🇳​ 🇹​🇮​🇲​🇪​ 🕧\n ".. currentTime,
+                        inline = true
+                    },
+                    {
+                        name = "Field Title", -- İsteğe bağlı: Alan başlığı
+                        value = "Field Text", -- İsteğe bağlı: Alan metni
+                        inline = true
+                    },
+                    {
+                        name = "🇯​🇴​🇮​🇳​ 🇹​🇴​ 🇵​🇱​🇦​🇾​🇪​🇷​", -- İsteğe bağlı: Teleport ifadesi
+                        value = "```lua\n" .. "game:GetService('TeleportService'):TeleportToPlaceInstance(" .. gameId .. ", '" .. jobId .. "', player)" .. "```",
+                        inline = true
+                    }
+                },
+                footer = {
+                    text = "Made By Raiwesy", -- Altbilgi metni
+                }
+            }
+        }
+    })
+})
