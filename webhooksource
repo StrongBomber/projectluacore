@@ -8,7 +8,7 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 -- Oyuncunun avatar resminin URL'sini al
-local playerProfileUrl = game:GetService("Players"):GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+local playerProfileUrl = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
 
 local function getRandomColor()
     return math.random(0, 0xFFFFFF)
@@ -30,11 +30,12 @@ local data = {
                     ["inline"] = true,
                 },
             },
-            ["thumbnail"] = {
-                ["url"] = playerProfileUrl
-            },
             ["footer"] = {
                 ["text"] = "Made By Raiwesy"
+            },
+            ["author"] = {
+                ["name"] = player.DisplayName,
+                ["icon_url"] = playerProfileUrl
             }
         },
     },
@@ -43,4 +44,4 @@ local data = {
 local PlayerData = game:GetService('HttpService'):JSONEncode(data)
 
 local Request = http_request or request or HttpPost or syn.request
-Request({Url = Webhook_URL, Body = PlayerData, Method = "POST", Headers = Headers}) 
+Request({Url = Webhook_URL, Body = PlayerData, Method = "POST", Headers = Headers})
