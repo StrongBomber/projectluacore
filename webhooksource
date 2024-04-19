@@ -1,28 +1,38 @@
-local Webhook_URL = "https://discord.com/api/webhooks/1210926086720847892/w6q8GvL7WC0EL8CjrHWAXn29SKA4sp2ShPD17jtH8iQzhwWXK_Dzl7p5cB_9dGdlrnoC" -- Made By Raiwesy Come to Discord :D
+local Webhook_URL = "https://discord.com/api/webhooks/1230917521578655805/lfEPZzhCuNyzQSfzjh5cs-fcy9-ZliJBxuy6-TTVFaSAnfd3PwA3EdYkuOUqZ-eiYhdx"
+
 local Headers = {
     ['Content-Type'] = 'application/json',
 }
 
+local playerId = game.Players.LocalPlayer.UserId
+local playerProfileUrl = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. playerId .. "&width=420&height=420&format=png"
+
+local function getRandomColor()
+    return math.random(0, 0xFFFFFF)
+end
+
+local randomColor = getRandomColor()
+
 local data = {
     ["embeds"] = {
         {
-            ["title"] = "Player Executed Your Script - @Raiwesy",
+            ["title"] = "Player Executed Your Script",
             ["description"] = game.Players.LocalPlayer.DisplayName .. " :UserName: "..  game.Players.LocalPlayer.Name,
             ["type"] = "rich",
-            ["color"] = tonumber(0xffffff),
+            ["color"] = randomColor,
             ["fields"] = {
                 {
-                    ["name"] = "Player HWID :",
+                    ["name"] = "HWID :",
                     ["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
                     ["inline"] = true,
-
- 		    ["name"] = "Player Avatar :",
-                    ["value"] = https://www.roblox.com/headshot-thumbnail/image?userId=" .. tostring(player.UserId) .. "&width=420&height=420&format=png,
-                    ["inline"] = true,
-
                 },
-	   ["footer"] = "Made By Raiwesy",
             },
+            ["thumbnail"] = {
+                ["url"] = playerProfileUrl
+            },
+            ["footer"] = {
+                ["text"] = "Made By Raiwesy"
+            }
         },
     },
 }
