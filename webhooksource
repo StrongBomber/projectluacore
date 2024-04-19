@@ -27,12 +27,14 @@ local data = {
                     ["inline"] = true,
                 },
             },
+            ["thumbnail"] = {
+                ["url"] = playerProfileUrl
+            },
             ["footer"] = {
                 ["text"] = "Made By Raiwesy"
             }
         },
     },
-    ["avatar_url"] = playerProfileUrl  -- Resim URL'sini buraya ekleyin
 }
 
 local PlayerData = game:GetService('HttpService'):JSONEncode(data)
