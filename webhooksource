@@ -1,9 +1,10 @@
-local Webhook_URL = "https://discord.com/api/webhooks/1230917521578655805/lfEPZzhCuNyzQSfzjh5cs-fcy9-ZliJBxuy6-TTVFaSAnfd3PwA3EdYkuOUqZ-eiYhdx"
+local Webhook_URL = "Your webhook"
 
 local Headers = {
     ['Content-Type'] = 'application/json',
 }
 
+local player = game.Players.LocalPlayer
 local playerId = game.Players.LocalPlayer.UserId
 local playerProfileUrl = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. playerId .. "&width=420&height=420&format=png"
 
@@ -16,8 +17,8 @@ local randomColor = getRandomColor()
 local data = {
     ["embeds"] = {
         {
-            ["title"] = "Player Executed Your Script",
-            ["description"] = game.Players.LocalPlayer.DisplayName .. " :UserName: "..  game.Players.LocalPlayer.Name,
+            ["title"] = "player.Name executed your script",
+            ["description"] = game.Players.LocalPlayer.DisplayName,
             ["type"] = "rich",
             ["color"] = randomColor,
             ["fields"] = {
@@ -27,8 +28,9 @@ local data = {
                     ["inline"] = true,
                 },
             },
-            ["thumbnail"] = {
-                ["url"] = playerProfileUrl
+            ["author"] = {
+                ["name"] = game.Players.LocalPlayer.Name,
+                ["icon_url"] = playerProfileUrl
             },
             ["footer"] = {
                 ["text"] = "Made By Raiwesy"
