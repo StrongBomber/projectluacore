@@ -8,7 +8,11 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 -- Oyuncunun avatar resminin URL'sini al
-local playerProfileUrl = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+local playerProfileUrl
+while not playerProfileUrl do
+    playerProfileUrl = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+    wait(1) -- Bekleme ekle, işlem tamamlanana kadar beklemesi için
+end
 
 local function getRandomColor()
     return math.random(0, 0xFFFFFF)
