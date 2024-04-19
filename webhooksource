@@ -1,4 +1,4 @@
-local Webhook_URL = "Your webhook" -- Discord webhook URL'si
+local Webhook_URL = "https://discord.com/api/webhooks/1230917521578655805/lfEPZzhCuNyzQSfzjh5cs-fcy9-ZliJBxuy6-TTVFaSAnfd3PwA3EdYkuOUqZ-eiYhdx" -- Discord webhook URL'si
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
