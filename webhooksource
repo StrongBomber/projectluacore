@@ -35,8 +35,8 @@ local response = request({
                         inline = true
                     },
                     {
-                        name = "Field Title", -- İsteğe bağlı: Alan başlığı
-                        value = "Field Text", -- İsteğe bağlı: Alan metni
+                        name = "𝘏𝘞𝘐𝘋",
+                        value = "game:GetService("RbxAnalyticsService"):GetClientId(),",
                         inline = true
                     },
                     {
