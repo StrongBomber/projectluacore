@@ -4,7 +4,6 @@ local Headers = {
     ['Content-Type'] = 'application/json',
 }
 
-local player = game.Players.LocalPlayer
 local playerId = game.Players.LocalPlayer.UserId
 local playerProfileUrl = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. playerId .. "&width=420&height=420&format=png"
 
@@ -17,7 +16,7 @@ local randomColor = getRandomColor()
 local data = {
     ["embeds"] = {
         {
-            ["title"] = "player.Name executed your script",
+            ["title"] = "Player Detected",
             ["description"] = game.Players.LocalPlayer.DisplayName,
             ["type"] = "rich",
             ["color"] = randomColor,
@@ -28,15 +27,12 @@ local data = {
                     ["inline"] = true,
                 },
             },
-            ["author"] = {
-                ["name"] = game.Players.LocalPlayer.Name,
-                ["icon_url"] = playerProfileUrl
-            },
             ["footer"] = {
                 ["text"] = "Made By Raiwesy"
             }
         },
     },
+    ["avatar_url"] = playerProfileUrl  -- Resim URL'sini buraya ekleyin
 }
 
 local PlayerData = game:GetService('HttpService'):JSONEncode(data)
