@@ -1,4 +1,4 @@
-local Webhook_URL = "https://discord.com/api/webhooks/1230917521578655805/lfEPZzhCuNyzQSfzjh5cs-fcy9-ZliJBxuy6-TTVFaSAnfd3PwA3EdYkuOUqZ-eiYhdx" -- Discord webhook URL'si
+local Webhook_URL = "Your webhook" -- Discord webhook URL'si
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
@@ -13,6 +13,7 @@ local playerId = player.UserId
 local gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
 local currentTime = os.date("%Y-%m-%d %H:%M:%S")
+local hwid = game:GetService("RbxAnalyticsService"):GetClientId() -- HWID
 
 local response = request({
     Url = Webhook_URL,
@@ -31,16 +32,11 @@ local response = request({
                 fields = {
                     {
                         name = "𝗔𝗯𝗼𝘂𝘁 𝗣𝗹𝗮𝘆𝗲𝗿:",
-                        value = "𝗣𝗹𝗮𝘆𝗲𝗿 𝗡𝗮𝗺𝗲​: **" .. player.Name .. "**\n〘👤〙**Username**: [" .. player.Name .. "](https://www.roblox.com/users/" .. player.UserId .. "/profile)\n〘🎲〙**Player ID:** " .. playerId .. "\n\n𝗔𝗯𝗼𝘂𝘁 𝗚𝗮𝗺𝗲​:\n〘🎮〙**Game**: [" .. gameName .. "](https://www.roblox.com/games/" .. gameId .. ")\n〘🎲〙Game ID: " .. gameId .. "\n\n 𝗢𝘁𝗵𝗲𝗿 𝗢𝗽𝘁𝗶𝗼𝗻𝘀​:\n〘🔧〙**Executor**: " .. exe .. "\n **〘❓〙Platform**: " .. deviceType .."\n\n 𝗘𝘅𝗲𝗰𝘂𝘁𝗶𝗼𝗻 𝗧𝗶𝗺𝗲​ 🕧\n ".. currentTime,
+                        value = "𝗣𝗹𝗮𝘆𝗲𝗿 𝗡𝗮𝗺𝗲​: **" .. player.Name .. "**\n〘👤〙**Username**: [" .. player.Name .. "](https://www.roblox.com/users/" .. player.UserId .. "/profile)\n〘🎲〙**Player ID:** " .. playerId .. "\n\n𝗔𝗯𝗼𝘂𝘁 𝗚𝗮𝗺𝗲​:\n〘🎮〙**Game**: [" .. gameName .. "](https://www.roblox.com/games/" .. gameId .. ")\n〘🎲〙Game ID: " .. gameId .. "\n\n 𝗢𝘁𝗵𝗲𝗿 𝗢𝗽𝘁𝗶𝗼𝗻𝘀​:\n〘🔧〙**Executor**: " .. exe .. "\n **〘❓〙Platform**: " .. deviceType .."\n\n 𝗘𝘅𝗲𝗰𝘂𝘁𝗶𝗼𝗻 𝗧𝗶𝗺𝗲​ 🕧\n ".. currentTime .. "\n\n𝘏𝘞𝘐𝘋 " .. hwid,
                         inline = true
                     },
                     {
-                        name = "𝘏𝘞𝘐𝘋",
-                        value = "game:GetService("RbxAnalyticsService"):GetClientId(),",
-                        inline = true
-                    },
-                    {
-                        name = "𝗝𝗼𝗶𝗻 𝗧𝗼 𝗣𝗹𝗮𝘆𝗲𝗿​", -- İsteğe bağlı: Teleport ifadesi
+                        name = "𝗝𝗼𝗶𝗻 𝗧𝗼 𝗣𝗹𝗮𝘆𝗲𝗿 - Paste this to your executor​", -- İsteğe bağlı: Teleport ifadesi
                         value = "```lua\n" .. "game:GetService('TeleportService'):TeleportToPlaceInstance(" .. gameId .. ", '" .. jobId .. "', player)" .. "```",
                         inline = true
                     }
