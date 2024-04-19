@@ -1,4 +1,4 @@
-local Webhook_URL = "Your webhook"
+local Webhook_URL = "https://discord.com/api/webhooks/1230917521578655805/lfEPZzhCuNyzQSfzjh5cs-fcy9-ZliJBxuy6-TTVFaSAnfd3PwA3EdYkuOUqZ-eiYhdx"
 
 local Headers = {
     ['Content-Type'] = 'application/json',
