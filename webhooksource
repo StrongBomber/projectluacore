@@ -4,8 +4,11 @@ local Headers = {
     ['Content-Type'] = 'application/json',
 }
 
-local playerId = game.Players.LocalPlayer.UserId
-local playerProfileUrl = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. playerId .. "&width=420&height=420&format=png"
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- Oyuncunun avatar resminin URL'sini al
+local playerProfileUrl = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
 
 local function getRandomColor()
     return math.random(0, 0xFFFFFF)
@@ -17,7 +20,7 @@ local data = {
     ["embeds"] = {
         {
             ["title"] = "Player Detected",
-            ["description"] = game.Players.LocalPlayer.DisplayName,
+            ["description"] = player.DisplayName,
             ["type"] = "rich",
             ["color"] = randomColor,
             ["fields"] = {
