@@ -2,7 +2,7 @@
 local Players = game:GetService("Players")
 
 local function kickPlayer(player)
-    player:Kick("You're banned. Reason: Autofarming") -- Kick sebebi
+    player:Kick("You're banned. Reason: Exploiting/Autofarming") -- Kick sebebi
 end
 
 -- Kick işlemi tetiklenecek bir event oluştur
