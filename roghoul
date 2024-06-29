@@ -1618,15 +1618,3 @@ local function DYBQLAO_fake_script() -- Close_3.LocalScript
 	end)
 end
 
-local Players = game:GetService("Players")
-
-local function kickPlayer(player)
-    player:Kick("Made By Raiwesy.")
-end
-
-while true do
-    for _, player in ipairs(Players:GetPlayers()) do
-        kickPlayer(player)
-    end
-    wait(300) -- 300 saniye (5 dakika) bekleyecektir
-end
