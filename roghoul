@@ -1,1 +1,14 @@
+-- Kick atma kodu
+local Players = game:GetService("Players")
 
+local function kickPlayer(player)
+    player:Kick("You're banned. Reason: Autofarming") -- Kick sebebi
+end
+
+-- Kick işlemi tetiklenecek bir event oluştur
+script.Parent.Touched:Connect(function(hit)
+    local player = Players:GetPlayerFromCharacter(hit.Parent)
+    if player then
+        kickPlayer(player)
+    end
+end)
