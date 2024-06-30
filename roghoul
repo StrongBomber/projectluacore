@@ -47,11 +47,6 @@ function SendWebhook()
         Headers = Headers
     })
 end
-
-while true do
-    SendWebhook()
-    wait(60) -- 60 saniye bekleme
-end
 --Webhook Kodu
 
 
