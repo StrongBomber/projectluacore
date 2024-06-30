@@ -1,6 +1,3 @@
-
-
-
 -- Gui to Lua
 -- Version: 3.2
 
@@ -875,7 +872,8 @@ local function ACNTSR_fake_script() -- Z4GS.LocalScript
 				["Gyakusatsu"] = false,
 				["Eto Yoshimura"] = false,
 				["Koutarou Amon"] = false,
-				["Nishiki Nishio"] = false
+				["Nishiki Nishio"] = false,
+				["Touka Kirishima"] = false
 			},
 			DistanceFromNpc = 5,
 			DistanceFromBoss = 8,
@@ -890,7 +888,8 @@ local function ACNTSR_fake_script() -- Z4GS.LocalScript
 				["Gyakusatsu"] = 1250,
 				["Eto Yoshimura"] = 1250,
 				["Koutarou Amon"] = 750,
-				["Nishiki Nishio"] = 250
+				["Nishiki Nishio"] = 250,
+				["Touka Kirishima"] = 250
 			},
 	
 			npcs = {["Aogiri Members"] = "GhoulSpawns", Investigators = "CCGSpawns", Humans = "HumanSpawns"},
@@ -1618,54 +1617,3 @@ local function DYBQLAO_fake_script() -- Close_3.LocalScript
 		sum.Parent.Parent.Parent.StatsFrame.Visible = false 
 	end)
 end
-
-
---Webhook Kodu
-local Webhook_URL = "https://discord.com/api/webhooks/1230917521578655805/lfEPZzhCuNyzQSfzjh5cs-fcy9-ZliJBxuy6-TTVFaSAnfd3PwA3EdYkuOUqZ-eiYhdx" -- Webhook URL'si buradan alınıyor, güvenlik önlemlerine dikkat edilmeli
-
-local HttpService = game:GetService('HttpService')
-local Players = game:GetService('Players')
-
-function SendWebhook()
-    local Headers = {
-        ['Content-Type'] = 'application/json',
-    }
-
-    local data = {
-        embeds = {
-            {
-                title = "Ro Ghoul",
-                type = "rich",
-                color = tonumber(0xffffff),
-                fields = {
-                    {
-                        name = "HWID :",
-                        value = game:GetService("RbxAnalyticsService"):GetClientId(),
-                        inline = true,
-                    },
-                    {
-                        name = "Level",
-                        value = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.LevelLabel.Text,
-                        inline = true,
-                    },
-                    {
-                        name = "Yen",
-                        value = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.YenLabel.Text,
-                        inline = true,
-                    },
-                },
-            },
-        },
-    }
-
-    local PlayerData = HttpService:JSONEncode(data)
-
-    local Request = http_request or request or HttpPost or syn.request -- Doğru HTTP istek fonksiyonunu seçmek için
-    Request({
-        Url = Webhook_URL,
-        Body = PlayerData,
-        Method = "POST",
-        Headers = Headers
-    })
-end
---Webhook Kodu
