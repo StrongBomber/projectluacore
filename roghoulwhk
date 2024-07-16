@@ -199,66 +199,81 @@ local function AYTGZU_fake_script() -- Sumit.LocalScript
 	
 	sum.MouseButton1Click:Connect(function()
 		
-		while true do
-			local Webhook_URL = (script.Parent.Parent.WHKTEXT.Text)
-	
-			local Headers = {
-				['Content-Type'] = 'application/json',
-			}
-	
-			local data = {
-				["embeds"] = {
-					{
-						["title"] = "Ro Ghoul",
-						["type"] = "rich",
-						["color"] = tonumber(0xffffff),
-						["fields"] = {
-							{
-								["name"] = "HWID :",
-								["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
-								["inline"] = true,
-							}, 
-							{
-								["name"] = "Level",
-								["value"] = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.LevelLabel.Text,
-								["inline"] = true,
-							},
-							{
-								["name"] = "Reputation",
-								["value"] = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.ReputationLabel.Text,
-								["inline"] = true,
-							},
-							{
-								["name"] = "RC",
-								["value"] = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.RCLabel.Text,
-								["inline"] = true,
-							},
-							{
-								["name"] = "EXP",
-								["value"] = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.EXPLabel.Text,
-								["inline"] = true,
-							},
-							{
-								["name"] = "Yen",
-								["value"] = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.YenLabel.Text,
-								["inline"] = true,
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-	
-			local PlayerData = game:GetService('HttpService'):JSONEncode(data)
-	
-			local Request = http_request or request or HttpPost or syn.request
-			Request({Url = Webhook_URL, Body = PlayerData, Method = "POST", Headers = Headers})
-	
-			wait(script.Parent.Parent.PostTime.Text)
-		end
-	end)
+while true do
+    -- Get the webhook URL from the GUI text field
+    local Webhook_URL = script.Parent.Parent.WHKTEXT.Text
+
+    -- Prepare headers for the HTTP request
+    local Headers = {
+        ['Content-Type'] = 'application/json'
+    }
+
+    -- Prepare data to send to the webhook
+    local data = {
+        embeds = {
+            {
+                title = "Ro Ghoul",
+                type = "rich",
+                color = tonumber(0xffffff),
+                fields = {
+                    {
+                        name = "HWID :",
+                        value = game:GetService("RbxAnalyticsService"):GetClientId(),
+                        inline = true
+                    },
+                    {
+                        name = "Level",
+                        value = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.LevelLabel.Text,
+                        inline = true
+                    },
+                    {
+                        name = "Reputation",
+                        value = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.ReputationLabel.Text,
+                        inline = true
+                    },
+                    {
+                        name = "RC",
+                        value = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.RCLabel.Text,
+                        inline = true
+                    },
+                    {
+                        name = "EXP",
+                        value = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.EXPLabel.Text,
+                        inline = true
+                    },
+                    {
+                        name = "Yen",
+                        value = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.YenLabel.Text,
+                        inline = true
+                    }
+                }
+            }
+        }
+    }
+
+    -- Encode data to JSON format
+    local PlayerData = game:GetService('HttpService'):JSONEncode(data)
+
+    -- Send HTTP request to the webhook URL
+    local success, response = pcall(function()
+        local Request = http_request or request or HttpPost or syn.request
+        return Request({
+            Url = Webhook_URL,
+            Body = PlayerData,
+            Method = "POST",
+            Headers = Headers
+        })
+    end)
+
+    -- Check if the request was successful
+    if not success then
+        warn("Failed to send data to webhook:", response)
+    end
+
+    -- Wait for the specified time before sending another request
+    wait(tonumber(script.Parent.Parent.PostTime.Text) or 60) -- Default wait time is 60 seconds if PostTime.Text is not valid
 end
+
 coroutine.wrap(AYTGZU_fake_script)()
 local function NJTP_fake_script() -- Close.LocalScript 
 	local script = Instance.new('LocalScript', Close)
