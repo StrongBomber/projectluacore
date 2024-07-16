@@ -222,7 +222,22 @@ local function AYTGZU_fake_script() -- Sumit.LocalScript
 								["name"] = "Level",
 								["value"] = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.LevelLabel.Text,
 								["inline"] = true,
-							}, 
+							},
+{
+								["name"] = "Reputation",
+								["value"] = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.ReputationLabel.Text,
+								["inline"] = true,
+							},
+{
+								["name"] = "RC",
+								["value"] = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.RCLabel.Text,
+								["inline"] = true,
+							},
+{
+								["name"] = "EXP",
+								["value"] = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.EXPLabel.Text,
+								["inline"] = true,
+							},
 							{
 								["name"] = "Yen",
 								["value"] = game.Players.LocalPlayer.PlayerGui.MobileHUD.MainFrame.StatsFrame.YenLabel.Text,
