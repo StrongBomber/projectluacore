@@ -246,7 +246,9 @@ local function AYTGZU_fake_script() -- Sumit.LocalScript
 						},
 					},
 				},
-			}
+			},
+		},
+	}
 	
 			local PlayerData = game:GetService('HttpService'):JSONEncode(data)
 	
