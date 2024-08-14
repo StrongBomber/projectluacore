@@ -5,4 +5,3 @@ local localPlayer = Players.LocalPlayer
 -- LocalPlayer'ı kickle
 localPlayer:Kick("You have been finished the free version of the cheat - Raiwesy")
 
-— Banmı yedin he HJKBFASDBJHKSSDKJHF
