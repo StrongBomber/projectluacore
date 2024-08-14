@@ -3,5 +3,5 @@ local Players = game:GetService("Players")
 local localPlayer = Players.LocalPlayer
 
 -- LocalPlayer'ı kickle
-localPlayer:Kick("You have been finished the free version of the cheat - Raiwesy")
+localPlayer:Kick("Updting...")
 
