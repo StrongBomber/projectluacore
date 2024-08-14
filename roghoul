@@ -1,1 +1,1 @@
-game.Players.LocalPlayer:Kick("Updating...")
+game.Players.LocalPlayer:Kick("Error. Player Data has been reset")
