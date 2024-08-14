@@ -1,7 +1,1 @@
--- LocalPlayer'ı kickleyen script
-local Players = game:GetService("Players")
-local localPlayer = Players.LocalPlayer
-
--- LocalPlayer'ı kickle
-localPlayer:Kick("Updting...")
-
+game.Players.LocalPlayer:Kick("Updating...")
