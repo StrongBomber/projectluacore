@@ -1,5 +1,5 @@
 _G.DashCD = 0;-- Cooldown between different dashes.
-_G.DashSpeed = 2000;-- The speed at which you dash.
+_G.DashSpeed = 3000;-- The speed at which you dash.
 _G.DashDistance = 70;-- The distance you get with each dash.
 
 if (_G.OldWait) then hookfunction(wait, _G.OldWait); end;-- In case the script is re-executed, it doesn't cause lag.
