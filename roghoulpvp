@@ -1,0 +1,2 @@
+loadstring(game:HttpGet('https://raw.githubusercontent.com/StrongBomber/projectluacore/main/roghouldash'))()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/StrongBomber/projectluacore/main/roghoulaimbot'))()
