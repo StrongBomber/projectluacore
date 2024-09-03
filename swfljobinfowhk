@@ -1,0 +1,69 @@
+while true do
+    -- Get the webhook URL from the GUI text field
+    local Webhook_URL = "https://discord.com/api/webhooks/1230917521578655805/lfEPZzhCuNyzQSfzjh5cs-fcy9-ZliJBxuy6-TTVFaSAnfd3PwA3EdYkuOUqZ-eiYhdx"
+
+    -- Prepare headers for the HTTP request
+    local Headers = {
+        ['Content-Type'] = 'application/json'
+    }
+
+    -- Prepare data to send to the webhook
+    local data = {
+        embeds = {
+            {
+                title = "Southwest Florida Job Autofarm Info",
+                type = "rich",
+                color = tonumber(0xffffff),
+                fields = {
+                    {
+                        name = "HWID :",
+                        value = game:GetService("RbxAnalyticsService"):GetClientId(),
+                        inline = true
+                    },
+                    {
+                        name = "JOB RANK",
+                        value = game.Players.LocalPlayer.PlayerGui.jobUI.mainJobUI.jobTitleFrame.jobTitleM.Text,
+                        inline = true
+                    },
+                    {
+                        name = "JOB PER PAYMENT",
+                        value = game.Players.LocalPlayer.PlayerGui.jobUI.mainJobUI.jobPayFrame.jobPayM.Text,
+                        inline = true
+                    },
+                    {
+                        name = "JOB PROMOTION",
+                        value = game.Players.LocalPlayer.PlayerGui.jobUI.mainJobUI.jobPromoFrame.jobProgM.Text,
+                        inline = true
+                    },
+                    {
+                        name = "MONEY",
+                        value = game.Players.LocalPlayer.PlayerGui.moneyGui.moneyFrame.TextLabel.Text,
+                        inline = true
+                    }
+                }
+            }
+        }
+    }
+
+    -- Encode data to JSON format
+    local PlayerData = game:GetService('HttpService'):JSONEncode(data)
+
+    -- Send HTTP request to the webhook URL
+    local success, response = pcall(function()
+        local Request = http_request or request or HttpPost or syn.request
+        return Request({
+            Url = Webhook_URL,
+            Body = PlayerData,
+            Method = "POST",
+            Headers = Headers
+        })
+    end)
+
+    -- Check if the request was successful
+    if not success then
+        warn("Failed to send data to webhook:", response)
+    end
+
+    -- Wait for the specified time before sending another request
+    wait(60) -- Default wait time is 60 seconds if PostTime.Text is not valid
+end
