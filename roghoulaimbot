@@ -7,6 +7,8 @@ local fovCircle
 local crosshairHorizontal
 local crosshairVertical
 
+local crosshairSize = 20
+
 local function createDrawingObjects()
     -- FOV dairesini çizmek için Drawing API'si kullanılır
     fovCircle = Drawing.new("Circle")
@@ -19,7 +21,6 @@ local function createDrawingObjects()
     fovCircle.Visible = true -- Daireyi görünür yap
 
     -- Crosshair çizimi için Drawing API'si kullanılır
-    local crosshairSize = 20
     local crosshairThickness = 2
 
     crosshairHorizontal = Drawing.new("Line")
@@ -84,21 +85,27 @@ end
 -- GUI oluştur
 local toggleButton = createGui()
 
--- Hedefi belirleyin
+-- Hedefi belirleyin (Allied klasöründe oyuncunun adı varsa hedefe kilitlenmez)
 local function getClosestTarget()
     local closestTarget = nil
     local shortestDistance = math.huge
+    local alliedFolder = player:WaitForChild("PlayerFolder"):WaitForChild("Allied")
 
     for _, character in pairs(workspace:GetChildren()) do
         if character:FindFirstChild("Humanoid") and character ~= player.Character then
-            local primaryPart = character:FindFirstChild("HumanoidRootPart") or character:FindFirstChild("Torso") or character:FindFirstChild("Head")
-            if primaryPart then
-                local screenPoint, onScreen = camera:WorldToScreenPoint(primaryPart.Position)
-                local distance = (Vector2.new(screenPoint.X, screenPoint.Y) - fovCircle.Position).Magnitude
+            local playerName = character.Name
 
-                if distance < fovCircle.Radius and distance < shortestDistance then
-                    closestTarget = character
-                    shortestDistance = distance
+            -- Allied klasöründe oyuncu varsa hedefi atla
+            if not alliedFolder:FindFirstChild(playerName) then
+                local primaryPart = character:FindFirstChild("HumanoidRootPart") or character:FindFirstChild("Torso") or character:FindFirstChild("Head")
+                if primaryPart then
+                    local screenPoint, onScreen = camera:WorldToScreenPoint(primaryPart.Position)
+                    local distance = (Vector2.new(screenPoint.X, screenPoint.Y) - fovCircle.Position).Magnitude
+
+                    if distance < fovCircle.Radius and distance < shortestDistance then
+                        closestTarget = character
+                        shortestDistance = distance
+                    end
                 end
             end
         end
