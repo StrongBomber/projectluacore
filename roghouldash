@@ -31,3 +31,27 @@ OldWait = hookfunction(wait, function (Secs, ...)
     return OldWait(Secs, ...);
 end);
 _G.OldWait = OldWait;-- Backing up in case of re-execution
+
+
+-- PvP Block for ipad
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local mobileHUD = player.PlayerGui:FindFirstChild("MobileHUD")
+
+local function setBlockPosition()
+    if mobileHUD then
+        local block = mobileHUD:FindFirstChild("Block")
+        if block then
+            block.Position = UDim2.new(0, 1310, 0, 770)
+        end
+    end
+end
+
+-- Initial setup
+setBlockPosition()
+
+-- Continuously ensure the position is set
+RunService.Heartbeat:Connect(function()
+    setBlockPosition()
+end)
