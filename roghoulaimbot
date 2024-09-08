@@ -8,6 +8,8 @@ local crosshairHorizontal
 local crosshairVertical
 
 local crosshairSize = 20
+local targetLostTime = nil -- Hedef kaybolduğunda zamanı tutar
+local respawnDelay = 3 -- Hedef kaybolduğunda 3 saniye bekleme süresi
 
 local function createDrawingObjects()
     -- FOV dairesini çizmek için Drawing API'si kullanılır
@@ -76,6 +78,9 @@ local function createGui()
         toggleButton.Text = fovEnabled and "Disable FOV Lock" or "Enable FOV Lock"
         if not fovEnabled then
             currentTarget = nil
+            fovCircle.Color = Color3.fromRGB(255, 0, 0) -- FOV rengi kırmızıya döner
+            crosshairHorizontal.Color = Color3.fromRGB(255, 0, 0) -- Crosshair kırmızıya döner
+            crosshairVertical.Color = Color3.fromRGB(255, 0, 0)
         end
     end)
 
@@ -133,10 +138,16 @@ runService.RenderStepped:Connect(function()
         end
 
         if currentTarget then
-            if not currentTarget:FindFirstChild("Humanoid") or not currentTarget.Parent then
-                currentTarget = nil
-            else
+            local humanoid = currentTarget:FindFirstChild("Humanoid")
+            
+            if humanoid and humanoid.Health > 0 then
+                -- FOV ve crosshair rengini yeşile değiştir
+                fovCircle.Color = Color3.fromRGB(0, 255, 0)
+                crosshairHorizontal.Color = Color3.fromRGB(0, 255, 0)
+                crosshairVertical.Color = Color3.fromRGB(0, 255, 0)
+
                 lockCameraToTarget(currentTarget)
+
                 -- Crosshair'in hedefin kafasına göre ayarla
                 local primaryPart = currentTarget:FindFirstChild("HumanoidRootPart") or currentTarget:FindFirstChild("Torso") or currentTarget:FindFirstChild("Head")
                 if primaryPart then
@@ -148,10 +159,25 @@ runService.RenderStepped:Connect(function()
                     crosshairHorizontal.Visible = true
                     crosshairVertical.Visible = true
                 end
+            else
+                -- Hedef öldü veya kaybolduysa kilitlenmeyi devre dışı bırak
+                fovEnabled = false
+                toggleButton.Text = "Enable FOV Lock"
+                fovCircle.Color = Color3.fromRGB(255, 0, 0) -- FOV kırmızıya döner
+                crosshairHorizontal.Color = Color3.fromRGB(255, 0, 0) -- Crosshair kırmızıya döner
+                crosshairVertical.Color = Color3.fromRGB(255, 0, 0)
+                targetLostTime = tick()
+                currentTarget = nil
             end
         else
             crosshairHorizontal.Visible = false
             crosshairVertical.Visible = false
+
+            -- Hedef kaybolduktan sonra belirlenen süre kadar bekle
+            if targetLostTime and tick() - targetLostTime >= respawnDelay then
+                currentTarget = getClosestTarget()
+                targetLostTime = nil
+            end
         end
     else
         crosshairHorizontal.Visible = false
