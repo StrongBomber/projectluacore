@@ -38,49 +38,53 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
-local mobileHUD = player.PlayerGui:FindFirstChild("MobileHUD")
 local blockPosition = UDim2.new(0, 1310, 0, 770)
 
 -- Function to set the Block position
-local function setBlockPosition()
-    if mobileHUD then
-        local block = mobileHUD:FindFirstChild("Block")
-        if block then
-            block.Position = blockPosition
-        end
+local function setBlockPosition(block)
+    if block then
+        block.Position = blockPosition
     end
+end
+
+-- Function to handle when Block is added to MobileHUD
+local function onBlockAdded(block)
+    -- Set initial position when Block is added
+    setBlockPosition(block)
 end
 
 -- Function to monitor changes in PlayerGui
 local function monitorPlayerGui()
-    while true do
-        if mobileHUD then
-            local block = mobileHUD:FindFirstChild("Block")
-            if block then
-                if block.Position ~= blockPosition then
-                    block.Position = blockPosition
-                end
-            end
+    local mobileHUD = player.PlayerGui:WaitForChild("MobileHUD")
+    local block = mobileHUD:WaitForChild("Block")
+
+    -- Set initial position of the Block
+    setBlockPosition(block)
+
+    -- Connect to Block being added
+    mobileHUD.ChildAdded:Connect(function(child)
+        if child.Name == "Block" then
+            onBlockAdded(child)
         end
-        wait(1) -- Check every second
-    end
+    end)
 end
 
--- Setup initial Block position
-setBlockPosition()
-
--- Monitor PlayerGui changes and continuously ensure Block's position
-RunService.Heartbeat:Connect(function()
-    setBlockPosition()
-end)
-
--- Monitor PlayerGui for Block position changes
+-- Initial setup
 monitorPlayerGui()
 
 -- Handle character respawn
 player.CharacterAdded:Connect(function(character)
-    -- Reinitialize MobileHUD after character respawn
-    mobileHUD = player.PlayerGui:FindFirstChild("MobileHUD")
-    -- Ensure Block's position is maintained
-    setBlockPosition()
+    -- Monitor new MobileHUD and Block
+    monitorPlayerGui()
+end)
+
+-- Continuously ensure Block's position is maintained
+RunService.Heartbeat:Connect(function()
+    local mobileHUD = player.PlayerGui:FindFirstChild("MobileHUD")
+    if mobileHUD then
+        local block = mobileHUD:FindFirstChild("Block")
+        if block and block.Position ~= blockPosition then
+            setBlockPosition(block)
+        end
+    end
 end)
