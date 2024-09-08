@@ -36,6 +36,7 @@ _G.OldWait = OldWait;-- Backing up in case of re-execution
 -- PvP Block for ipad
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+
 local player = Players.LocalPlayer
 local mobileHUD = player.PlayerGui:FindFirstChild("MobileHUD")
 
@@ -50,6 +51,14 @@ end
 
 -- Initial setup
 setBlockPosition()
+
+-- Monitor changes to player's character and ensure Block's position is maintained
+local function onCharacterAdded(character)
+    -- Make sure the Block position is set when the character is added
+    setBlockPosition()
+end
+
+player.CharacterAdded:Connect(onCharacterAdded)
 
 -- Continuously ensure the position is set
 RunService.Heartbeat:Connect(function()
