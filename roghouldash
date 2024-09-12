@@ -38,12 +38,22 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
-local blockPosition = UDim2.new(0, 1310, 0, 770)
+
+-- Define the positions for Block and Dash buttons
+local blockPosition = UDim2.new(0, 1311, 0, 850)
+local dashPosition = UDim2.new(0, -100, 0, 0)
 
 -- Function to set the Block position
 local function setBlockPosition(block)
     if block then
         block.Position = blockPosition
+    end
+end
+
+-- Function to set the Dash position
+local function setDashPosition(dash)
+    if dash then
+        dash.Position = dashPosition
     end
 end
 
@@ -53,18 +63,36 @@ local function onBlockAdded(block)
     setBlockPosition(block)
 end
 
+-- Function to handle when Dash is added to Movement
+local function onDashAdded(dash)
+    -- Set initial position when Dash is added
+    setDashPosition(dash)
+end
+
 -- Function to monitor changes in PlayerGui
 local function monitorPlayerGui()
     local mobileHUD = player.PlayerGui:WaitForChild("MobileHUD")
+    
+    -- Monitor Block button
     local block = mobileHUD:WaitForChild("Block")
-
-    -- Set initial position of the Block
     setBlockPosition(block)
+    
+    -- Monitor Dash button
+    local movement = mobileHUD:WaitForChild("Movement")
+    local dash = movement:WaitForChild("Dash")
+    setDashPosition(dash)
 
     -- Connect to Block being added
     mobileHUD.ChildAdded:Connect(function(child)
         if child.Name == "Block" then
             onBlockAdded(child)
+        end
+    end)
+
+    -- Connect to Dash being added
+    movement.ChildAdded:Connect(function(child)
+        if child.Name == "Dash" then
+            onDashAdded(child)
         end
     end)
 end
@@ -74,17 +102,27 @@ monitorPlayerGui()
 
 -- Handle character respawn
 player.CharacterAdded:Connect(function(character)
-    -- Monitor new MobileHUD and Block
+    -- Monitor new MobileHUD, Block, and Dash
     monitorPlayerGui()
 end)
 
--- Continuously ensure Block's position is maintained
+-- Continuously ensure Block and Dash positions are maintained
 RunService.Heartbeat:Connect(function()
     local mobileHUD = player.PlayerGui:FindFirstChild("MobileHUD")
     if mobileHUD then
+        -- Ensure Block button position
         local block = mobileHUD:FindFirstChild("Block")
         if block and block.Position ~= blockPosition then
             setBlockPosition(block)
+        end
+        
+        -- Ensure Dash button position
+        local movement = mobileHUD:FindFirstChild("Movement")
+        if movement then
+            local dash = movement:FindFirstChild("Dash")
+            if dash and dash.Position ~= dashPosition then
+                setDashPosition(dash)
+            end
         end
     end
 end)
