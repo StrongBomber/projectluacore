@@ -1,1 +1,238 @@
-asdsad
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local Title = Instance.new("TextLabel")
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
+local Description = Instance.new("TextLabel")
+local UIGradient = Instance.new("UIGradient")
+local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_2 = Instance.new("UITextSizeConstraint")
+local BallHitbox = Instance.new("TextBox")
+local UICorner_2 = Instance.new("UICorner")
+local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_3 = Instance.new("UITextSizeConstraint")
+local Reach1 = Instance.new("TextLabel")
+local UIAspectRatioConstraint_4 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_4 = Instance.new("UITextSizeConstraint")
+local TackleHitbox = Instance.new("TextBox")
+local UICorner_3 = Instance.new("UICorner")
+local UIAspectRatioConstraint_5 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_5 = Instance.new("UITextSizeConstraint")
+local Reach2 = Instance.new("TextLabel")
+local UIAspectRatioConstraint_6 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_6 = Instance.new("UITextSizeConstraint")
+local Confirm = Instance.new("TextButton")
+local UICorner_4 = Instance.new("UICorner")
+local UIAspectRatioConstraint_7 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_7 = Instance.new("UITextSizeConstraint")
+local Credits = Instance.new("TextLabel")
+local UIAspectRatioConstraint_8 = Instance.new("UIAspectRatioConstraint")
+local UITextSizeConstraint_8 = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_9 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_10 = Instance.new("UIAspectRatioConstraint")
+
+--Properties:
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.279853493, 0, 0.350299388, 0)
+Frame.Size = UDim2.new(0.439560443, 0, 0.335329354, 0)
+
+UICorner.CornerRadius = UDim.new(0, 15)
+UICorner.Parent = Frame
+
+Title.Name = "Title"
+Title.Parent = Frame
+Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1.000
+Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Title.BorderSizePixel = 0
+Title.Position = UDim2.new(0, 0, 0.0416666679, 0)
+Title.Size = UDim2.new(1, 0, 0.148809522, 0)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "Super League Soccer"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextScaled = true
+Title.TextSize = 25.000
+Title.TextWrapped = true
+
+UIAspectRatioConstraint.Parent = Title
+UIAspectRatioConstraint.AspectRatio = 12.000
+
+UITextSizeConstraint.Parent = Title
+UITextSizeConstraint.MaxTextSize = 25
+
+Description.Name = "Description"
+Description.Parent = Frame
+Description.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Description.BackgroundTransparency = 1.000
+Description.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Description.BorderSizePixel = 0
+Description.Position = UDim2.new(0, 0, 0.130952388, 0)
+Description.Size = UDim2.new(1, 0, 0.148809522, 0)
+Description.Font = Enum.Font.Gotham
+Description.Text = "Custom Reach"
+Description.TextColor3 = Color3.fromRGB(255, 255, 255)
+Description.TextScaled = true
+Description.TextSize = 17.000
+Description.TextWrapped = true
+
+UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(0, 0, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(94, 94, 94))}
+UIGradient.Rotation = -90
+UIGradient.Parent = Description
+
+UIAspectRatioConstraint_2.Parent = Description
+UIAspectRatioConstraint_2.AspectRatio = 12.000
+
+UITextSizeConstraint_2.Parent = Description
+UITextSizeConstraint_2.MaxTextSize = 17
+
+BallHitbox.Name = "BallHitbox"
+BallHitbox.Parent = Frame
+BallHitbox.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+BallHitbox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+BallHitbox.BorderSizePixel = 0
+BallHitbox.Position = UDim2.new(0.0500000007, 0, 0.34523809, 0)
+BallHitbox.Size = UDim2.new(0.894999981, 0, 0.148809522, 0)
+BallHitbox.Font = Enum.Font.SourceSansSemibold
+BallHitbox.PlaceholderText = "Value"
+BallHitbox.Text = ""
+BallHitbox.TextColor3 = Color3.fromRGB(255, 255, 255)
+BallHitbox.TextScaled = true
+BallHitbox.TextSize = 28.000
+BallHitbox.TextWrapped = true
+
+UICorner_2.Parent = BallHitbox
+
+UIAspectRatioConstraint_3.Parent = BallHitbox
+UIAspectRatioConstraint_3.AspectRatio = 10.740
+
+UITextSizeConstraint_3.Parent = BallHitbox
+UITextSizeConstraint_3.MaxTextSize = 28
+
+Reach1.Name = "Reach1"
+Reach1.Parent = Frame
+Reach1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Reach1.BackgroundTransparency = 1.000
+Reach1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Reach1.BorderSizePixel = 0
+Reach1.Position = UDim2.new(0.049999889, 0, 0.223214343, 0)
+Reach1.Size = UDim2.new(0.238322407, 0, 0.148809522, 0)
+Reach1.Font = Enum.Font.Unknown
+Reach1.Text = "Get Ball Hitbox Reach"
+Reach1.TextColor3 = Color3.fromRGB(80, 80, 80)
+Reach1.TextScaled = true
+Reach1.TextSize = 14.000
+Reach1.TextWrapped = true
+
+UIAspectRatioConstraint_4.Parent = Reach1
+UIAspectRatioConstraint_4.AspectRatio = 2.860
+
+UITextSizeConstraint_4.Parent = Reach1
+UITextSizeConstraint_4.MaxTextSize = 14
+
+TackleHitbox.Name = "TackleHitbox"
+TackleHitbox.Parent = Frame
+TackleHitbox.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TackleHitbox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TackleHitbox.BorderSizePixel = 0
+TackleHitbox.Position = UDim2.new(0.0500000007, 0, 0.610119045, 0)
+TackleHitbox.Size = UDim2.new(0.894999981, 0, 0.148809522, 0)
+TackleHitbox.Font = Enum.Font.SourceSansSemibold
+TackleHitbox.PlaceholderText = "Value"
+TackleHitbox.Text = ""
+TackleHitbox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TackleHitbox.TextScaled = true
+TackleHitbox.TextSize = 28.000
+TackleHitbox.TextWrapped = true
+
+UICorner_3.Parent = TackleHitbox
+
+UIAspectRatioConstraint_5.Parent = TackleHitbox
+UIAspectRatioConstraint_5.AspectRatio = 10.740
+
+UITextSizeConstraint_5.Parent = TackleHitbox
+UITextSizeConstraint_5.MaxTextSize = 28
+
+Reach2.Name = "Reach2"
+Reach2.Parent = Frame
+Reach2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Reach2.BackgroundTransparency = 1.000
+Reach2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Reach2.BorderSizePixel = 0
+Reach2.Position = UDim2.new(0.0500000007, 0, 0.494047612, 0)
+Reach2.Size = UDim2.new(0.223333329, 0, 0.148809522, 0)
+Reach2.Font = Enum.Font.Unknown
+Reach2.Text = "Tackle Hitbox Reach"
+Reach2.TextColor3 = Color3.fromRGB(80, 80, 80)
+Reach2.TextScaled = true
+Reach2.TextSize = 14.000
+Reach2.TextWrapped = true
+
+UIAspectRatioConstraint_6.Parent = Reach2
+UIAspectRatioConstraint_6.AspectRatio = 2.680
+
+UITextSizeConstraint_6.Parent = Reach2
+UITextSizeConstraint_6.MaxTextSize = 14
+
+Confirm.Name = "Confirm"
+Confirm.Parent = Frame
+Confirm.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Confirm.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Confirm.BorderSizePixel = 0
+Confirm.Position = UDim2.new(0.38499999, 0, 0.77976191, 0)
+Confirm.Size = UDim2.new(0.224999994, 0, 0.148809522, 0)
+Confirm.Font = Enum.Font.GothamBold
+Confirm.Text = "Confirm"
+Confirm.TextColor3 = Color3.fromRGB(255, 255, 255)
+Confirm.TextScaled = true
+Confirm.TextSize = 14.000
+Confirm.TextWrapped = true
+
+UICorner_4.CornerRadius = UDim.new(0, 10)
+UICorner_4.Parent = Confirm
+
+UIAspectRatioConstraint_7.Parent = Confirm
+UIAspectRatioConstraint_7.AspectRatio = 2.700
+
+UITextSizeConstraint_7.Parent = Confirm
+UITextSizeConstraint_7.MaxTextSize = 14
+
+Credits.Name = "Credits"
+Credits.Parent = Frame
+Credits.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Credits.BackgroundTransparency = 1.000
+Credits.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Credits.BorderSizePixel = 0
+Credits.Position = UDim2.new(0.793333352, 0, 0.892857134, 0)
+Credits.Size = UDim2.new(0.193333328, 0, 0.104166664, 0)
+Credits.Font = Enum.Font.GothamBold
+Credits.Text = "@raiwesy"
+Credits.TextColor3 = Color3.fromRGB(255, 255, 255)
+Credits.TextScaled = true
+Credits.TextSize = 20.000
+Credits.TextWrapped = true
+Credits.TextXAlignment = Enum.TextXAlignment.Right
+
+UIAspectRatioConstraint_8.Parent = Credits
+UIAspectRatioConstraint_8.AspectRatio = 3.314
+
+UITextSizeConstraint_8.Parent = Credits
+UITextSizeConstraint_8.MaxTextSize = 20
+
+UIAspectRatioConstraint_9.Parent = Frame
+UIAspectRatioConstraint_9.AspectRatio = 1.786
+
+UIAspectRatioConstraint_10.Parent = ScreenGui
+UIAspectRatioConstraint_10.AspectRatio = 1.362
