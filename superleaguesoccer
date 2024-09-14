@@ -291,14 +291,14 @@ local function updateHitboxSizes()
             hitbox.Size = Vector3.new(ballHitboxValue, ballHitboxValue, ballHitboxValue)
             hitbox.OriginalSize.Value = Vector3.new(ballHitboxValue, ballHitboxValue, ballHitboxValue)
             hitbox.BrickColor = BrickColor.new(Color3.fromRGB(0, 0, 255)) -- Set color to blue
-            hitbox.Transparency = 0.25 -- Set transparency to 0.25
+            hitbox.Transparency = 1 -- Set transparency to 0.10
         end
         
         if tackleHitboxValue then
             tackleHitbox.Size = Vector3.new(tackleHitboxValue, tackleHitboxValue, tackleHitboxValue)
             tackleHitbox.OriginalSize.Value = Vector3.new(tackleHitboxValue, tackleHitboxValue, tackleHitboxValue)
             tackleHitbox.BrickColor = BrickColor.new(Color3.fromRGB(0, 0, 255)) -- Set color to blue
-            tackleHitbox.Transparency = 0.25 -- Set transparency to 0.25
+            tackleHitbox.Transparency = 1 -- Set transparency to 0.10
         end
     end
 end
