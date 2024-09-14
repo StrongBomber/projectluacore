@@ -1,4 +1,4 @@
--- Gui to Lua
+-- GUI to Lua
 -- Version: 3.2
 
 -- Instances:
@@ -37,10 +37,11 @@ local UITextSizeConstraint_8 = Instance.new("UITextSizeConstraint")
 local UIAspectRatioConstraint_9 = Instance.new("UIAspectRatioConstraint")
 local UIAspectRatioConstraint_10 = Instance.new("UIAspectRatioConstraint")
 
---Properties:
+-- Properties:
 
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.ResetOnSpawn = false
 
 Frame.Parent = ScreenGui
 Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
@@ -172,7 +173,7 @@ Reach2.BackgroundTransparency = 1.000
 Reach2.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Reach2.BorderSizePixel = 0
 Reach2.Position = UDim2.new(0.0500000007, 0, 0.494047612, 0)
-Reach2.Size = UDim2.new(0.223333329, 0, 0.148809522, 0)
+Reach2.Size = UDim2.new(0.238322407, 0, 0.148809522, 0)
 Reach2.Font = Enum.Font.Unknown
 Reach2.Text = "Tackle Hitbox Reach"
 Reach2.TextColor3 = Color3.fromRGB(80, 80, 80)
@@ -236,3 +237,73 @@ UIAspectRatioConstraint_9.AspectRatio = 1.786
 
 UIAspectRatioConstraint_10.Parent = ScreenGui
 UIAspectRatioConstraint_10.AspectRatio = 1.362
+
+-- Draggable Frame Script
+local userInputService = game:GetService("UserInputService")
+local dragging
+local dragInput
+local startPos
+local startMousePos
+
+local function updatePosition(input)
+    local delta = input.Position - startMousePos
+    Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+local function onInputBegan(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        startPos = Frame.Position
+        startMousePos = input.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end
+
+local function onInputChanged(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        updatePosition(input)
+    end
+end
+
+Frame.InputBegan:Connect(onInputBegan)
+userInputService.InputChanged:Connect(onInputChanged)
+
+-- Update hitbox sizes and appearance
+local function updateHitboxSizes()
+    local player = game.Players.LocalPlayer
+    if not player then return end
+    
+    local character = player.Character
+    if not character then return end
+    
+    local hitbox = character:FindFirstChild("Hitbox")
+    local tackleHitbox = character:FindFirstChild("TackleHitbox")
+    
+    if hitbox and tackleHitbox then
+        local ballHitboxValue = tonumber(BallHitbox.Text)
+        local tackleHitboxValue = tonumber(TackleHitbox.Text)
+        
+        if ballHitboxValue then
+            hitbox.Size = Vector3.new(ballHitboxValue, ballHitboxValue, ballHitboxValue)
+            hitbox.OriginalSize.Value = Vector3.new(ballHitboxValue, ballHitboxValue, ballHitboxValue)
+            hitbox.BrickColor = BrickColor.new(Color3.fromRGB(0, 0, 255)) -- Set color to blue
+            hitbox.Transparency = 0.25 -- Set transparency to 0.25
+        end
+        
+        if tackleHitboxValue then
+            tackleHitbox.Size = Vector3.new(tackleHitboxValue, tackleHitboxValue, tackleHitboxValue)
+            tackleHitbox.OriginalSize.Value = Vector3.new(tackleHitboxValue, tackleHitboxValue, tackleHitboxValue)
+            tackleHitbox.BrickColor = BrickColor.new(Color3.fromRGB(0, 0, 255)) -- Set color to blue
+            tackleHitbox.Transparency = 0.25 -- Set transparency to 0.25
+        end
+    end
+end
+
+-- Connect the Confirm button
+Confirm.MouseButton1Click:Connect(function()
+    updateHitboxSizes()
+end)
