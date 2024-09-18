@@ -11,3 +11,29 @@ local class=Instance.new('StringValue',part);class.Name='TreeClass';class.Value=
 part.Name = name
 for k,l in pairs(part:GetChildren()) do if not l:IsA'BasePart' then continue end if l.Transparency == 0 then l.Transparency = 0.5 end end
 end
+
+-- Ekranın ortasında, en solda bir buton oluşturuyoruz
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+local button = Instance.new("TextButton")
+
+-- Butonun özelliklerini ayarlıyoruz
+screenGui.Parent = player:WaitForChild("PlayerGui")
+button.Parent = screenGui
+button.Size = UDim2.new(0, 100, 0, 50)
+button.Position = UDim2.new(0, 0, 0.5, -25) -- En sol ve orta konum
+button.Text = "Toggle"
+
+-- Değişken, ilk olarak açık kabul edelim
+local frostyEnabled = true
+
+-- Butona basıldığında çalışacak fonksiyon
+button.MouseButton1Click:Connect(function()
+    local frostyGui = game:GetService("CoreGui"):FindFirstChild("frosty is cute")
+    if frostyGui then
+        frostyEnabled = not frostyEnabled
+        frostyGui.Enabled = frostyEnabled
+    else
+        warn("CoreGui'de 'frosty is cute' bulunamadı.")
+    end
+end)
