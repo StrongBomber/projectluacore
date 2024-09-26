@@ -39,9 +39,10 @@ local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 
--- Define the positions for Block and Dash buttons
+-- Define the positions and sizes for Block and Dash buttons
 local blockPosition = UDim2.new(0, 1311, 0, 850)
 local dashPosition = UDim2.new(0, -100, 0, 0)
+local dashSize = UDim2.new(0, 250, 0, 80)
 
 -- Function to set the Block position
 local function setBlockPosition(block)
@@ -50,10 +51,16 @@ local function setBlockPosition(block)
     end
 end
 
--- Function to set the Dash position
-local function setDashPosition(dash)
+-- Function to set the Dash properties: position, size, and ScaleType
+local function setDashProperties(dash)
     if dash then
         dash.Position = dashPosition
+        dash.Size = dashSize
+        
+        -- Assuming Dash contains an ImageLabel or ImageButton
+        if dash:IsA("ImageLabel") or dash:IsA("ImageButton") then
+            dash.ScaleType = Enum.ScaleType.Crop
+        end
     end
 end
 
@@ -65,8 +72,8 @@ end
 
 -- Function to handle when Dash is added to Movement
 local function onDashAdded(dash)
-    -- Set initial position when Dash is added
-    setDashPosition(dash)
+    -- Set initial position, size, and ScaleType when Dash is added
+    setDashProperties(dash)
 end
 
 -- Function to monitor changes in PlayerGui
@@ -80,7 +87,7 @@ local function monitorPlayerGui()
     -- Monitor Dash button
     local movement = mobileHUD:WaitForChild("Movement")
     local dash = movement:WaitForChild("Dash")
-    setDashPosition(dash)
+    setDashProperties(dash)
 
     -- Connect to Block being added
     mobileHUD.ChildAdded:Connect(function(child)
@@ -106,7 +113,7 @@ player.CharacterAdded:Connect(function(character)
     monitorPlayerGui()
 end)
 
--- Continuously ensure Block and Dash positions are maintained
+-- Continuously ensure Block and Dash positions and properties are maintained
 RunService.Heartbeat:Connect(function()
     local mobileHUD = player.PlayerGui:FindFirstChild("MobileHUD")
     if mobileHUD then
@@ -116,12 +123,12 @@ RunService.Heartbeat:Connect(function()
             setBlockPosition(block)
         end
         
-        -- Ensure Dash button position
+        -- Ensure Dash button properties (position, size, and ScaleType)
         local movement = mobileHUD:FindFirstChild("Movement")
         if movement then
             local dash = movement:FindFirstChild("Dash")
-            if dash and dash.Position ~= dashPosition then
-                setDashPosition(dash)
+            if dash and (dash.Position ~= dashPosition or dash.Size ~= dashSize) then
+                setDashProperties(dash)
             end
         end
     end
