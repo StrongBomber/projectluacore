@@ -6,6 +6,6 @@ task.spawn(function()
 		pcall(function()
 			channel:SendAsync("TEAM RAIWESY - THE BEST") -- Mesajı sen istersen değiştir
 		end)
-		task.wait() -- Maksimum hızda çalışır
+		task.wait(2) -- Maksimum hızda çalışır
 	end
 end)
