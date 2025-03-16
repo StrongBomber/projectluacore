@@ -4,7 +4,7 @@ local channel = TextChatService.TextChannels.RBXGeneral
 task.spawn(function()
 	while true do
 		pcall(function()
-			channel:SendAsync("/team fuck uuuu") -- Mesajı sen istersen değiştir
+			channel:SendAsync("TEAM RAIWESY - THE BEST") -- Mesajı sen istersen değiştir
 		end)
 		task.wait() -- Maksimum hızda çalışır
 	end
