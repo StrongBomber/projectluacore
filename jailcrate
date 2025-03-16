@@ -1,9 +1,2 @@
 script_key = "sBliawCEKYLaHejJOFFLclSnyBiLLSxc"
-
--- İlk script hemen çalışır
 loadstring(game:HttpGet("https://jailhax.lol/scripts/FarmFree.lua"))()
-
--- 4 saniye sonra ikinci script çalışır
-task.delay(2, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/StrongBomber/projectluacore/refs/heads/main/spam"))()
-end)
