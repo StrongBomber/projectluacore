@@ -1,0 +1,43 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/StrongBomber/projectluacore/refs/heads/main/emergencyhamburgbeanz"))()
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua"))()
+-- GUI oluştur
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "DraggableToggleButton"
+screenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+
+-- Buton oluştur
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 30, 0, 30) -- Boyut 30x30 yapıldı
+toggleButton.Position = UDim2.new(0, 100, 0, 100)
+toggleButton.Text = "+"
+toggleButton.BackgroundColor3 = Color3.fromRGB(100, 150, 255)
+toggleButton.TextSize = 18
+toggleButton.Parent = screenGui
+toggleButton.Active = true
+toggleButton.Draggable = true -- Sürüklenebilir
+
+-- Toggle mantığı
+local toggled = false
+
+toggleButton.MouseButton1Click:Connect(function()
+	toggled = not toggled
+	local CoreGui = game:GetService("CoreGui")
+	
+	local c751 = CoreGui:FindFirstChild("C751")
+	local beanz = CoreGui:FindFirstChild("BeanzUI")
+	
+	if c751 then
+		c751.Enabled = toggled
+	end
+	if beanz then
+		beanz.Enabled = toggled
+	end
+	
+	if toggled then
+		toggleButton.Text = "-" -- Açıldıysa "-" işareti göster
+		toggleButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+	else
+		toggleButton.Text = "+" -- Kapalıysa "+" işareti göster
+		toggleButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+	end
+end)
