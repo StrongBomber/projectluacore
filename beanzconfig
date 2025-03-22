@@ -1,0 +1,43 @@
+-- Draggable Toggle Button Oluştur
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "DraggableToggleButton"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 30, 0, 30)
+toggleButton.Position = UDim2.new(0, 100, 0, 100)
+toggleButton.Text = "+"
+toggleButton.BackgroundColor3 = Color3.fromRGB(100, 150, 255)
+toggleButton.TextSize = 18
+toggleButton.Parent = screenGui
+toggleButton.Active = true
+toggleButton.Draggable = true
+
+-- Toggle Değişkeni
+local toggled = false
+
+-- Toggle Fonksiyonu
+toggleButton.MouseButton1Click:Connect(function()
+    local CoreGui = game:GetService("CoreGui")
+    local beanzGui = CoreGui:FindFirstChild("BeanzUI")
+    
+    -- BeanzUI'yi toggle et
+    if beanzGui then
+        toggled = not toggled
+        pcall(function()
+            beanzGui.Enabled = toggled
+        end)
+        
+        -- Buton görünümünü güncelle
+        if toggled then
+            toggleButton.Text = "-"
+            toggleButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0) -- Yeşil, aktif
+        else
+            toggleButton.Text = "+"
+            toggleButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0) -- Kırmızı, pasif
+        end
+    else
+        warn("BeanzUI bulunamadı.")
+    end
+end)
