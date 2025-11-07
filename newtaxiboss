@@ -66,7 +66,7 @@ print("Creating window...")
 -- Create Window
 local Window = Fluent:CreateWindow({
     Title = "🚖 Project Luacore by Raiwesy | Taxi Boss",
-    SubTitle = "by devfixz",
+    SubTitle = "by Raiwesy - insta @raiwesy",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = true,
