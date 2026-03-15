@@ -3,6 +3,7 @@
 -- ║  NoClip | FreeCam | SpeedHack | JumpHack | ESP | ClickTP    ║
 -- ║  Waypoints | PlayerTP | InfJump | Fly | AntiAFK | GodMode   ║
 -- ║  + CB: Skeleton ESP | Box ESP | Aimbot | Tracer | MobileFly  ║
+-- ║  + Legit Aimbot (Rastgele Hedef Bölge)                       ║
 -- ╚══════════════════════════════════════════════════════════════╝
 
 local Players          = game:GetService("Players")
@@ -225,7 +226,7 @@ local TABBAR = frame(MF, UDim2.new(1,0,0,CFG.TAB_H), UDim2.new(0,0,0,CFG.HEADER_
 frame(MF, UDim2.new(1,0,0,1), UDim2.new(0,0,0,CFG.HEADER_H+CFG.TAB_H), C.border)
 
 -- ══════════════════════════════════════
---  TABS — CB eklendi (6 tab)
+--  TABS
 -- ══════════════════════════════════════
 local TABS = {
     {name="Movement", icon="🏃"},
@@ -889,6 +890,12 @@ local cb = {
     aim_vischeck      = true,
     aim_fov_visible   = true,
     aim_fov_color     = Color3.fromRGB(255, 255, 255),
+    -- Legit Aimbot
+    legit_aim_enabled = false,          -- toggle
+    legit_aim_parts   = {"Head", "UpperTorso", "Torso"},  -- havuz
+    legit_aim_interval= 0.35,           -- kaç saniyede bir bölge değişsin
+    legit_aim_timer   = 0,              -- iç sayaç (UI'de gösterilmez)
+    legit_aim_current = "Head",         -- şu an kullanılan bölge (bilgi satırı için)
     -- Fly
     cbfly_enabled     = false,
     cbfly_speed       = 50,
@@ -915,7 +922,7 @@ local custom_bones = {
 }
 
 -- ─── Yardımcı ─────────────────────────────────────────────────
-local cb_esp = {}   -- [player] = { lines={}, box, box_ol, box_fill, hpbg, hp, name, dist, tracer, tracer_ol, character, humanoid }
+local cb_esp = {}
 
 local function cbW2S(pos)
     local v, on = camera:WorldToViewportPoint(pos)
@@ -929,7 +936,6 @@ local function cbRig(c)
     return r6_bones
 end
 
--- Bir part kameradan görünüyor mu? (duvar arkasında mı değil mi)
 local function cbIsVisible(part, char)
     local origin   = camera.CFrame.Position
     local target   = part.Position
@@ -938,13 +944,10 @@ local function cbIsVisible(part, char)
     rp.FilterType  = Enum.RaycastFilterType.Exclude
     rp.FilterDescendantsInstances = {player.Character or workspace, char}
     local result   = workspace:Raycast(origin, dir, rp)
-    -- Sonuç yoksa ya da çarptığı şey hedefin içinde → görünür
     if not result then return true end
-    -- Çarptığı nokta hedefe çok yakınsa görünür say
     return (result.Position - target).Magnitude < 1.5
 end
 
--- Karakterin genel görünürlüğü: torso veya head görünüyor mu?
 local function cbCharVisible(c)
     local torso = c:FindFirstChild("UpperTorso") or c:FindFirstChild("Torso") or c:FindFirstChild("HumanoidRootPart")
     if torso and cbIsVisible(torso, c) then return true end
@@ -982,7 +985,6 @@ local function cbClean(p)
 end
 
 local function cbBuild(p)
-    -- Ön koşullar
     if not p:IsA("Player") or not cb.esp_active then return end
     if cb.team_check and p.Team == player.Team and p.Team ~= nil then cbClean(p); return end
     cbClean(p)
@@ -992,7 +994,6 @@ local function cbBuild(p)
     if not h or h.Health <= 0 then return end
     local hrp = c:FindFirstChild("HumanoidRootPart"); if not hrp then return end
 
-    -- Kemikler için Drawing nesnelerini oluştur
     local lines = {}
     if cb.skeleton_enabled then
         for _, bone in ipairs(cbRig(c)) do
@@ -1014,7 +1015,6 @@ local function cbBuild(p)
     local tracer   = cbMakeLine()
     local tracer_ol= cbMakeLine()
 
-    -- Sabit özellikler (her frame değişmeyecek olanlar)
     box_ol.Thickness  = cb.box_thickness + 1
     box_ol.Color      = Color3.new(0,0,0)
     box_fill.Filled   = true
@@ -1057,7 +1057,6 @@ local function cbGetBounds(c)
     }
 end
 
--- Tüm nesneleri gizle (tek fonksiyon, tekrar yok)
 local HIDE_KEYS = {"box","box_ol","box_fill","hpbg","hp","name","dist","tracer","tracer_ol"}
 local function cbHideAll(d)
     for _, k in ipairs(HIDE_KEYS) do if d[k] then d[k].Visible=false end end
@@ -1066,11 +1065,9 @@ end
 
 local function cbUpdateESP()
     for p, d in pairs(cb_esp) do
-        -- Karakter/humanoid geçerlilik kontrolü
         local c = d.character
         local h = d.humanoid
         if not c or not c.Parent or not h then cbClean(p); continue end
-        -- Karakter yeniden spawn ettiyse yeniden build et
         if p.Character and p.Character ~= c then
             cbBuild(p); continue
         end
@@ -1079,11 +1076,9 @@ local function cbUpdateESP()
         local hrp = c:FindFirstChild("HumanoidRootPart")
         if not hrp then cbHideAll(d); continue end
 
-        -- Görünürlük tespiti (iskelet rengi için)
         local visible = cbCharVisible(c)
         local skelCol = visible and cb.skel_visible_col or cb.skel_hidden_col
 
-        -- ── İskelet ────────────────────────────────────────────
         if cb.skeleton_enabled and d.lines and #d.lines > 0 then
             for _, b in ipairs(d.lines) do
                 local p1, p2 = b.p1, b.p2
@@ -1093,7 +1088,7 @@ local function cbUpdateESP()
                     if on1 and on2 then
                         b.line.From        = s1
                         b.line.To          = s2
-                        b.line.Color       = skelCol           -- ← görünürlüğe göre renk
+                        b.line.Color       = skelCol
                         b.line.Thickness   = cb.skeleton_thickness
                         b.line.Transparency= cb.skeleton_transp
                         b.line.Visible     = true
@@ -1108,24 +1103,20 @@ local function cbUpdateESP()
             if d.lines then for _, b in pairs(d.lines) do b.line.Visible=false end end
         end
 
-        -- ── Bounding box ────────────────────────────────────────
         local bounds = cbGetBounds(c)
         if bounds then
-            -- Dış çerçeve (outline)
             if cb.box_enabled then
                 d.box_ol.Position = bounds.topLeft - Vector2.new(1,1)
                 d.box_ol.Size     = bounds.size    + Vector2.new(2,2)
                 d.box_ol.Thickness= cb.box_thickness + 1
                 d.box_ol.Visible  = true
 
-                -- Dolgu
                 d.box_fill.Position    = bounds.topLeft
                 d.box_fill.Size        = bounds.size
                 d.box_fill.Color       = cb.box_fill_color
                 d.box_fill.Transparency= cb.box_fill_transp
                 d.box_fill.Visible     = cb.box_filled
 
-                -- Ana kutu
                 d.box.Position  = bounds.topLeft
                 d.box.Size      = bounds.size
                 d.box.Color     = cb.box_color
@@ -1135,7 +1126,6 @@ local function cbUpdateESP()
                 d.box.Visible=false; d.box_ol.Visible=false; d.box_fill.Visible=false
             end
 
-            -- ── Can barı ─────────────────────────────────────────
             if cb.hpbar_enabled then
                 local bw  = 3
                 local bh  = bounds.size.Y
@@ -1152,7 +1142,6 @@ local function cbUpdateESP()
                 d.hp.Visible=false; d.hpbg.Visible=false
             end
 
-            -- ── İsim ─────────────────────────────────────────────
             if cb.name_enabled then
                 d.name.Text        = p.DisplayName
                 d.name.Position    = Vector2.new(bounds.center.X, bounds.topLeft.Y - 15)
@@ -1161,7 +1150,6 @@ local function cbUpdateESP()
                 d.name.Visible     = true
             else d.name.Visible=false end
 
-            -- ── Mesafe ───────────────────────────────────────────
             if cb.dist_enabled then
                 local dist = (hrp.Position - camera.CFrame.Position).Magnitude
                 d.dist.Text     = string.format("%d studs", math.floor(dist))
@@ -1171,13 +1159,11 @@ local function cbUpdateESP()
                 d.dist.Visible  = true
             else d.dist.Visible=false end
         else
-            -- Ekranda değil: kutu/bar/yazıları gizle (iskelet zaten kendi içinde halledildi)
             d.box.Visible=false; d.box_ol.Visible=false; d.box_fill.Visible=false
             d.hp.Visible=false;  d.hpbg.Visible=false
             d.name.Visible=false; d.dist.Visible=false
         end
 
-        -- ── Tracer ───────────────────────────────────────────────
         if cb.tracer_enabled then
             local sp, on = cbW2S(hrp.Position)
             if on then
@@ -1206,7 +1192,6 @@ local function cbUpdateESP()
 end
 
 local function cbRefreshAll()
-    -- Önce hepsini temizle, sonra yeniden build et
     for p, _ in pairs(cb_esp) do cbClean(p) end
     for _, p in ipairs(Players:GetPlayers()) do
         if p ~= player then cbBuild(p) end
@@ -1241,6 +1226,35 @@ local function cbAimAt(target)
     local dir  = (part.Position - camera.CFrame.Position).Unit
     local tgt  = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + dir)
     camera.CFrame = camera.CFrame:Lerp(tgt, 1 / cb.aim_smooth)
+end
+
+-- ══════════════════════════════════════
+--  LEGİT AİMBOT — Rastgele Bölge Seçici
+-- ══════════════════════════════════════
+-- Her legit_aim_interval saniyede bir havuzdan rastgele bir bölge seçer
+-- ve bunu cb.aim_part olarak atar; böylece normal aimbot bu bölgeyi hedefler.
+-- Seçilen bölge, UI'deki bilgi satırında da güncellenir.
+
+local legitAimPartLabel = nil  -- aşağıda UI oluşturulduktan sonra atanır
+
+local function cbPickRandomPart()
+    local pool = cb.legit_aim_parts
+    -- Havuzdan rastgele bir index seç, mevcut bölgeyle aynı olmaması için
+    -- (tek elemanlı havuzda kontrol atlatılır)
+    local idx
+    if #pool <= 1 then
+        idx = 1
+    else
+        repeat
+            idx = math.random(1, #pool)
+        until pool[idx] ~= cb.legit_aim_current
+    end
+    cb.legit_aim_current = pool[idx]
+    cb.aim_part          = pool[idx]
+    -- UI etiketini güncelle
+    if legitAimPartLabel then
+        legitAimPartLabel.Text = "🎲 Aktif Bölge:  " .. cb.legit_aim_current
+    end
 end
 
 -- ─── Mobil Fly GUI ────────────────────────────────────────────
@@ -1366,18 +1380,216 @@ dropdown(t5, "Hedef Part", {"Head","UpperTorso","HumanoidRootPart","LowerTorso"}
 sliderRow(t5, "Aimbot FOV",    20, 500, 100, 26, function(v) cb.aim_fov=v end)
 sliderRow(t5, "Yumuşaklık",     1,  20,   5, 27, function(v) cb.aim_smooth=v end)
 
+-- ══════════════════════════════════════
+--  LEGİT AİMBOT UI  (Aimbot bölümünün hemen altı)
+-- ══════════════════════════════════════
 sep(t5, 28)
-secHdr(t5, "✈️  MOBİL FLY  (Ekran Butonları)", 29)
-checkRow(t5, "Fly Aktif", false, 30, function(v)
+secHdr(t5, "🎲  LEGİT AİMBOT  (Rastgele Bölge)", 29)
+infoRow(t5, "ℹ️  Açıkken hedef bölgeyi Head / UpperTorso / Torso arasında rastgele değiştirir. Normal Aimbot ile birlikte çalışır.", 30)
+
+-- Aktif bölgeyi gösteren bilgi satırı
+local legitInfoRow = frame(t5, UDim2.new(1,0,0,36), UDim2.new(0,0,0,0), C.row_b)
+legitInfoRow.LayoutOrder = 31; corner(legitInfoRow, 5)
+legitAimPartLabel = lbl(
+    legitInfoRow,
+    "🎲 Aktif Bölge:  " .. cb.legit_aim_current,
+    UDim2.new(1,-12,1,0), UDim2.new(0,10,0,0),
+    C.accent, 13
+)
+
+-- Toggle satırı
+checkRow(t5, "Legit Aimbot  (rastgele bölge)", false, 32, function(v)
+    cb.legit_aim_enabled = v
+    if v then
+        -- Hemen bir bölge seç
+        cbPickRandomPart()
+    else
+        -- Kapatınca hedef bölgeyi Head'e geri döndür
+        cb.legit_aim_current = "Head"
+        cb.aim_part          = "Head"
+        if legitAimPartLabel then
+            legitAimPartLabel.Text = "🎲 Aktif Bölge:  Head  (devre dışı)"
+        end
+    end
+end)
+
+-- Bölge değişim aralığı slider'ı (0.1 — 2.0 sn)
+sliderRow(t5, "Bölge Değişim Süresi (sn)", 0.1, 2.0, 0.35, 33, function(v)
+    cb.legit_aim_interval = v
+end)
+
+sep(t5, 34)
+secHdr(t5, "✈️  MOBİL FLY  (Ekran Butonları)", 35)
+checkRow(t5, "Fly Aktif", false, 36, function(v)
     cb.cbfly_enabled=v; cbFlyGui.Enabled=v
     if v then cbStartFly() else cbStopFly() end
 end)
-sliderRow(t5, "Fly Hızı", 10, 200, 50, 31, function(v) cb.cbfly_speed=v end)
+sliderRow(t5, "Fly Hızı", 10, 200, 50, 37, function(v) cb.cbfly_speed=v end)
 
-sep(t5, 32)
-actionBtn(t5, "🔄  ESP Yenile", C.btn_blue, 33, function() cbRefreshAll() end)
-actionBtn(t5, "🗑  ESP Temizle", C.red, 34, function()
+sep(t5, 38)
+actionBtn(t5, "🔄  ESP Yenile", C.btn_blue, 39, function() cbRefreshAll() end)
+actionBtn(t5, "🗑  ESP Temizle", C.red, 40, function()
     for p, _ in pairs(cb_esp) do cbClean(p) end
+end)
+
+sep(t5, 41)
+secHdr(t5, "📱  COUNTER BLOX - MOBİL", 42)
+infoRow(t5, "ℹ️  Açıkken CB'nin mobil UI elemanları (GUI.Mobile) ve chat paneli sürüklenebilir & pinch ile boyutlandırılabilir hale gelir.", 43)
+
+-- ── CB Mobile UI Düzenleyici state ──────────────────────────
+local cbMobileActive    = false
+local cbMobileConns     = {}
+
+-- Chat paneli için ayrı bir ScreenGui oluştur (ikinci scriptten alındı)
+local cbChatGui = Instance.new("ScreenGui")
+cbChatGui.Name           = "CB_ChatGui"
+cbChatGui.ResetOnSpawn   = false
+cbChatGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+cbChatGui.DisplayOrder   = 998
+cbChatGui.Enabled        = false
+cbChatGui.Parent         = player.PlayerGui
+
+-- Chat Paneli
+local cbChatPanel = Instance.new("Frame")
+cbChatPanel.Name              = "ChatPanel"
+cbChatPanel.Parent            = cbChatGui
+cbChatPanel.Size              = UDim2.new(0, 250, 0, 60)
+cbChatPanel.Position          = UDim2.new(0.5, -125, 0.05, 60)
+cbChatPanel.BackgroundColor3  = Color3.fromRGB(45, 45, 45)
+cbChatPanel.BorderSizePixel   = 0
+do local r = Instance.new("UICorner", cbChatPanel); r.CornerRadius = UDim.new(0, 8) end
+
+local cbTextBox = Instance.new("TextBox")
+cbTextBox.Parent             = cbChatPanel
+cbTextBox.Size               = UDim2.new(0.75, -10, 0.6, 0)
+cbTextBox.Position           = UDim2.new(0.05, 0, 0.2, 0)
+cbTextBox.PlaceholderText    = "Mesaj yaz..."
+cbTextBox.Text               = ""
+cbTextBox.BackgroundColor3   = Color3.fromRGB(60, 60, 60)
+cbTextBox.TextColor3         = Color3.new(1, 1, 1)
+cbTextBox.Font               = Enum.Font.SourceSans
+cbTextBox.TextSize           = 16
+cbTextBox.ClearTextOnFocus   = true
+do local r = Instance.new("UICorner", cbTextBox); r.CornerRadius = UDim.new(0, 6) end
+
+local cbSendBtn = Instance.new("TextButton")
+cbSendBtn.Parent            = cbChatPanel
+cbSendBtn.Size              = UDim2.new(0.15, 0, 0.6, 0)
+cbSendBtn.Position          = UDim2.new(0.82, 0, 0.2, 0)
+cbSendBtn.BackgroundColor3  = Color3.fromRGB(0, 120, 215)
+cbSendBtn.Text              = ">"
+cbSendBtn.TextColor3        = Color3.new(1, 1, 1)
+cbSendBtn.TextSize          = 20
+cbSendBtn.Font              = Enum.Font.GothamBold
+do local r = Instance.new("UICorner", cbSendBtn); r.CornerRadius = UDim.new(0, 6) end
+
+-- Chat gönder
+local function cbSendChat()
+    local msg = cbTextBox.Text
+    if msg ~= "" then
+        local TCS = game:GetService("TextChatService")
+        if TCS.ChatVersion == Enum.ChatVersion.TextChatService then
+            local ch = TCS.TextChannels:FindFirstChild("RBXGeneral")
+            if ch then ch:SendAsync(msg) end
+        else
+            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(msg, "All")
+        end
+        cbTextBox.Text = ""
+    end
+end
+cbSendBtn.MouseButton1Click:Connect(cbSendChat)
+cbTextBox.FocusLost:Connect(function(enter) if enter then cbSendChat() end end)
+
+-- ── Draggable / pinch yardımcısı ────────────────────────────
+local function cbMakeAdjustable(obj)
+    local dragging, dragStart, startPos
+    local isPinching = false
+
+    local c1 = obj.InputBegan:Connect(function(inp)
+        if not cbMobileActive then return end
+        if inp.UserInputType == Enum.UserInputType.Touch
+            or inp.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging  = true
+            dragStart = inp.Position
+            startPos  = obj.Position
+            inp.Changed:Connect(function()
+                if inp.UserInputState == Enum.UserInputState.End then
+                    dragging    = false
+                    isPinching  = false
+                end
+            end)
+        end
+    end)
+
+    local c2 = UserInputService.InputChanged:Connect(function(inp)
+        if dragging and not isPinching and
+            (inp.UserInputType == Enum.UserInputType.MouseMovement
+             or inp.UserInputType == Enum.UserInputType.Touch) then
+            local d = inp.Position - dragStart
+            obj.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + d.X,
+                startPos.Y.Scale, startPos.Y.Offset + d.Y
+            )
+        end
+    end)
+
+    local c3 = UserInputService.TouchPinch:Connect(function(touches, scale, velocity, state)
+        if not cbMobileActive then return end
+        if state == Enum.UserInputState.Begin then
+            local center = (touches[1] + touches[2]) / 2
+            local found  = player.PlayerGui:GetGuiObjectsAtPosition(center.X, center.Y)
+            for _, fo in pairs(found) do
+                if fo == obj then
+                    isPinching = true
+                    -- startSize'ı kaydet (pinch başlangıcı)
+                    obj:SetAttribute("_pinchW", obj.Size.X.Offset)
+                    obj:SetAttribute("_pinchH", obj.Size.Y.Offset)
+                    break
+                end
+            end
+        elseif state == Enum.UserInputState.Change and isPinching then
+            local pw = obj:GetAttribute("_pinchW") or obj.Size.X.Offset
+            local ph = obj:GetAttribute("_pinchH") or obj.Size.Y.Offset
+            obj.Size = UDim2.new(
+                obj.Size.X.Scale, math.max(50, pw * scale),
+                obj.Size.Y.Scale, math.max(30, ph * scale)
+            )
+        end
+    end)
+
+    table.insert(cbMobileConns, c1)
+    table.insert(cbMobileConns, c2)
+    table.insert(cbMobileConns, c3)
+end
+
+-- ── Toggle butonu ────────────────────────────────────────────
+local _, cbMobileSetVal = checkRow(t5, "CB Mobil UI Düzenleyici", false, 44, function(v)
+    cbMobileActive = v
+
+    if v then
+        -- Chat GUI'yi göster
+        cbChatGui.Enabled = true
+
+        -- Chat panelini draggable yap
+        cbMakeAdjustable(cbChatPanel)
+
+        -- GUI.Mobile içindeki tüm GuiObject'leri draggable yap
+        local mobileFrame = player.PlayerGui:FindFirstChild("GUI")
+            and player.PlayerGui.GUI:FindFirstChild("Mobile")
+        if mobileFrame then
+            for _, child in ipairs(mobileFrame:GetChildren()) do
+                if child:IsA("GuiObject") then
+                    cbMakeAdjustable(child)
+                end
+            end
+        end
+    else
+        -- Tüm bağlantıları kes
+        for _, conn in pairs(cbMobileConns) do conn:Disconnect() end
+        cbMobileConns = {}
+        -- Chat GUI'yi gizle
+        cbChatGui.Enabled = false
+    end
 end)
 
 -- ══════════════════════════════════════
@@ -1638,11 +1850,21 @@ RunService.Heartbeat:Connect(function(dt)
 
     -- CB Aimbot (otomatik)
     if cb.aim_enabled then local target=cbGetClosest(); if target then cbAimAt(target) end end
+
+    -- ══════════════════════════════════════
+    --  LEGİT AİMBOT — bölge değiştirici timer
+    -- ══════════════════════════════════════
+    if cb.legit_aim_enabled then
+        cb.legit_aim_timer = cb.legit_aim_timer + dt
+        if cb.legit_aim_timer >= cb.legit_aim_interval then
+            cb.legit_aim_timer = 0
+            cbPickRandomPart()
+        end
+    end
 end)
 
 -- NoClip + NoClip Camera
 RunService.Stepped:Connect(function()
-    -- Karakter noclip
     if S.noClip then
         local ch=getChar(); if ch then
             for _,part in ipairs(ch:GetDescendants()) do
@@ -1689,5 +1911,6 @@ end)
 print("╔══════════════════════════════════════════╗")
 print("║    ✦ RAIWESY V0.1 + CB TAB YÜKLENDI ✦    ║")
 print("║  Movement / Visual / TP / Misc / CB       ║")
+print("║  Legit Aimbot (Rastgele Bölge) EKLENDİ    ║")
 print("║  Toggle: ✦ butonu veya RightShift         ║")
 print("╚══════════════════════════════════════════╝")
