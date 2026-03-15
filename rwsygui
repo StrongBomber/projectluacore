@@ -1,0 +1,1693 @@
+-- ╔══════════════════════════════════════════════════════════════╗
+-- ║         RAIWESY V0.1 + COUNTERBLOX TAB  |  Mobil Uyumlu     ║
+-- ║  NoClip | FreeCam | SpeedHack | JumpHack | ESP | ClickTP    ║
+-- ║  Waypoints | PlayerTP | InfJump | Fly | AntiAFK | GodMode   ║
+-- ║  + CB: Skeleton ESP | Box ESP | Aimbot | Tracer | MobileFly  ║
+-- ╚══════════════════════════════════════════════════════════════╝
+
+local Players          = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService     = game:GetService("TweenService")
+local RunService       = game:GetService("RunService")
+local Lighting         = game:GetService("Lighting")
+
+local player = Players.LocalPlayer
+local mouse  = player:GetMouse()
+local camera = workspace.CurrentCamera
+
+-- ══════════════════════════════════════
+--  CONFIG
+-- ══════════════════════════════════════
+local CFG = {
+    TOGGLE_KEY = Enum.KeyCode.RightShift,
+    TP_OFFSET  = Vector3.new(0, 3, 0),
+    WIN_W      = 480,
+    WIN_H      = 540,
+    HEADER_H   = 48,
+    TAB_H      = 44,
+    C = {
+        bg        = Color3.fromRGB(22, 26, 32),
+        header    = Color3.fromRGB(14, 17, 22),
+        tab_bar   = Color3.fromRGB(18, 21, 28),
+        tab_on    = Color3.fromRGB(35, 80, 155),
+        tab_off   = Color3.fromRGB(18, 21, 28),
+        accent    = Color3.fromRGB(80, 145, 255),
+        panel_hdr = Color3.fromRGB(42, 72, 130),
+        input_bg  = Color3.fromRGB(16, 19, 26),
+        btn_blue  = Color3.fromRGB(35, 80, 155),
+        btn_dark  = Color3.fromRGB(28, 32, 44),
+        txt       = Color3.fromRGB(210, 218, 230),
+        txt_dim   = Color3.fromRGB(110, 120, 138),
+        txt_lbl   = Color3.fromRGB(170, 182, 200),
+        chk_on    = Color3.fromRGB(70, 155, 75),
+        chk_off   = Color3.fromRGB(52, 58, 72),
+        sl_fill   = Color3.fromRGB(55, 115, 215),
+        sl_bg     = Color3.fromRGB(36, 40, 52),
+        row_a     = Color3.fromRGB(26, 30, 38),
+        row_b     = Color3.fromRGB(22, 26, 34),
+        red       = Color3.fromRGB(170, 55, 55),
+        green     = Color3.fromRGB(55, 160, 80),
+        orange    = Color3.fromRGB(180, 100, 20),
+        border    = Color3.fromRGB(44, 50, 64),
+    },
+    WP_COLORS = {
+        Color3.fromRGB(255,100,100), Color3.fromRGB(100,200,255),
+        Color3.fromRGB(100,255,150), Color3.fromRGB(255,200,50),
+        Color3.fromRGB(200,100,255), Color3.fromRGB(255,150,50),
+        Color3.fromRGB(50,255,220),  Color3.fromRGB(255,80,180),
+    },
+}
+local C = CFG.C
+
+-- ══════════════════════════════════════
+--  STATE
+-- ══════════════════════════════════════
+local S = {
+    open = true, tab = 1,
+    winDrag = false, winDragStart = nil, winDragPos = nil,
+    clickTP = false, skipGUI = true,
+    tpMode = "direct", tweenDur = 1.0,
+    tweenStyle = Enum.EasingStyle.Quad, activeTween = nil,
+    waypoints = {}, wpID = 0,
+    lastTPPos  = nil,
+    deathPos   = nil,
+    noClip    = false,
+    fly       = false, flySpeed = 40, flyConn = nil,
+    speed     = false, speedVal = 50,
+    infJump   = false, jumpVal  = 50,
+    espEnabled= false, espBoxes = {},
+    fullBright= false,
+    origBright= Lighting.Brightness,
+    origAmb   = Lighting.Ambient,
+    origOutAmb= Lighting.OutdoorAmbient,
+    origFog   = Lighting.FogEnd,
+    freeCam   = false, fcSpeed = 30, fcConn = nil,
+    godMode   = false,
+    antiAFK   = false, lastAFK = 0,
+    camNoClip = false,
+    highlightEnabled   = false,
+    highlightFill      = Color3.fromRGB(255, 0, 4),
+    highlightOutline   = Color3.fromRGB(255, 255, 255),
+    highlightFillTrans = 0.5,
+    highlightOutTrans  = 0,
+    highlights         = {},
+}
+
+-- Forward declarations (UI'den önce tanımla, implementasyon aşağıda)
+
+-- ══════════════════════════════════════
+--  HELPERS
+-- ══════════════════════════════════════
+local function getChar() return player.Character end
+local function getHRP()
+    local ch = getChar(); return ch and ch:FindFirstChild("HumanoidRootPart")
+end
+local function getHum()
+    local ch = getChar(); return ch and ch:FindFirstChildOfClass("Humanoid")
+end
+
+local function tw(obj, props, dur, style, dir)
+    TweenService:Create(obj, TweenInfo.new(
+        dur or 0.15, style or Enum.EasingStyle.Quad, dir or Enum.EasingDirection.Out
+    ), props):Play()
+end
+
+local function teleportTo(pos)
+    local hrp = getHRP(); if not hrp then return end
+    S.lastTPPos = hrp.Position
+    if _G.RaiwesyUpdateFBStatus then _G.RaiwesyUpdateFBStatus() end
+    if S.tpMode == "tween" then
+        if S.activeTween then S.activeTween:Cancel() end
+        local t = TweenService:Create(hrp,
+            TweenInfo.new(S.tweenDur, S.tweenStyle, Enum.EasingDirection.Out),
+            {CFrame = CFrame.new(pos + CFG.TP_OFFSET)})
+        S.activeTween = t; t:Play()
+    else
+        hrp.CFrame = CFrame.new(pos + CFG.TP_OFFSET)
+    end
+end
+
+local function isTouch(inp)
+    return inp.UserInputType == Enum.UserInputType.Touch
+        or inp.UserInputType == Enum.UserInputType.MouseButton1
+end
+
+local function corner(p, r)
+    local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, r or 6); c.Parent = p; return c
+end
+local function stroke(p, t, col)
+    local s = Instance.new("UIStroke"); s.Thickness = t or 1; s.Color = col or C.border; s.Parent = p; return s
+end
+local function frame(parent, size, pos, bg)
+    local f = Instance.new("Frame"); f.Size = size
+    f.Position = pos or UDim2.new(0,0,0,0)
+    f.BackgroundColor3 = bg or C.bg; f.BorderSizePixel = 0; f.Parent = parent; return f
+end
+local function lbl(parent, text, size, pos, col, fs, align)
+    local l = Instance.new("TextLabel"); l.Text = text; l.Size = size
+    l.Position = pos or UDim2.new(0,0,0,0); l.BackgroundTransparency = 1
+    l.TextColor3 = col or C.txt; l.TextSize = fs or 13; l.Font = Enum.Font.Code
+    l.TextXAlignment = align or Enum.TextXAlignment.Left
+    l.BorderSizePixel = 0; l.Parent = parent; return l
+end
+local function mkbtn(parent, text, size, pos, bg, col, fs)
+    local b = Instance.new("TextButton"); b.Text = text; b.Size = size
+    b.Position = pos or UDim2.new(0,0,0,0); b.BackgroundColor3 = bg or C.btn_dark
+    b.BorderSizePixel = 0; b.AutoButtonColor = false; b.Font = Enum.Font.Code
+    b.TextSize = fs or 13; b.TextColor3 = col or C.txt; b.Parent = parent
+    corner(b, 5); return b
+end
+
+-- ── Ölüm pozisyonu takibi ──
+local function connectDeath(ch)
+    local hum = ch:FindFirstChildOfClass("Humanoid")
+    if not hum then return end
+    hum.Died:Connect(function()
+        local h = ch:FindFirstChild("HumanoidRootPart")
+        if h then
+            S.deathPos = h.Position
+            if _G.RaiwesyUpdateFBStatus then _G.RaiwesyUpdateFBStatus() end
+        end
+    end)
+end
+
+if player.Character then connectDeath(player.Character) end
+player.CharacterAdded:Connect(function(ch)
+    task.wait(0.1)
+    connectDeath(ch)
+end)
+
+-- ══════════════════════════════════════
+--  SCREEN GUI
+-- ══════════════════════════════════════
+local SG = Instance.new("ScreenGui")
+SG.Name = "RaiwesyGUI"; SG.ResetOnSpawn = false
+SG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+SG.IgnoreGuiInset = true
+SG.DisplayOrder = 999
+SG.Parent = player.PlayerGui
+
+local DD_OVERLAY = frame(SG, UDim2.new(1,0,1,0), UDim2.new(0,0,0,0), Color3.fromRGB(0,0,0))
+DD_OVERLAY.BackgroundTransparency = 1; DD_OVERLAY.ZIndex = 100
+local activeDropdown = nil
+local ddClose = Instance.new("TextButton")
+ddClose.Size = UDim2.new(1,0,1,0); ddClose.BackgroundTransparency = 1
+ddClose.Text = ""; ddClose.ZIndex = 99; ddClose.Visible = false; ddClose.Parent = DD_OVERLAY
+
+-- ══════════════════════════════════════
+--  TOGGLE BUTTON
+-- ══════════════════════════════════════
+local TogBtn = mkbtn(SG, "✦",
+    UDim2.new(0,56,0,56), UDim2.new(0,16,0,80),
+    C.btn_blue, Color3.fromRGB(220,232,255), 22)
+TogBtn.ZIndex = 30; corner(TogBtn, 8); stroke(TogBtn, 2, C.accent)
+
+-- ══════════════════════════════════════
+--  MAIN FRAME
+-- ══════════════════════════════════════
+local vp0 = camera.ViewportSize
+local MF = frame(SG,
+    UDim2.new(0,CFG.WIN_W,0,CFG.WIN_H),
+    UDim2.new(0, vp0.X/2 - CFG.WIN_W/2, 0, vp0.Y/2 - CFG.WIN_H/2),
+    C.bg)
+MF.ClipsDescendants = true; MF.ZIndex = 10; corner(MF, 8); stroke(MF, 1.5, C.border)
+
+local HDR = frame(MF, UDim2.new(1,0,0,CFG.HEADER_H), UDim2.new(0,0,0,0), C.header)
+corner(HDR, 8)
+frame(MF, UDim2.new(1,0,0,10), UDim2.new(0,0,0,CFG.HEADER_H-10), C.header)
+lbl(HDR, "✦ RAIWESY", UDim2.new(0,160,1,0), UDim2.new(0,14,0,0), C.accent, 15)
+lbl(HDR, "V0.1", UDim2.new(0,50,1,0), UDim2.new(0,158,0,0), C.txt_dim, 12)
+local CloseBtn = mkbtn(HDR, "✕",
+    UDim2.new(0,40,0,36), UDim2.new(1,-46,0.5,-18),
+    C.red, Color3.fromRGB(255,210,210), 16)
+
+local TABBAR = frame(MF, UDim2.new(1,0,0,CFG.TAB_H), UDim2.new(0,0,0,CFG.HEADER_H), C.tab_bar)
+frame(MF, UDim2.new(1,0,0,1), UDim2.new(0,0,0,CFG.HEADER_H+CFG.TAB_H), C.border)
+
+-- ══════════════════════════════════════
+--  TABS — CB eklendi (6 tab)
+-- ══════════════════════════════════════
+local TABS = {
+    {name="Movement", icon="🏃"},
+    {name="Visual",   icon="👁"},
+    {name="Teleport", icon="⚡"},
+    {name="Misc",     icon="🛠"},
+    {name="ESP",      icon="🎯"},
+    {name="Settings", icon="⚙"},
+}
+local TAB_W = CFG.WIN_W / #TABS
+local tabBtns = {}; local tabPanels = {}
+
+local CONTENT_Y = CFG.HEADER_H + CFG.TAB_H + 1
+local CA = frame(MF, UDim2.new(1,0,1,-CONTENT_Y), UDim2.new(0,0,0,CONTENT_Y), C.bg)
+
+-- ══════════════════════════════════════
+--  TAB FACTORY
+-- ══════════════════════════════════════
+local function makeTab(idx, tabData)
+    local b = mkbtn(TABBAR,
+        tabData.icon.."  "..tabData.name,
+        UDim2.new(0,TAB_W-2,1,-6), UDim2.new(0,(idx-1)*TAB_W+1,0,3),
+        idx==1 and C.tab_on or C.tab_off,
+        idx==1 and Color3.fromRGB(255,255,255) or C.txt_dim, 10)
+    b.ZIndex = 12; corner(b, 4); tabBtns[idx] = b
+
+    local sc = Instance.new("ScrollingFrame")
+    sc.Size = UDim2.new(1,0,1,0); sc.Position = UDim2.new(0,0,0,0)
+    sc.BackgroundTransparency = 1; sc.BorderSizePixel = 0
+    sc.ScrollBarThickness = 5; sc.ScrollBarImageColor3 = C.accent
+    sc.ScrollingDirection = Enum.ScrollingDirection.Y
+    sc.CanvasSize = UDim2.new(0,0,0,0); sc.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    sc.Visible = idx==1; sc.ZIndex = 11; sc.Parent = CA
+    tabPanels[idx] = sc
+
+    local pad = Instance.new("UIPadding")
+    pad.PaddingTop=UDim.new(0,10); pad.PaddingLeft=UDim.new(0,10)
+    pad.PaddingRight=UDim.new(0,14); pad.PaddingBottom=UDim.new(0,16)
+    pad.Parent = sc
+
+    local lay = Instance.new("UIListLayout")
+    lay.SortOrder = Enum.SortOrder.LayoutOrder; lay.Padding = UDim.new(0,8)
+    lay.Parent = sc
+    return sc
+end
+
+-- ══════════════════════════════════════
+--  COMPONENTS
+-- ══════════════════════════════════════
+local function secHdr(parent, text, order)
+    local f = frame(parent, UDim2.new(1,0,0,28), UDim2.new(0,0,0,0), C.panel_hdr)
+    f.LayoutOrder = order or 0; corner(f, 4)
+    lbl(f, text, UDim2.new(1,-10,1,0), UDim2.new(0,10,0,0), Color3.fromRGB(195,212,255), 12)
+    return f
+end
+
+local function sep(parent, order)
+    local f = frame(parent, UDim2.new(1,0,0,1), UDim2.new(0,0,0,0), C.border)
+    f.LayoutOrder = order or 0; return f
+end
+
+local function checkRow(parent, text, default, order, onChange)
+    local row = frame(parent, UDim2.new(1,0,0,46), UDim2.new(0,0,0,0), C.row_a)
+    row.LayoutOrder = order or 0; corner(row, 5)
+    lbl(row, text, UDim2.new(1,-62,1,0), UDim2.new(0,12,0,0), C.txt_lbl, 13)
+    local checked = default or false
+    local box = frame(row, UDim2.new(0,28,0,28), UDim2.new(1,-40,0.5,-14),
+        checked and C.chk_on or C.chk_off)
+    corner(box, 5); stroke(box, 1, C.border)
+    local chkL = lbl(box, checked and "✓" or "",
+        UDim2.new(1,0,1,0), UDim2.new(0,0,0,0),
+        Color3.fromRGB(255,255,255), 14, Enum.TextXAlignment.Center)
+    local ov = Instance.new("TextButton")
+    ov.Size=UDim2.new(1,0,1,0); ov.BackgroundTransparency=1; ov.Text=""; ov.Parent=row
+    local function setVal(v)
+        checked=v; box.BackgroundColor3=v and C.chk_on or C.chk_off
+        chkL.Text=v and "✓" or ""
+    end
+    ov.MouseButton1Click:Connect(function()
+        setVal(not checked); if onChange then onChange(checked) end
+    end)
+    return row, setVal
+end
+
+local function dropdown(parent, lbl_text, options, default, order, onChange)
+    local row = frame(parent, UDim2.new(1,0,0,46), UDim2.new(0,0,0,0), C.row_b)
+    row.LayoutOrder = order or 0; corner(row, 5)
+    lbl(row, lbl_text, UDim2.new(0.5,0,1,0), UDim2.new(0,12,0,0), C.txt_lbl, 13)
+    local selected = default or options[1]
+    local vBtn = mkbtn(row, selected.."  ▼",
+        UDim2.new(0.44,0,0,34), UDim2.new(0.54,0,0.5,-17), C.input_bg, C.txt, 12)
+    stroke(vBtn, 1, C.border)
+
+    local listH = #options * 38
+    local dropF = Instance.new("Frame")
+    dropF.Size = UDim2.new(0,200,0,listH); dropF.BackgroundColor3 = C.input_bg
+    dropF.BorderSizePixel = 0; dropF.ZIndex = 101; dropF.Visible = false
+    dropF.ClipsDescendants = false; dropF.Parent = SG
+    corner(dropF, 5); stroke(dropF, 1.5, C.accent)
+
+    local dl = Instance.new("UIListLayout")
+    dl.SortOrder = Enum.SortOrder.LayoutOrder; dl.Parent = dropF
+
+    local function closeDD()
+        dropF.Visible = false
+        if activeDropdown == dropF then activeDropdown = nil end
+        ddClose.Visible = false; vBtn.Text = selected.."  ▼"
+    end
+
+    for i, opt in ipairs(options) do
+        local ob = mkbtn(dropF, opt, UDim2.new(1,0,0,38), UDim2.new(0,0,0,0),
+            Color3.fromRGB(18,22,30), C.txt, 13)
+        ob.LayoutOrder = i; ob.ZIndex = 102
+        ob.MouseButton1Click:Connect(function()
+            selected = opt; closeDD(); if onChange then onChange(opt) end
+        end)
+    end
+
+    vBtn.MouseButton1Click:Connect(function()
+        if activeDropdown and activeDropdown ~= dropF then
+            activeDropdown.Visible = false; activeDropdown = nil
+        end
+        if dropF.Visible then closeDD(); return end
+        local ap = vBtn.AbsolutePosition; local as = vBtn.AbsoluteSize
+        local vps = camera.ViewportSize
+        local lx = ap.X; local ly = ap.Y + as.Y + 2
+        if ly + listH > vps.Y - 10 then ly = ap.Y - listH - 2 end
+        if lx + 200 > vps.X - 4 then lx = vps.X - 204 end
+        dropF.Position = UDim2.new(0,lx,0,ly)
+        dropF.Size = UDim2.new(0, math.max(as.X,200), 0, listH)
+        dropF.Visible = true; activeDropdown = dropF; ddClose.Visible = true
+        vBtn.Text = selected.."  ▲"
+    end)
+    return row
+end
+
+local function sliderRow(parent, lbl_text, minV, maxV, defV, order, onChange)
+    local row = frame(parent, UDim2.new(1,0,0,54), UDim2.new(0,0,0,0), C.row_a)
+    row.LayoutOrder = order or 0; corner(row, 5)
+    lbl(row, lbl_text, UDim2.new(0.65,0,0,22), UDim2.new(0,12,0,4), C.txt_lbl, 13)
+    local valL = lbl(row, tostring(defV), UDim2.new(0.3,0,0,22),
+        UDim2.new(0.68,0,0,4), C.accent, 13, Enum.TextXAlignment.Right)
+    local track = frame(row, UDim2.new(1,-24,0,10), UDim2.new(0,12,0,34), C.sl_bg)
+    corner(track, 5)
+    local pct = (defV-minV)/(maxV-minV)
+    local fill = frame(track, UDim2.new(pct,0,1,0), UDim2.new(0,0,0,0), C.sl_fill); corner(fill,5)
+    local knob = frame(track, UDim2.new(0,20,0,20), UDim2.new(pct,0,0.5,-10), C.accent)
+    corner(knob,10); stroke(knob,1.5,Color3.fromRGB(180,210,255))
+    local sliding = false
+    local function upd(absX)
+        local p = math.clamp((absX-track.AbsolutePosition.X)/track.AbsoluteSize.X,0,1)
+        local v = math.round((minV+p*(maxV-minV))*100)/100
+        fill.Size=UDim2.new(p,0,1,0); knob.Position=UDim2.new(p,-10,0.5,-10)
+        valL.Text=tostring(v); if onChange then onChange(v) end
+    end
+    track.InputBegan:Connect(function(inp) if isTouch(inp) then sliding=true; upd(inp.Position.X) end end)
+    UserInputService.InputChanged:Connect(function(inp)
+        if sliding and (inp.UserInputType==Enum.UserInputType.MouseMovement
+            or inp.UserInputType==Enum.UserInputType.Touch) then upd(inp.Position.X) end
+    end)
+    UserInputService.InputEnded:Connect(function(inp) if isTouch(inp) then sliding=false end end)
+    return row
+end
+
+local function actionBtn(parent, text, bg, order, onClick)
+    local b = mkbtn(parent, text, UDim2.new(1,0,0,46), UDim2.new(0,0,0,0),
+        bg or C.btn_blue, Color3.fromRGB(240,245,255), 14)
+    b.LayoutOrder = order or 0
+    b.MouseButton1Click:Connect(function() if onClick then onClick() end end)
+    return b
+end
+
+local function infoRow(parent, text, order)
+    local l = lbl(parent, text, UDim2.new(1,0,0,0), UDim2.new(0,0,0,0), C.txt_dim, 12)
+    l.LayoutOrder = order or 0; l.TextWrapped = true; l.AutomaticSize = Enum.AutomaticSize.Y
+    return l
+end
+
+-- ══════════════════════════════════════
+--  TAB 1 — MOVEMENT
+-- ══════════════════════════════════════
+local t1 = makeTab(1, TABS[1])
+
+secHdr(t1, "🏃  HAREKET", 1)
+checkRow(t1, "NoClip  (duvarlara gir)", false, 2, function(v) S.noClip = v end)
+checkRow(t1, "Speed Hack", false, 3, function(v)
+    S.speed = v
+    local hum = getHum()
+    if hum then hum.WalkSpeed = v and S.speedVal or 16 end
+end)
+sliderRow(t1, "Yürüyüş Hızı", 16, 300, 50, 4, function(v)
+    S.speedVal = v
+    if S.speed then local hum=getHum(); if hum then hum.WalkSpeed=v end end
+end)
+
+sep(t1, 5)
+secHdr(t1, "🦘  ZIPLAMA", 6)
+checkRow(t1, "Sonsuz Zıplama", false, 7, function(v) S.infJump = v end)
+sliderRow(t1, "Zıplama Gücü", 50, 500, 50, 8, function(v)
+    S.jumpVal = v
+    if S.infJump then local hum=getHum(); if hum then hum.JumpPower=v end end
+end)
+
+sep(t1, 9)
+secHdr(t1, "✈️  UÇUŞ", 10)
+checkRow(t1, "Fly  (uçma modu)", false, 11, function(v)
+    S.fly = v
+    if not v then
+        if S.flyConn then S.flyConn:Disconnect(); S.flyConn = nil end
+        local hrp = getHRP()
+        if hrp then
+            local bg2 = hrp:FindFirstChild("RaiFlyBG")
+            local bv2 = hrp:FindFirstChild("RaiFlyBV")
+            if bg2 then bg2:Destroy() end
+            if bv2 then bv2:Destroy() end
+        end
+    end
+end)
+sliderRow(t1, "Uçuş Hızı", 10, 200, 40, 12, function(v) S.flySpeed = v end)
+
+sep(t1, 13)
+secHdr(t1, "🛡  GOD MODE", 14)
+checkRow(t1, "God Mode  (ölümsüzlük)", false, 15, function(v)
+    S.godMode = v
+    if not v then
+        local hum = getHum()
+        if hum then hum.MaxHealth=100; hum.Health=100 end
+    end
+end)
+
+-- ══════════════════════════════════════
+--  TAB 2 — VISUAL
+-- ══════════════════════════════════════
+local t2 = makeTab(2, TABS[2])
+
+secHdr(t2, "👁  ESP  (Ad + Mesafe)", 1)
+checkRow(t2, "Billboard ESP  (ad & mesafe)", false, 2, function(v)
+    S.espEnabled = v
+    if not v then
+        for _, d in pairs(S.espBoxes) do
+            if d.bill and d.bill.Parent then d.bill:Destroy() end
+        end
+        S.espBoxes = {}
+    end
+end)
+
+sep(t2, 3)
+secHdr(t2, "🎨  HIGHLIGHT ESP", 4)
+
+local PALETTE_COLORS = {
+    Color3.fromRGB(255,0,0),   Color3.fromRGB(255,80,80),  Color3.fromRGB(220,50,50),
+    Color3.fromRGB(180,0,0),   Color3.fromRGB(255,120,0),  Color3.fromRGB(255,180,0),
+    Color3.fromRGB(0,255,0),   Color3.fromRGB(0,200,80),   Color3.fromRGB(0,255,200),
+    Color3.fromRGB(0,150,255), Color3.fromRGB(0,80,255),   Color3.fromRGB(100,0,255),
+    Color3.fromRGB(200,0,255), Color3.fromRGB(255,0,200),  Color3.fromRGB(255,100,200),
+    Color3.fromRGB(255,255,255),Color3.fromRGB(180,180,180),Color3.fromRGB(0,0,0),
+}
+
+local colorPopup = Instance.new("Frame")
+colorPopup.Size    = UDim2.new(0,220,0,140)
+colorPopup.BackgroundColor3 = C.bg
+colorPopup.BorderSizePixel  = 0
+colorPopup.ZIndex  = 110; colorPopup.Visible = false
+colorPopup.ClipsDescendants = false; colorPopup.Parent = SG
+corner(colorPopup, 8); stroke(colorPopup, 1.5, C.accent)
+
+local cpTitle = lbl(colorPopup, "Renk Seç", UDim2.new(1,0,0,24), UDim2.new(0,8,0,4), C.accent, 12)
+cpTitle.ZIndex = 111
+
+local cpGrid = Instance.new("Frame")
+cpGrid.Size = UDim2.new(1,-12,0,102); cpGrid.Position = UDim2.new(0,6,0,28)
+cpGrid.BackgroundTransparency = 1; cpGrid.ZIndex = 111; cpGrid.Parent = colorPopup
+
+local cpLayout = Instance.new("UIGridLayout")
+cpLayout.CellSize = UDim2.new(0,28,0,28); cpLayout.CellPadding = UDim2.new(0,4,0,4)
+cpLayout.SortOrder = Enum.SortOrder.LayoutOrder; cpLayout.Parent = cpGrid
+
+local cpCallback = nil
+
+for i, col in ipairs(PALETTE_COLORS) do
+    local sw = Instance.new("TextButton")
+    sw.Size = UDim2.new(0,28,0,28); sw.BackgroundColor3 = col
+    sw.BorderSizePixel = 0; sw.Text = ""; sw.ZIndex = 112; sw.Parent = cpGrid
+    corner(sw, 4)
+    sw.MouseButton1Click:Connect(function()
+        if cpCallback then cpCallback(col) end
+        colorPopup.Visible = false
+    end)
+end
+
+local function openColorPopup(anchorBtn, callback)
+    cpCallback = callback
+    local ap = anchorBtn.AbsolutePosition; local as = anchorBtn.AbsoluteSize
+    local vps = camera.ViewportSize
+    local px = ap.X + as.X + 6; local py = ap.Y
+    if px + 220 > vps.X - 4 then px = ap.X - 226 end
+    if py + 140 > vps.Y - 4 then py = vps.Y - 144 end
+    colorPopup.Position = UDim2.new(0,px,0,py)
+    colorPopup.Visible = true
+end
+
+ddClose.MouseButton1Click:Connect(function()
+    if activeDropdown then activeDropdown.Visible = false; activeDropdown = nil end
+    colorPopup.Visible = false
+    ddClose.Visible = false
+end)
+
+local function applyHighlightToChar(character, plrName)
+    local old = character:FindFirstChildOfClass("Highlight")
+    if old then old:Destroy() end
+    if not S.highlightEnabled then return end
+    local hi = Instance.new("Highlight")
+    hi.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop; hi.Enabled = true
+    hi.FillColor = S.highlightFill; hi.OutlineColor = S.highlightOutline
+    hi.FillTransparency = S.highlightFillTrans; hi.OutlineTransparency = S.highlightOutTrans
+    hi.Parent = character; S.highlights[plrName] = hi
+end
+
+local function applyHighlightToPlayer(plr)
+    if plr == player then return end
+    if plr.Character then applyHighlightToChar(plr.Character, plr.Name) end
+    plr.CharacterAdded:Connect(function(ch) task.wait(0.2); applyHighlightToChar(ch, plr.Name) end)
+end
+
+local function removeAllHighlights()
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr.Character then
+            local hi = plr.Character:FindFirstChildOfClass("Highlight")
+            if hi then hi:Destroy() end
+        end
+    end
+    S.highlights = {}
+end
+
+checkRow(t2, "Highlight ESP  (duvardan görüş)", false, 5, function(v)
+    S.highlightEnabled = v
+    if v then
+        for _, plr in ipairs(Players:GetPlayers()) do applyHighlightToPlayer(plr) end
+        Players.PlayerAdded:Connect(applyHighlightToPlayer)
+    else removeAllHighlights() end
+end)
+
+local fillRow = frame(t2, UDim2.new(1,0,0,46), UDim2.new(0,0,0,0), C.row_b)
+fillRow.LayoutOrder = 6; corner(fillRow, 5)
+lbl(fillRow, "Fill Rengi", UDim2.new(1,-110,1,0), UDim2.new(0,12,0,0), C.txt_lbl, 13)
+local fillPreview = frame(fillRow, UDim2.new(0,32,0,32), UDim2.new(1,-100,0.5,-16), S.highlightFill)
+corner(fillPreview, 6); stroke(fillPreview, 1, C.border)
+local fillPickBtn = mkbtn(fillRow, "🎨", UDim2.new(0,54,0,34), UDim2.new(1,-60,0.5,-17), C.btn_dark, C.accent, 14)
+fillPickBtn.MouseButton1Click:Connect(function()
+    openColorPopup(fillPickBtn, function(col)
+        S.highlightFill = col; fillPreview.BackgroundColor3 = col
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character then
+                local hi = plr.Character:FindFirstChildOfClass("Highlight")
+                if hi then hi.FillColor = col end
+            end
+        end
+    end)
+end)
+
+local outRow = frame(t2, UDim2.new(1,0,0,46), UDim2.new(0,0,0,0), C.row_a)
+outRow.LayoutOrder = 7; corner(outRow, 5)
+lbl(outRow, "Outline Rengi", UDim2.new(1,-110,1,0), UDim2.new(0,12,0,0), C.txt_lbl, 13)
+local outPreview = frame(outRow, UDim2.new(0,32,0,32), UDim2.new(1,-100,0.5,-16), S.highlightOutline)
+corner(outPreview, 6); stroke(outPreview, 1, C.border)
+local outPickBtn = mkbtn(outRow, "🎨", UDim2.new(0,54,0,34), UDim2.new(1,-60,0.5,-17), C.btn_dark, C.accent, 14)
+outPickBtn.MouseButton1Click:Connect(function()
+    openColorPopup(outPickBtn, function(col)
+        S.highlightOutline = col; outPreview.BackgroundColor3 = col
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character then
+                local hi = plr.Character:FindFirstChildOfClass("Highlight")
+                if hi then hi.OutlineColor = col end
+            end
+        end
+    end)
+end)
+
+sliderRow(t2, "Fill Şeffaflık", 0, 1, 0.5, 8, function(v)
+    S.highlightFillTrans = v
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= player and plr.Character then
+            local hi = plr.Character:FindFirstChildOfClass("Highlight")
+            if hi then hi.FillTransparency = v end
+        end
+    end
+end)
+
+sliderRow(t2, "Outline Şeffaflık", 0, 1, 0, 9, function(v)
+    S.highlightOutTrans = v
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= player and plr.Character then
+            local hi = plr.Character:FindFirstChildOfClass("Highlight")
+            if hi then hi.OutlineTransparency = v end
+        end
+    end
+end)
+
+sep(t2, 10)
+secHdr(t2, "💡  FULL BRIGHT", 11)
+checkRow(t2, "Full Bright  (gece görüşü)", false, 12, function(v)
+    S.fullBright = v
+    if v then
+        Lighting.Brightness=2; Lighting.Ambient=Color3.fromRGB(178,178,178)
+        Lighting.OutdoorAmbient=Color3.fromRGB(178,178,178); Lighting.FogEnd=100000
+    else
+        Lighting.Brightness=S.origBright; Lighting.Ambient=S.origAmb
+        Lighting.OutdoorAmbient=S.origOutAmb; Lighting.FogEnd=S.origFog
+    end
+end)
+
+sep(t2, 13)
+secHdr(t2, "📷  FREECAM", 14)
+checkRow(t2, "FreeCam  (serbest kamera)", false, 15, function(v)
+    S.freeCam = v
+    if v then camera.CameraType = Enum.CameraType.Scriptable
+    else
+        camera.CameraType = Enum.CameraType.Custom
+        if S.fcConn then S.fcConn:Disconnect(); S.fcConn = nil end
+    end
+end)
+sliderRow(t2, "FreeCam Hızı", 5, 200, 30, 16, function(v) S.fcSpeed = v end)
+
+sep(t2, 17)
+secHdr(t2, "🔭  ZOOM", 18)
+sliderRow(t2, "Maksimum Zoom", 10, 500, 400, 19, function(v) player.CameraMaxZoomDistance = v end)
+sliderRow(t2, "Minimum Zoom", 0, 50, 0, 20, function(v) player.CameraMinZoomDistance = v end)
+
+sep(t2, 21)
+secHdr(t2, "👻  NOCLIP KAMERA", 22)
+infoRow(t2, "ℹ️  Kamera duvarlardan geçer. Karakter yerinde durur, sadece görüş açısı geçer.", 23)
+checkRow(t2, "NoClip Kamera  (duvardan bak)", false, 24, function(v)
+    S.camNoClip = v
+    local PopperClient = LocalPlayer:WaitForChild("PlayerScripts").PlayerModule.CameraModule.ZoomController.Popper
+    for i, fn in next, getgc() do
+        if getfenv(fn).script == PopperClient and typeof(fn) == "function" then
+            for i2, v2 in next, debug.getconstants(fn) do
+                if tonumber(v2) == 0.25 then
+                    debug.setconstant(fn, i2, 0)
+                elseif tonumber(v2) == 0 then
+                    debug.setconstant(fn, i2, 0.25)
+                end
+            end
+        end
+    end
+end)
+
+-- ══════════════════════════════════════
+--  TAB 3 — TELEPORT
+-- ══════════════════════════════════════
+local t3 = makeTab(3, TABS[3])
+
+secHdr(t3, "⏪  FLASHBACK & TP BACK", 1)
+local fbStatusRow = frame(t3, UDim2.new(1,0,0,52), UDim2.new(0,0,0,0), C.row_b)
+fbStatusRow.LayoutOrder = 2; corner(fbStatusRow, 5)
+local fbDeathLbl = lbl(fbStatusRow, "💀 Ölüm:  --", UDim2.new(1,0,0,22), UDim2.new(0,10,0,4), C.txt_dim, 12)
+local fbBackLbl  = lbl(fbStatusRow, "↩ Önceki:  --", UDim2.new(1,0,0,20), UDim2.new(0,10,0,28), C.txt_dim, 11)
+
+local function updateFBStatus()
+    if S.deathPos then
+        fbDeathLbl.Text = string.format("💀 Ölüm:  %.0f,  %.0f,  %.0f", S.deathPos.X, S.deathPos.Y, S.deathPos.Z)
+        fbDeathLbl.TextColor3 = C.red
+    else fbDeathLbl.Text = "💀 Ölüm:  Henüz kaydedilmedi"; fbDeathLbl.TextColor3 = C.txt_dim end
+    if S.lastTPPos then
+        fbBackLbl.Text = string.format("↩ Önceki:  %.0f,  %.0f,  %.0f", S.lastTPPos.X, S.lastTPPos.Y, S.lastTPPos.Z)
+        fbBackLbl.TextColor3 = C.accent
+    else fbBackLbl.Text = "↩ Önceki:  Henüz kaydedilmedi"; fbBackLbl.TextColor3 = C.txt_dim end
+end
+_G.RaiwesyUpdateFBStatus = updateFBStatus
+
+local flashBtn = actionBtn(t3, "💀  Flashback  (öldüğüm yere ışınlan)", C.red, 3, function()
+    if S.deathPos then teleportTo(S.deathPos); updateFBStatus()
+    else
+        flashBtn.Text = "❌  Ölüm konumu kaydedilmedi!"
+        task.delay(2, function() flashBtn.Text = "💀  Flashback  (öldüğüm yere ışınlan)" end)
+    end
+end)
+task.defer(function() flashBtn.Text = "💀  Flashback  (öldüğüm yere ışınlan)" end)
+
+local tpBackBtn = actionBtn(t3, "↩  TP Back  (önceki konuma dön)", C.btn_blue, 4, function()
+    if S.lastTPPos then local prev=S.lastTPPos; teleportTo(prev); updateFBStatus()
+    else
+        tpBackBtn.Text = "❌  Önceki konum kaydedilmedi!"
+        task.delay(2, function() tpBackBtn.Text = "↩  TP Back  (önceki konuma dön)" end)
+    end
+end)
+
+sep(t3, 5)
+secHdr(t3, "🖱  CLICK TELEPORT", 6)
+checkRow(t3, "Click Teleport", false, 7, function(v) S.clickTP = v end)
+checkRow(t3, "GUI tıklamalarını yoksay", true, 8, function(v) S.skipGUI = v end)
+
+sep(t3, 9)
+secHdr(t3, "📍  WAYPOINTS", 10)
+actionBtn(t3, "➕  Mevcut Konuma Waypoint Ekle", C.btn_blue, 11, function() _G.RaiwesyAddWP() end)
+sep(t3, 12)
+secHdr(t3, "📋  KAYITLI WAYPOINTLER", 13)
+
+local wpContainer = frame(t3, UDim2.new(1,0,0,0), UDim2.new(0,0,0,0), C.bg)
+wpContainer.LayoutOrder = 14; wpContainer.AutomaticSize = Enum.AutomaticSize.Y
+local wpLay = Instance.new("UIListLayout")
+wpLay.SortOrder = Enum.SortOrder.LayoutOrder; wpLay.Padding = UDim.new(0,4); wpLay.Parent = wpContainer
+local wpEmptyL = lbl(wpContainer, "Henüz waypoint eklenmedi.", UDim2.new(1,0,0,36), UDim2.new(0,0,0,0), C.txt_dim, 12)
+wpEmptyL.LayoutOrder = 0
+local function wpEmpty() wpEmptyL.Visible = #S.waypoints == 0 end
+
+_G.RaiwesyAddWP = function()
+    local hrp = getHRP(); if not hrp then return end
+    S.wpID += 1; local id = S.wpID; local pos = hrp.Position
+    local col = CFG.WP_COLORS[((id-1) % #CFG.WP_COLORS)+1]
+    local wp = {id=id, name="WP "..id, position=pos, color=col}
+    local row = frame(wpContainer, UDim2.new(1,0,0,54), UDim2.new(0,0,0,0), C.row_a)
+    row.LayoutOrder = id; corner(row,6); stroke(row,1,col)
+    frame(row, UDim2.new(0,4,0.65,0), UDim2.new(0,5,0.17,0), col)
+    local nameL = lbl(row, wp.name, UDim2.new(1,-154,0,22), UDim2.new(0,16,0,5), col, 13)
+    wp.nameLabel = nameL
+    lbl(row, string.format("%.0f, %.0f, %.0f", pos.X, pos.Y, pos.Z), UDim2.new(1,-16,0,18), UDim2.new(0,16,0,30), C.txt_dim, 11)
+    local tpB  = mkbtn(row, "⚡", UDim2.new(0,40,0,40), UDim2.new(1,-124,0.5,-20), C.btn_blue, col, 18)
+    local rnB  = mkbtn(row, "✏", UDim2.new(0,40,0,40), UDim2.new(1,-80,0.5,-20), C.btn_dark, C.txt_dim, 16)
+    local delB = mkbtn(row, "🗑", UDim2.new(0,40,0,40), UDim2.new(1,-38,0.5,-20), Color3.fromRGB(48,18,18), C.red, 16)
+    tpB.MouseButton1Click:Connect(function() teleportTo(wp.position) end)
+    local renBox = Instance.new("TextBox")
+    renBox.Size=UDim2.new(1,-154,0,22); renBox.Position=UDim2.new(0,16,0,5)
+    renBox.BackgroundColor3=C.input_bg; renBox.Text=wp.name
+    renBox.Font=Enum.Font.Code; renBox.TextSize=13; renBox.TextColor3=col
+    renBox.PlaceholderColor3=C.txt_dim; renBox.BorderSizePixel=0
+    renBox.Visible=false; renBox.ZIndex=15; renBox.Parent=row
+    corner(renBox,4); stroke(renBox,1,C.accent)
+    local editing = false
+    rnB.MouseButton1Click:Connect(function()
+        editing = not editing; renBox.Visible=editing; nameL.Visible=not editing
+        if editing then renBox:CaptureFocus() end
+    end)
+    renBox.FocusLost:Connect(function()
+        if renBox.Text ~= "" then wp.name=renBox.Text; nameL.Text=renBox.Text end
+        editing=false; renBox.Visible=false; nameL.Visible=true
+    end)
+    delB.MouseButton1Click:Connect(function()
+        for i,w in ipairs(S.waypoints) do if w.id==id then table.remove(S.waypoints,i); break end end
+        row:Destroy(); wpEmpty()
+    end)
+    wp.frame = row; table.insert(S.waypoints, wp); wpEmpty()
+end
+wpEmpty()
+
+sep(t3, 15)
+secHdr(t3, "👤  OYUNCUYA IŞINLAN", 16)
+actionBtn(t3, "🔄  Oyuncu Listesini Yenile", C.btn_dark, 17, function() _G.RaiwesyRefreshPlayers() end)
+
+local plContainer = frame(t3, UDim2.new(1,0,0,0), UDim2.new(0,0,0,0), C.bg)
+plContainer.LayoutOrder = 18; plContainer.AutomaticSize = Enum.AutomaticSize.Y
+local plLay = Instance.new("UIListLayout")
+plLay.SortOrder = Enum.SortOrder.Name; plLay.Padding = UDim.new(0,4); plLay.Parent = plContainer
+local noPlrL = lbl(plContainer, "Sunucuda başka oyuncu yok.", UDim2.new(1,0,0,36), UDim2.new(0,0,0,0), C.txt_dim, 12)
+
+_G.RaiwesyRefreshPlayers = function()
+    for _, ch in ipairs(plContainer:GetChildren()) do if ch:IsA("Frame") then ch:Destroy() end end
+    local list = Players:GetPlayers(); local count = 0
+    for _, plr in ipairs(list) do
+        if plr ~= player then
+            count += 1
+            local row = frame(plContainer, UDim2.new(1,0,0,56), UDim2.new(0,0,0,0), count%2==0 and C.row_a or C.row_b)
+            row.Name = "PLR_"..plr.Name; corner(row,6)
+            local dot = frame(row, UDim2.new(0,10,0,10), UDim2.new(0,12,0.5,-5), C.accent); corner(dot,5)
+            lbl(row, plr.DisplayName, UDim2.new(1,-116,0,24), UDim2.new(0,30,0,7), C.txt, 14)
+            lbl(row, "@"..plr.Name, UDim2.new(1,-116,0,18), UDim2.new(0,30,0,31), C.txt_dim, 11)
+            local tpB = mkbtn(row, "⚡  TP", UDim2.new(0,84,0,40), UDim2.new(1,-92,0.5,-20), C.btn_blue, Color3.fromRGB(240,248,255), 13)
+            tpB.MouseButton1Click:Connect(function()
+                local tc = plr.Character
+                if tc then local th = tc:FindFirstChild("HumanoidRootPart"); if th then teleportTo(th.Position) end end
+            end)
+        end
+    end
+    noPlrL.Visible = (count == 0)
+end
+
+Players.PlayerAdded:Connect(function() task.wait(0.5); _G.RaiwesyRefreshPlayers() end)
+Players.PlayerRemoving:Connect(function() task.wait(0.2); _G.RaiwesyRefreshPlayers() end)
+task.defer(_G.RaiwesyRefreshPlayers)
+
+-- ══════════════════════════════════════
+--  TAB 4 — MISC
+-- ══════════════════════════════════════
+local t4 = makeTab(4, TABS[4])
+
+secHdr(t4, "🤖  ANTI-AFK", 1)
+checkRow(t4, "Anti-AFK  (kick engeli)", false, 2, function(v) S.antiAFK = v end)
+
+sep(t4, 3)
+secHdr(t4, "📋  OYUNCU BİLGİSİ", 4)
+local infoLbl = lbl(t4, "Bilgi yükleniyor...", UDim2.new(1,0,0,96), UDim2.new(0,0,0,0), C.txt_dim, 12)
+infoLbl.LayoutOrder = 5; infoLbl.TextWrapped = true; infoLbl.LineHeight = 1.4
+
+local function refreshInfo()
+    local hrp = getHRP(); local hum = getHum()
+    if not hrp or not hum then infoLbl.Text = "Karakter bulunamadı."; return end
+    local p = hrp.Position; local vel = hrp.AssemblyLinearVelocity
+    infoLbl.Text = string.format("Konum: %.1f, %.1f, %.1f\nHz: %.1f studs/s\nSaglik: %.0f / %.0f\nJumpPower: %.0f",
+        p.X, p.Y, p.Z, vel.Magnitude, hum.Health, hum.MaxHealth, hum.JumpPower)
+end
+_G.RaiwesyRefreshInfo = refreshInfo
+
+sep(t4, 7)
+secHdr(t4, "💥  KARAKTER", 8)
+actionBtn(t4, "☠  Kendini Öldür", C.red, 9, function()
+    local hum = getHum(); if hum then hum.Health = 0 end
+end)
+actionBtn(t4, "🔄  Karakteri Sıfırla", C.orange, 10, function() player:LoadCharacter() end)
+
+sep(t4, 11)
+secHdr(t4, "🌐  SUNUCU", 12)
+actionBtn(t4, "🔄  Sunucuya Yeniden Katıl", C.btn_dark, 13, function()
+    local TeleportService = game:GetService("TeleportService")
+    TeleportService:Teleport(game.PlaceId, player)
+end)
+
+-- ══════════════════════════════════════
+--  TAB 5 — UNIVERSAL ESP + AIMBOT
+-- ══════════════════════════════════════
+local t5 = makeTab(5, TABS[5])
+
+-- ESP + Aimbot config
+local cb = {
+    esp_active        = true,
+    team_check        = true,
+    -- İskelet: görünür=yeşil, görünmez=kırmızı
+    skel_visible_col  = Color3.fromRGB(0, 255, 0),
+    skel_hidden_col   = Color3.fromRGB(255, 0, 0),
+    skeleton_enabled  = true,
+    skeleton_thickness= 2,
+    skeleton_transp   = 1,
+    -- Kutu
+    box_enabled       = true,
+    box_color         = Color3.fromRGB(255, 255, 255),
+    box_thickness     = 2,
+    box_filled        = false,
+    box_fill_color    = Color3.fromRGB(255, 255, 255),
+    box_fill_transp   = 0.2,
+    -- Can barı
+    hpbar_enabled     = true,
+    hp_color_high     = Color3.fromRGB(0, 255, 0),
+    hp_color_low      = Color3.fromRGB(255, 0, 0),
+    -- İsim & mesafe
+    name_enabled      = true,
+    name_color        = Color3.fromRGB(255, 255, 255),
+    name_size         = 14,
+    dist_enabled      = true,
+    dist_color        = Color3.fromRGB(200, 200, 200),
+    dist_size         = 12,
+    -- Tracer
+    tracer_enabled    = false,
+    tracer_color      = Color3.fromRGB(255, 255, 255),
+    tracer_thickness  = 1,
+    tracer_transp     = 1,
+    tracer_from       = "Bottom",
+    -- Aimbot
+    aim_enabled       = false,
+    aim_fov           = 100,
+    aim_smooth        = 5,
+    aim_part          = "Head",
+    aim_vischeck      = true,
+    aim_fov_visible   = true,
+    aim_fov_color     = Color3.fromRGB(255, 255, 255),
+    -- Fly
+    cbfly_enabled     = false,
+    cbfly_speed       = 50,
+}
+
+-- ─── Bone tabloları ───────────────────────────────────────────
+local r15_bones = {
+    {"Head","UpperTorso"},{"UpperTorso","LowerTorso"},
+    {"UpperTorso","LeftUpperArm"},{"LeftUpperArm","LeftLowerArm"},{"LeftLowerArm","LeftHand"},
+    {"UpperTorso","RightUpperArm"},{"RightUpperArm","RightLowerArm"},{"RightLowerArm","RightHand"},
+    {"LowerTorso","LeftUpperLeg"},{"LeftUpperLeg","LeftLowerLeg"},{"LeftLowerLeg","LeftFoot"},
+    {"LowerTorso","RightUpperLeg"},{"RightUpperLeg","RightLowerLeg"},{"RightLowerLeg","RightFoot"},
+}
+local r6_bones = {
+    {"Head","Torso"},{"Torso","Left Arm"},{"Torso","Right Arm"},
+    {"Torso","Left Leg"},{"Torso","Right Leg"},
+}
+local custom_bones = {
+    {"Head","Torso"},
+    {"Torso","Left Upper Arm"},{"Left Upper Arm","Left Lower Arm"},{"Left Lower Arm","Left Hand"},
+    {"Torso","Right Upper Arm"},{"Right Upper Arm","Right Lower Arm"},{"Right Lower Arm","Right Hand"},
+    {"Torso","Left Upper Leg"},{"Left Upper Leg","Left Lower Leg"},{"Left Lower Leg","Left Foot"},
+    {"Torso","Right Upper Leg"},{"Right Upper Leg","Right Lower Leg"},{"Right Lower Leg","Right Foot"},
+}
+
+-- ─── Yardımcı ─────────────────────────────────────────────────
+local cb_esp = {}   -- [player] = { lines={}, box, box_ol, box_fill, hpbg, hp, name, dist, tracer, tracer_ol, character, humanoid }
+
+local function cbW2S(pos)
+    local v, on = camera:WorldToViewportPoint(pos)
+    return Vector2.new(v.X, v.Y), on
+end
+
+local function cbRig(c)
+    local h = c:FindFirstChildOfClass("Humanoid")
+    if h and h.RigType == Enum.HumanoidRigType.R15 then return r15_bones end
+    if c:FindFirstChild("Left Upper Arm") then return custom_bones end
+    return r6_bones
+end
+
+-- Bir part kameradan görünüyor mu? (duvar arkasında mı değil mi)
+local function cbIsVisible(part, char)
+    local origin   = camera.CFrame.Position
+    local target   = part.Position
+    local dir      = (target - origin)
+    local rp       = RaycastParams.new()
+    rp.FilterType  = Enum.RaycastFilterType.Exclude
+    rp.FilterDescendantsInstances = {player.Character or workspace, char}
+    local result   = workspace:Raycast(origin, dir, rp)
+    -- Sonuç yoksa ya da çarptığı şey hedefin içinde → görünür
+    if not result then return true end
+    -- Çarptığı nokta hedefe çok yakınsa görünür say
+    return (result.Position - target).Magnitude < 1.5
+end
+
+-- Karakterin genel görünürlüğü: torso veya head görünüyor mu?
+local function cbCharVisible(c)
+    local torso = c:FindFirstChild("UpperTorso") or c:FindFirstChild("Torso") or c:FindFirstChild("HumanoidRootPart")
+    if torso and cbIsVisible(torso, c) then return true end
+    local head = c:FindFirstChild("Head")
+    if head and cbIsVisible(head, c) then return true end
+    return false
+end
+
+local function cbMakeLine()
+    local l = Drawing.new("Line")
+    l.Visible=false; l.Thickness=cb.skeleton_thickness
+    l.Color=cb.skel_visible_col; l.Transparency=cb.skeleton_transp
+    return l
+end
+local function cbMakeSquare()
+    local s = Drawing.new("Square"); s.Visible=false; s.Filled=false; return s
+end
+local function cbMakeText()
+    local t = Drawing.new("Text")
+    t.Visible=false; t.Center=true; t.Outline=true; t.Font=2
+    return t
+end
+
+local function cbClean(p)
+    local d = cb_esp[p]; if not d then return end
+    if d.lines then
+        for _, b in pairs(d.lines) do
+            if b.line then b.line:Remove() end
+        end
+    end
+    for _, k in ipairs({"box","box_ol","box_fill","hpbg","hp","name","dist","tracer","tracer_ol"}) do
+        if d[k] then d[k]:Remove() end
+    end
+    cb_esp[p] = nil
+end
+
+local function cbBuild(p)
+    -- Ön koşullar
+    if not p:IsA("Player") or not cb.esp_active then return end
+    if cb.team_check and p.Team == player.Team and p.Team ~= nil then cbClean(p); return end
+    cbClean(p)
+
+    local c = p.Character; if not c then return end
+    local h = c:FindFirstChildOfClass("Humanoid")
+    if not h or h.Health <= 0 then return end
+    local hrp = c:FindFirstChild("HumanoidRootPart"); if not hrp then return end
+
+    -- Kemikler için Drawing nesnelerini oluştur
+    local lines = {}
+    if cb.skeleton_enabled then
+        for _, bone in ipairs(cbRig(c)) do
+            local p1 = c:FindFirstChild(bone[1])
+            local p2 = c:FindFirstChild(bone[2])
+            if p1 and p2 then
+                table.insert(lines, {line=cbMakeLine(), p1=p1, p2=p2})
+            end
+        end
+    end
+
+    local box      = cbMakeSquare()
+    local box_ol   = cbMakeSquare()
+    local box_fill = cbMakeSquare()
+    local hpbg     = cbMakeSquare()
+    local hp       = cbMakeSquare()
+    local name_t   = cbMakeText()
+    local dist_t   = cbMakeText()
+    local tracer   = cbMakeLine()
+    local tracer_ol= cbMakeLine()
+
+    -- Sabit özellikler (her frame değişmeyecek olanlar)
+    box_ol.Thickness  = cb.box_thickness + 1
+    box_ol.Color      = Color3.new(0,0,0)
+    box_fill.Filled   = true
+    hpbg.Filled       = true
+    hpbg.Color        = Color3.new(0,0,0)
+    hpbg.Transparency = 0.5
+    hp.Filled         = true
+    tracer_ol.Color   = Color3.new(0,0,0)
+
+    cb_esp[p] = {
+        lines=lines, character=c, humanoid=h,
+        box=box, box_ol=box_ol, box_fill=box_fill,
+        hpbg=hpbg, hp=hp, name=name_t, dist=dist_t,
+        tracer=tracer, tracer_ol=tracer_ol,
+    }
+end
+
+local function cbGetBounds(c)
+    local hrp = c:FindFirstChild("HumanoidRootPart"); if not hrp then return nil end
+    local sz = hrp.Size; local cf = hrp.CFrame; local corners = {}
+    for _, off in ipairs({
+        Vector3.new( sz.X/2, sz.Y/2, sz.Z/2), Vector3.new(-sz.X/2, sz.Y/2, sz.Z/2),
+        Vector3.new( sz.X/2,-sz.Y/2, sz.Z/2), Vector3.new(-sz.X/2,-sz.Y/2, sz.Z/2),
+        Vector3.new( sz.X/2, sz.Y/2,-sz.Z/2), Vector3.new(-sz.X/2, sz.Y/2,-sz.Z/2),
+        Vector3.new( sz.X/2,-sz.Y/2,-sz.Z/2), Vector3.new(-sz.X/2,-sz.Y/2,-sz.Z/2),
+    }) do
+        local sp, on = cbW2S(cf:PointToWorldSpace(off))
+        if on then table.insert(corners, sp) end
+    end
+    if #corners == 0 then return nil end
+    local minX,maxX,minY,maxY = math.huge,-math.huge,math.huge,-math.huge
+    for _, co in pairs(corners) do
+        minX=math.min(minX,co.X); maxX=math.max(maxX,co.X)
+        minY=math.min(minY,co.Y); maxY=math.max(maxY,co.Y)
+    end
+    return {
+        topLeft = Vector2.new(minX,minY),
+        size    = Vector2.new(maxX-minX, maxY-minY),
+        center  = Vector2.new((minX+maxX)/2, (minY+maxY)/2),
+    }
+end
+
+-- Tüm nesneleri gizle (tek fonksiyon, tekrar yok)
+local HIDE_KEYS = {"box","box_ol","box_fill","hpbg","hp","name","dist","tracer","tracer_ol"}
+local function cbHideAll(d)
+    for _, k in ipairs(HIDE_KEYS) do if d[k] then d[k].Visible=false end end
+    if d.lines then for _, b in pairs(d.lines) do b.line.Visible=false end end
+end
+
+local function cbUpdateESP()
+    for p, d in pairs(cb_esp) do
+        -- Karakter/humanoid geçerlilik kontrolü
+        local c = d.character
+        local h = d.humanoid
+        if not c or not c.Parent or not h then cbClean(p); continue end
+        -- Karakter yeniden spawn ettiyse yeniden build et
+        if p.Character and p.Character ~= c then
+            cbBuild(p); continue
+        end
+        if h.Health <= 0 then cbHideAll(d); continue end
+
+        local hrp = c:FindFirstChild("HumanoidRootPart")
+        if not hrp then cbHideAll(d); continue end
+
+        -- Görünürlük tespiti (iskelet rengi için)
+        local visible = cbCharVisible(c)
+        local skelCol = visible and cb.skel_visible_col or cb.skel_hidden_col
+
+        -- ── İskelet ────────────────────────────────────────────
+        if cb.skeleton_enabled and d.lines and #d.lines > 0 then
+            for _, b in ipairs(d.lines) do
+                local p1, p2 = b.p1, b.p2
+                if p1 and p1.Parent and p2 and p2.Parent then
+                    local s1, on1 = cbW2S(p1.Position)
+                    local s2, on2 = cbW2S(p2.Position)
+                    if on1 and on2 then
+                        b.line.From        = s1
+                        b.line.To          = s2
+                        b.line.Color       = skelCol           -- ← görünürlüğe göre renk
+                        b.line.Thickness   = cb.skeleton_thickness
+                        b.line.Transparency= cb.skeleton_transp
+                        b.line.Visible     = true
+                    else
+                        b.line.Visible = false
+                    end
+                else
+                    b.line.Visible = false
+                end
+            end
+        else
+            if d.lines then for _, b in pairs(d.lines) do b.line.Visible=false end end
+        end
+
+        -- ── Bounding box ────────────────────────────────────────
+        local bounds = cbGetBounds(c)
+        if bounds then
+            -- Dış çerçeve (outline)
+            if cb.box_enabled then
+                d.box_ol.Position = bounds.topLeft - Vector2.new(1,1)
+                d.box_ol.Size     = bounds.size    + Vector2.new(2,2)
+                d.box_ol.Thickness= cb.box_thickness + 1
+                d.box_ol.Visible  = true
+
+                -- Dolgu
+                d.box_fill.Position    = bounds.topLeft
+                d.box_fill.Size        = bounds.size
+                d.box_fill.Color       = cb.box_fill_color
+                d.box_fill.Transparency= cb.box_fill_transp
+                d.box_fill.Visible     = cb.box_filled
+
+                -- Ana kutu
+                d.box.Position  = bounds.topLeft
+                d.box.Size      = bounds.size
+                d.box.Color     = cb.box_color
+                d.box.Thickness = cb.box_thickness
+                d.box.Visible   = true
+            else
+                d.box.Visible=false; d.box_ol.Visible=false; d.box_fill.Visible=false
+            end
+
+            -- ── Can barı ─────────────────────────────────────────
+            if cb.hpbar_enabled then
+                local bw  = 3
+                local bh  = bounds.size.Y
+                local pct = math.clamp(h.Health / math.max(h.MaxHealth, 1), 0, 1)
+                local cur = bh * pct
+                d.hpbg.Position = Vector2.new(bounds.topLeft.X - bw - 3, bounds.topLeft.Y)
+                d.hpbg.Size     = Vector2.new(bw, bh)
+                d.hpbg.Visible  = true
+                d.hp.Position   = Vector2.new(bounds.topLeft.X - bw - 3, bounds.topLeft.Y + bh - cur)
+                d.hp.Size       = Vector2.new(bw, cur)
+                d.hp.Color      = cb.hp_color_high:Lerp(cb.hp_color_low, 1 - pct)
+                d.hp.Visible    = true
+            else
+                d.hp.Visible=false; d.hpbg.Visible=false
+            end
+
+            -- ── İsim ─────────────────────────────────────────────
+            if cb.name_enabled then
+                d.name.Text        = p.DisplayName
+                d.name.Position    = Vector2.new(bounds.center.X, bounds.topLeft.Y - 15)
+                d.name.Color       = cb.name_color
+                d.name.Size        = cb.name_size
+                d.name.Visible     = true
+            else d.name.Visible=false end
+
+            -- ── Mesafe ───────────────────────────────────────────
+            if cb.dist_enabled then
+                local dist = (hrp.Position - camera.CFrame.Position).Magnitude
+                d.dist.Text     = string.format("%d studs", math.floor(dist))
+                d.dist.Position = Vector2.new(bounds.center.X, bounds.topLeft.Y + bounds.size.Y + 2)
+                d.dist.Color    = cb.dist_color
+                d.dist.Size     = cb.dist_size
+                d.dist.Visible  = true
+            else d.dist.Visible=false end
+        else
+            -- Ekranda değil: kutu/bar/yazıları gizle (iskelet zaten kendi içinde halledildi)
+            d.box.Visible=false; d.box_ol.Visible=false; d.box_fill.Visible=false
+            d.hp.Visible=false;  d.hpbg.Visible=false
+            d.name.Visible=false; d.dist.Visible=false
+        end
+
+        -- ── Tracer ───────────────────────────────────────────────
+        if cb.tracer_enabled then
+            local sp, on = cbW2S(hrp.Position)
+            if on then
+                local vp   = camera.ViewportSize
+                local from
+                if     cb.tracer_from == "Bottom" then from = Vector2.new(vp.X/2, vp.Y)
+                elseif cb.tracer_from == "Middle" then from = Vector2.new(vp.X/2, vp.Y/2)
+                elseif cb.tracer_from == "Top"    then from = Vector2.new(vp.X/2, 0)
+                else                                   from = Vector2.new(mouse.X, mouse.Y) end
+                d.tracer_ol.From       = from; d.tracer_ol.To = sp
+                d.tracer_ol.Thickness  = cb.tracer_thickness + 2
+                d.tracer_ol.Transparency = cb.tracer_transp * 0.5
+                d.tracer_ol.Visible    = (cb.tracer_thickness > 1)
+                d.tracer.From          = from; d.tracer.To = sp
+                d.tracer.Color         = cb.tracer_color
+                d.tracer.Thickness     = cb.tracer_thickness
+                d.tracer.Transparency  = cb.tracer_transp
+                d.tracer.Visible       = true
+            else
+                d.tracer.Visible=false; d.tracer_ol.Visible=false
+            end
+        else
+            d.tracer.Visible=false; d.tracer_ol.Visible=false
+        end
+    end
+end
+
+local function cbRefreshAll()
+    -- Önce hepsini temizle, sonra yeniden build et
+    for p, _ in pairs(cb_esp) do cbClean(p) end
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= player then cbBuild(p) end
+    end
+end
+
+-- ─── Aimbot ───────────────────────────────────────────────────
+local cb_fov_circle = Drawing.new("Circle")
+cb_fov_circle.Visible=false; cb_fov_circle.Thickness=2
+cb_fov_circle.NumSides=64;   cb_fov_circle.Filled=false
+
+local function cbGetClosest()
+    local closest, closestDist = nil, cb.aim_fov
+    local center = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y/2)
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p == player then continue end
+        if cb.team_check and p.Team == player.Team and p.Team ~= nil then continue end
+        local c = p.Character; if not c then continue end
+        local h = c:FindFirstChildOfClass("Humanoid"); if not h or h.Health <= 0 then continue end
+        local part = c:FindFirstChild(cb.aim_part); if not part then continue end
+        if cb.aim_vischeck and not cbIsVisible(part, c) then continue end
+        local sp, on = cbW2S(part.Position); if not on then continue end
+        local dist = (sp - center).Magnitude
+        if dist < closestDist then closestDist=dist; closest=p end
+    end
+    return closest
+end
+
+local function cbAimAt(target)
+    if not target or not target.Character then return end
+    local part = target.Character:FindFirstChild(cb.aim_part); if not part then return end
+    local dir  = (part.Position - camera.CFrame.Position).Unit
+    local tgt  = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + dir)
+    camera.CFrame = camera.CFrame:Lerp(tgt, 1 / cb.aim_smooth)
+end
+
+-- ─── Mobil Fly GUI ────────────────────────────────────────────
+local cbFlyInput = {fwd=false,bwd=false,lft=false,rgt=false,up=false,dn=false}
+local cbFlyConn  = nil
+
+local cbFlyGui = Instance.new("ScreenGui")
+cbFlyGui.Name="CB_FlyGui"; cbFlyGui.ResetOnSpawn=false
+cbFlyGui.DisplayOrder=1000; cbFlyGui.Enabled=false; cbFlyGui.Parent=player.PlayerGui
+
+local cbFlyFrame = Instance.new("Frame")
+cbFlyFrame.Size=UDim2.new(0,196,0,196); cbFlyFrame.Position=UDim2.new(0,16,1,-212)
+cbFlyFrame.BackgroundColor3=Color3.fromRGB(18,22,30); cbFlyFrame.BackgroundTransparency=0.25
+cbFlyFrame.BorderSizePixel=0; cbFlyFrame.Parent=cbFlyGui
+do local r=Instance.new("UICorner"); r.CornerRadius=UDim.new(0,14); r.Parent=cbFlyFrame end
+
+local cbFlyTitle = Instance.new("TextLabel")
+cbFlyTitle.Size=UDim2.new(1,0,0,20); cbFlyTitle.BackgroundTransparency=1
+cbFlyTitle.Text="✈ FLY"; cbFlyTitle.TextColor3=Color3.fromRGB(80,145,255)
+cbFlyTitle.Font=Enum.Font.GothamBold; cbFlyTitle.TextSize=11; cbFlyTitle.Parent=cbFlyFrame
+
+local function cbFlyBtn(label,gx,gy,flag)
+    local pad=4; local bsz=56
+    local btn = Instance.new("TextButton")
+    btn.Size=UDim2.new(0,bsz,0,bsz)
+    btn.Position=UDim2.new(0,pad+gx*(bsz+pad),0,22+pad+gy*(bsz+pad))
+    btn.Text=label; btn.TextScaled=true; btn.Font=Enum.Font.GothamBold
+    btn.TextColor3=Color3.new(1,1,1); btn.BackgroundColor3=Color3.fromRGB(40,48,64)
+    btn.BackgroundTransparency=0.1; btn.BorderSizePixel=0; btn.Parent=cbFlyFrame
+    do local r=Instance.new("UICorner"); r.CornerRadius=UDim.new(0,10); r.Parent=btn end
+    local function press()   cbFlyInput[flag]=true;  btn.BackgroundColor3=Color3.fromRGB(55,115,215) end
+    local function release() cbFlyInput[flag]=false; btn.BackgroundColor3=Color3.fromRGB(40,48,64) end
+    btn.MouseButton1Down:Connect(press); btn.MouseButton1Up:Connect(release)
+    btn.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.Touch then press() end end)
+    btn.InputEnded:Connect(function(i) if i.UserInputType==Enum.UserInputType.Touch then release() end end)
+end
+cbFlyBtn("↑",1,0,"fwd"); cbFlyBtn("⬆",2,0,"up")
+cbFlyBtn("←",0,1,"lft"); cbFlyBtn("↓",1,1,"bwd"); cbFlyBtn("→",2,1,"rgt")
+cbFlyBtn("⬇",0,2,"dn")
+
+local function cbStartFly()
+    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    for _, n in ipairs({"RaiFlyBG","RaiFlyBV","CB_FlyBG","CB_FlyBV"}) do
+        local o = hrp:FindFirstChild(n); if o then o:Destroy() end
+    end
+    local bg = Instance.new("BodyGyro")
+    bg.Name="CB_FlyBG"; bg.MaxTorque=Vector3.new(9e9,9e9,9e9)
+    bg.CFrame=hrp.CFrame; bg.D=50; bg.P=1e5; bg.Parent=hrp
+    local bv = Instance.new("BodyVelocity")
+    bv.Name="CB_FlyBV"; bv.Velocity=Vector3.zero; bv.MaxForce=Vector3.new(9e9,9e9,9e9); bv.Parent=hrp
+    if cbFlyConn then cbFlyConn:Disconnect() end
+    cbFlyConn = RunService.Heartbeat:Connect(function()
+        if not cb.cbfly_enabled then
+            cbFlyConn:Disconnect(); cbFlyConn=nil
+            for _, n in ipairs({"CB_FlyBG","CB_FlyBV"}) do
+                local o=hrp:FindFirstChild(n); if o then o:Destroy() end
+            end
+            return
+        end
+        local dir=Vector3.zero; local cf=camera.CFrame
+        if cbFlyInput.fwd then dir=dir+cf.LookVector end
+        if cbFlyInput.bwd then dir=dir-cf.LookVector end
+        if cbFlyInput.lft then dir=dir-cf.RightVector end
+        if cbFlyInput.rgt then dir=dir+cf.RightVector end
+        if cbFlyInput.up  then dir=dir+Vector3.new(0,1,0) end
+        if cbFlyInput.dn  then dir=dir-Vector3.new(0,1,0) end
+        if dir.Magnitude>0 then dir=dir.Unit end
+        local bv2=hrp:FindFirstChild("CB_FlyBV"); local bg2=hrp:FindFirstChild("CB_FlyBG")
+        if bv2 then bv2.Velocity=dir*cb.cbfly_speed end
+        if bg2 then bg2.CFrame=cf end
+    end)
+end
+
+local function cbStopFly()
+    if cbFlyConn then cbFlyConn:Disconnect(); cbFlyConn=nil end
+    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        for _, n in ipairs({"CB_FlyBG","CB_FlyBV"}) do
+            local o=hrp:FindFirstChild(n); if o then o:Destroy() end
+        end
+    end
+    cbFlyGui.Enabled=false
+end
+
+-- ─── Tab UI ───────────────────────────────────────────────────
+secHdr(t5, "📡  UNIVERSAL ESP", 1)
+
+checkRow(t5, "ESP Aktif", true, 2, function(v)
+    cb.esp_active = v
+    if not v then
+        for p, _ in pairs(cb_esp) do cbClean(p) end
+    else
+        cbRefreshAll()
+    end
+end)
+checkRow(t5, "Takım Kontrolü", true, 3, function(v) cb.team_check=v; cbRefreshAll() end)
+checkRow(t5, "İskelet", true, 4, function(v) cb.skeleton_enabled=v end)
+checkRow(t5, "Kutu", true, 5, function(v) cb.box_enabled=v end)
+checkRow(t5, "Kutu Dolgu", false, 6, function(v) cb.box_filled=v end)
+checkRow(t5, "Can Barı", true, 7, function(v) cb.hpbar_enabled=v end)
+checkRow(t5, "İsim", true, 8, function(v) cb.name_enabled=v end)
+checkRow(t5, "Mesafe", true, 9, function(v) cb.dist_enabled=v end)
+checkRow(t5, "Tracer", false, 10, function(v) cb.tracer_enabled=v end)
+
+infoRow(t5, "🟢 Görünür düşman = Yeşil iskelet   🔴 Duvar arkası = Kırmızı iskelet", 11)
+
+sep(t5, 12)
+secHdr(t5, "⚙️  ESP AYARLARI", 13)
+sliderRow(t5, "İskelet Kalınlığı", 1, 5, 2, 14, function(v) cb.skeleton_thickness=v end)
+sliderRow(t5, "İskelet Şeffaflık", 0, 1, 1, 15, function(v) cb.skeleton_transp=v end)
+sliderRow(t5, "Kutu Kalınlığı",    1, 5, 2, 16, function(v) cb.box_thickness=v end)
+sliderRow(t5, "İsim Boyutu",      10,24,14, 17, function(v) cb.name_size=v end)
+sliderRow(t5, "Mesafe Boyutu",     8,20,12, 18, function(v) cb.dist_size=v end)
+
+sep(t5, 19)
+secHdr(t5, "🎯  AIMBOT  (Otomatik — Tuş Gerekmez)", 20)
+infoRow(t5, "ℹ️  Toggle açıkken sürekli aktif. Mobil uyumlu.", 21)
+checkRow(t5, "Aimbot Aktif", false, 22, function(v) cb.aim_enabled=v end)
+checkRow(t5, "Görünürlük Kontrolü", true, 23, function(v) cb.aim_vischeck=v end)
+checkRow(t5, "FOV Dairesi Göster", true, 24, function(v) cb.aim_fov_visible=v end)
+dropdown(t5, "Hedef Part", {"Head","UpperTorso","HumanoidRootPart","LowerTorso"}, "Head", 25, function(v) cb.aim_part=v end)
+sliderRow(t5, "Aimbot FOV",    20, 500, 100, 26, function(v) cb.aim_fov=v end)
+sliderRow(t5, "Yumuşaklık",     1,  20,   5, 27, function(v) cb.aim_smooth=v end)
+
+sep(t5, 28)
+secHdr(t5, "✈️  MOBİL FLY  (Ekran Butonları)", 29)
+checkRow(t5, "Fly Aktif", false, 30, function(v)
+    cb.cbfly_enabled=v; cbFlyGui.Enabled=v
+    if v then cbStartFly() else cbStopFly() end
+end)
+sliderRow(t5, "Fly Hızı", 10, 200, 50, 31, function(v) cb.cbfly_speed=v end)
+
+sep(t5, 32)
+actionBtn(t5, "🔄  ESP Yenile", C.btn_blue, 33, function() cbRefreshAll() end)
+actionBtn(t5, "🗑  ESP Temizle", C.red, 34, function()
+    for p, _ in pairs(cb_esp) do cbClean(p) end
+end)
+
+-- ══════════════════════════════════════
+--  TAB 6 — SETTINGS
+-- ══════════════════════════════════════
+local t6 = makeTab(6, TABS[6])
+
+secHdr(t6, "🚀  IŞINLANMA MODU", 1)
+dropdown(t6, "TP Modu", {"direct","tween"}, "direct", 2, function(v) S.tpMode=v end)
+dropdown(t6, "Tween Easing", {"Quad","Linear","Sine","Cubic","Quart","Quint","Bounce","Elastic","Back"}, "Quad", 3, function(v)
+    local M={Quad=Enum.EasingStyle.Quad,Linear=Enum.EasingStyle.Linear,Sine=Enum.EasingStyle.Sine,
+        Cubic=Enum.EasingStyle.Cubic,Quart=Enum.EasingStyle.Quart,Quint=Enum.EasingStyle.Quint,
+        Bounce=Enum.EasingStyle.Bounce,Elastic=Enum.EasingStyle.Elastic,Back=Enum.EasingStyle.Back}
+    S.tweenStyle=M[v] or Enum.EasingStyle.Quad
+end)
+sliderRow(t6, "Tween Süresi (sn)", 0.1, 5, 1.0, 4, function(v) S.tweenDur=v end)
+
+sep(t6, 5)
+secHdr(t6, "⚙  GENEL", 6)
+sliderRow(t6, "TP Y Offset", 0, 10, 3, 7, function(v) CFG.TP_OFFSET=Vector3.new(0,v,0) end)
+
+sep(t6, 8)
+secHdr(t6, "🎨  ARAYÜZ", 9)
+sliderRow(t6, "UI Opaklık", 0.3, 1.0, 1.0, 10, function(v) MF.BackgroundTransparency=1-v end)
+
+sep(t6, 11)
+actionBtn(t6, "🗑  Tüm Waypointleri Sil", C.red, 12, function()
+    for _,wp in ipairs(S.waypoints) do if wp.frame then wp.frame:Destroy() end end
+    S.waypoints={}; wpEmpty()
+end)
+
+-- ══════════════════════════════════════
+--  TAB SWITCHING
+-- ══════════════════════════════════════
+local function switchTab(idx)
+    S.tab = idx
+    for i, b in ipairs(tabBtns) do
+        local on = i==idx
+        tw(b, {BackgroundColor3 = on and C.tab_on or C.tab_off})
+        b.TextColor3 = on and Color3.fromRGB(255,255,255) or C.txt_dim
+        tabPanels[i].Visible = on
+    end
+end
+for i, b in ipairs(tabBtns) do
+    b.MouseButton1Click:Connect(function() switchTab(i) end)
+end
+
+-- ══════════════════════════════════════
+--  GUI OPEN / CLOSE
+-- ══════════════════════════════════════
+local function openGUI()
+    S.open=true; MF.Visible=true
+    MF.Size=UDim2.new(0,CFG.WIN_W,0,0)
+    tw(MF,{Size=UDim2.new(0,CFG.WIN_W,0,CFG.WIN_H)},0.22,Enum.EasingStyle.Back,Enum.EasingDirection.Out)
+    tw(TogBtn,{BackgroundColor3=C.btn_blue},0.15)
+end
+
+local function closeGUI()
+    S.open=false
+    tw(MF,{Size=UDim2.new(0,CFG.WIN_W,0,0)},0.18,Enum.EasingStyle.Quad,Enum.EasingDirection.In)
+    task.delay(0.2,function() if not S.open then MF.Visible=false end end)
+    tw(TogBtn,{BackgroundColor3=C.green},0.15)
+end
+
+local function toggleGUI()
+    if S.open then closeGUI() else openGUI() end
+end
+
+CloseBtn.MouseButton1Click:Connect(toggleGUI)
+UserInputService.InputBegan:Connect(function(inp,proc)
+    if proc then return end
+    if inp.KeyCode==CFG.TOGGLE_KEY then toggleGUI() end
+end)
+
+-- ══════════════════════════════════════
+--  WINDOW DRAG
+-- ══════════════════════════════════════
+HDR.InputBegan:Connect(function(inp)
+    if isTouch(inp) then S.winDrag=true; S.winDragStart=inp.Position; S.winDragPos=MF.Position end
+end)
+UserInputService.InputChanged:Connect(function(inp)
+    if not S.winDrag then return end
+    if inp.UserInputType~=Enum.UserInputType.MouseMovement and inp.UserInputType~=Enum.UserInputType.Touch then return end
+    local d=inp.Position-S.winDragStart; local vps=camera.ViewportSize
+    local nx=math.clamp(S.winDragPos.X.Offset+d.X,0,vps.X-CFG.WIN_W)
+    local ny=math.clamp(S.winDragPos.Y.Offset+d.Y,0,vps.Y-CFG.WIN_H)
+    MF.Position=UDim2.new(S.winDragPos.X.Scale,nx,S.winDragPos.Y.Scale,ny)
+end)
+UserInputService.InputEnded:Connect(function(inp)
+    if isTouch(inp) then S.winDrag=false end
+end)
+
+-- ══════════════════════════════════════
+--  TOGGLE BUTTON DRAG + CLICK
+-- ══════════════════════════════════════
+do
+    local tbActive=false; local tbStartM=nil; local tbStartPos=nil; local tbDragged=false
+    TogBtn.InputBegan:Connect(function(inp)
+        if isTouch(inp) then tbActive=true; tbDragged=false; tbStartM=inp.Position; tbStartPos=TogBtn.Position end
+    end)
+    UserInputService.InputChanged:Connect(function(inp)
+        if not tbActive then return end
+        if inp.UserInputType~=Enum.UserInputType.MouseMovement and inp.UserInputType~=Enum.UserInputType.Touch then return end
+        local delta=inp.Position-tbStartM
+        if delta.Magnitude>8 then tbDragged=true end
+        if tbDragged then
+            local vps=camera.ViewportSize
+            local nx=math.clamp(tbStartPos.X.Offset+delta.X,0,vps.X-56)
+            local ny=math.clamp(tbStartPos.Y.Offset+delta.Y,0,vps.Y-56)
+            TogBtn.Position=UDim2.new(tbStartPos.X.Scale,nx,tbStartPos.Y.Scale,ny)
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(inp)
+        if not tbActive then return end
+        if not isTouch(inp) then return end
+        local wasDrag=tbDragged; tbActive=false; tbDragged=false
+        if not wasDrag then toggleGUI() end
+    end)
+end
+
+-- ══════════════════════════════════════
+--  CLICK TELEPORT
+-- ══════════════════════════════════════
+UserInputService.InputBegan:Connect(function(inp,proc)
+    if proc then return end
+    if not S.clickTP then return end
+    if inp.UserInputType~=Enum.UserInputType.MouseButton1 and inp.UserInputType~=Enum.UserInputType.Touch then return end
+    if S.skipGUI and S.open then
+        local mp=inp.Position; local p=MF.AbsolutePosition; local sz=MF.AbsoluteSize
+        if mp.X>=p.X and mp.X<=p.X+sz.X and mp.Y>=p.Y and mp.Y<=p.Y+sz.Y then return end
+    end
+    if mouse.Target then teleportTo(mouse.Hit.Position) end
+end)
+
+-- ══════════════════════════════════════
+--  FLY — start/stop
+-- ══════════════════════════════════════
+local function startFly()
+    local hrp=getHRP(); if not hrp then return end
+    local old1=hrp:FindFirstChild("RaiFlyBG"); local old2=hrp:FindFirstChild("RaiFlyBV")
+    if old1 then old1:Destroy() end; if old2 then old2:Destroy() end
+    local bg=Instance.new("BodyGyro")
+    bg.Name="RaiFlyBG"; bg.MaxTorque=Vector3.new(9e9,9e9,9e9); bg.CFrame=hrp.CFrame; bg.D=50; bg.P=1e5; bg.Parent=hrp
+    local bv=Instance.new("BodyVelocity")
+    bv.Name="RaiFlyBV"; bv.MaxForce=Vector3.new(9e9,9e9,9e9); bv.Velocity=Vector3.zero; bv.Parent=hrp
+    if S.flyConn then S.flyConn:Disconnect() end
+    S.flyConn=RunService.Heartbeat:Connect(function()
+        if not S.fly then
+            S.flyConn:Disconnect(); S.flyConn=nil
+            local b1=hrp:FindFirstChild("RaiFlyBG"); local b2=hrp:FindFirstChild("RaiFlyBV")
+            if b1 then b1:Destroy() end; if b2 then b2:Destroy() end; return
+        end
+        local dir=Vector3.zero
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) or UserInputService:IsKeyDown(Enum.KeyCode.Up) then dir=dir+camera.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) or UserInputService:IsKeyDown(Enum.KeyCode.Down) then dir=dir-camera.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) or UserInputService:IsKeyDown(Enum.KeyCode.Left) then dir=dir-camera.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) or UserInputService:IsKeyDown(Enum.KeyCode.Right) then dir=dir+camera.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.E) then dir=dir+Vector3.new(0,1,0) end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Q) then dir=dir-Vector3.new(0,1,0) end
+        if dir.Magnitude>0 then dir=dir.Unit end
+        local b1=hrp:FindFirstChild("RaiFlyBV"); local b2=hrp:FindFirstChild("RaiFlyBG")
+        if b1 then b1.Velocity=dir*S.flySpeed end; if b2 then b2.CFrame=camera.CFrame end
+    end)
+end
+
+-- ══════════════════════════════════════
+--  FREECAM loop
+-- ══════════════════════════════════════
+local function startFreeCam()
+    if S.fcConn then return end
+    S.fcConn=RunService.Heartbeat:Connect(function(dt)
+        if not S.freeCam then S.fcConn:Disconnect(); S.fcConn=nil; return end
+        local dir=Vector3.zero
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir=dir+camera.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir=dir-camera.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir=dir-camera.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir=dir+camera.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.E) then dir=dir+Vector3.new(0,1,0) end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Q) then dir=dir-Vector3.new(0,1,0) end
+        if dir.Magnitude>0 then camera.CFrame=camera.CFrame*CFrame.new(dir.Unit*S.fcSpeed*dt) end
+    end)
+end
+
+-- ══════════════════════════════════════
+--  ESP update (Billboard)
+-- ══════════════════════════════════════
+local function updateESP()
+    if not S.espEnabled then return end
+    for name,d in pairs(S.espBoxes) do
+        local plr=Players:FindFirstChild(name)
+        if not plr or not plr.Character then
+            if d.bill and d.bill.Parent then d.bill:Destroy() end
+            S.espBoxes[name]=nil
+        end
+    end
+    for _,plr in ipairs(Players:GetPlayers()) do
+        if plr~=player and plr.Character then
+            local hrp=plr.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                local d=S.espBoxes[plr.Name]
+                if not d then
+                    local bill=Instance.new("BillboardGui")
+                    bill.Size=UDim2.new(0,120,0,50); bill.StudsOffset=Vector3.new(0,3.5,0)
+                    bill.AlwaysOnTop=true; bill.Parent=hrp
+                    local nL=Instance.new("TextLabel")
+                    nL.Size=UDim2.new(1,0,0.5,0); nL.BackgroundTransparency=1
+                    nL.Font=Enum.Font.GothamBold; nL.TextSize=15
+                    nL.TextStrokeTransparency=0; nL.TextStrokeColor3=Color3.new(0,0,0)
+                    nL.TextColor3=Color3.fromRGB(255,80,80); nL.Parent=bill
+                    local dL=Instance.new("TextLabel")
+                    dL.Size=UDim2.new(1,0,0.5,0); dL.Position=UDim2.new(0,0,0.5,0)
+                    dL.BackgroundTransparency=1; dL.Font=Enum.Font.Code; dL.TextSize=12
+                    dL.TextStrokeTransparency=0; dL.TextStrokeColor3=Color3.new(0,0,0)
+                    dL.TextColor3=Color3.fromRGB(255,220,50); dL.Parent=bill
+                    local hi=Instance.new("SelectionBox")
+                    hi.LineThickness=0.06; hi.Color3=Color3.fromRGB(255,60,60)
+                    hi.SurfaceTransparency=0.75; hi.SurfaceColor3=Color3.fromRGB(255,60,60)
+                    hi.Adornee=plr.Character; hi.Parent=bill
+                    S.espBoxes[plr.Name]={bill=bill,nameL=nL,distL=dL,hi=hi}; d=S.espBoxes[plr.Name]
+                end
+                local myHRP=getHRP()
+                local dist=myHRP and math.floor((hrp.Position-myHRP.Position).Magnitude) or 0
+                d.nameL.Text=plr.DisplayName; d.distL.Text=tostring(dist).."m"; d.bill.Parent=hrp
+            end
+        end
+    end
+end
+
+-- ══════════════════════════════════════
+--  MAIN HEARTBEAT
+-- ══════════════════════════════════════
+local espTick=0; local infoTick=0
+RunService.Heartbeat:Connect(function(dt)
+    local now=os.clock()
+
+    infoTick=infoTick+dt
+    if infoTick>=1 then infoTick=0; if _G.RaiwesyRefreshInfo then _G.RaiwesyRefreshInfo() end end
+
+    if S.speed then local hum=getHum(); if hum then hum.WalkSpeed=S.speedVal end end
+    if S.infJump then local hum=getHum(); if hum then hum.JumpPower=S.jumpVal end end
+    if S.godMode then local hum=getHum(); if hum and hum.Health<hum.MaxHealth then hum.Health=hum.MaxHealth end end
+    if S.fly and not S.flyConn then startFly() end
+    if S.freeCam and not S.fcConn then startFreeCam() end
+    if S.antiAFK and now-S.lastAFK>60 then S.lastAFK=now; local hum=getHum(); if hum then hum.Jump=true end end
+
+    espTick=espTick+dt
+    if espTick>=0.5 then espTick=0; updateESP() end
+
+    -- CB ESP
+    if cb.esp_active then cbUpdateESP() end
+
+    -- CB FOV dairesi
+    if cb.aim_fov_visible and cb.aim_enabled then
+        cb_fov_circle.Visible=true
+        cb_fov_circle.Position=Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y/2)
+        cb_fov_circle.Radius=cb.aim_fov; cb_fov_circle.Color=cb.aim_fov_color
+    else cb_fov_circle.Visible=false end
+
+    -- CB Aimbot (otomatik)
+    if cb.aim_enabled then local target=cbGetClosest(); if target then cbAimAt(target) end end
+end)
+
+-- NoClip + NoClip Camera
+RunService.Stepped:Connect(function()
+    -- Karakter noclip
+    if S.noClip then
+        local ch=getChar(); if ch then
+            for _,part in ipairs(ch:GetDescendants()) do
+                if part:IsA("BasePart") then part.CanCollide=false end
+            end
+        end
+    end
+end)
+
+-- Inf Jump
+UserInputService.JumpRequest:Connect(function()
+    if not S.infJump then return end
+    local hum=getHum(); if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
+end)
+
+-- ══════════════════════════════════════
+--  RESPAWN
+-- ══════════════════════════════════════
+player.CharacterAdded:Connect(function()
+    task.wait(0.6)
+    if S.speed   then local h=getHum(); if h then h.WalkSpeed=S.speedVal end end
+    if S.infJump then local h=getHum(); if h then h.JumpPower=S.jumpVal  end end
+    if S.godMode then local h=getHum(); if h then h.MaxHealth=math.huge; h.Health=math.huge end end
+    if S.fly     then S.flyConn=nil; startFly() end
+    if cb.cbfly_enabled then cbStartFly() end
+    task.wait(1); cbRefreshAll()
+end)
+
+-- CB Oyuncu olayları
+Players.PlayerAdded:Connect(function(p)
+    p.CharacterAdded:Connect(function() task.wait(1); if p~=player then cbBuild(p) end end)
+end)
+Players.PlayerRemoving:Connect(function(p) cbClean(p) end)
+
+-- CB Periyodik yenileme
+task.spawn(function()
+    task.wait(1); cbRefreshAll()
+    while task.wait(30) do if cb.esp_active then cbRefreshAll() end end
+end)
+
+-- ══════════════════════════════════════
+--  STARTUP
+-- ══════════════════════════════════════
+print("╔══════════════════════════════════════════╗")
+print("║    ✦ RAIWESY V0.1 + CB TAB YÜKLENDI ✦    ║")
+print("║  Movement / Visual / TP / Misc / CB       ║")
+print("║  Toggle: ✦ butonu veya RightShift         ║")
+print("╚══════════════════════════════════════════╝")
