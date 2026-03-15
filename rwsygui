@@ -457,6 +457,196 @@ checkRow(t1, "God Mode  (ölümsüzlük)", false, 15, function(v)
     end
 end)
 
+sep(t1, 16)
+secHdr(t1, "🔒  KARAKTER KİLİDİ", 17)
+infoRow(t1, "ℹ️  Açıkken karakter tamamen dondurulur: hareket, zıplama ve fizik engellenir.", 18)
+
+-- ── Karakter Kilidi state ────────────────────────────────────
+local charLock = {
+    enabled   = false,
+    frozenPos = nil,
+    stepped   = nil,
+}
+
+local function charLockApply()
+    local hrp = getHRP()
+    if not hrp then return end
+
+    -- Eski nesneleri temizle
+    for _, n in ipairs({"RaiLockBP", "RaiLockBG"}) do
+        local o = hrp:FindFirstChild(n); if o then o:Destroy() end
+    end
+
+    -- Konumu kaydet
+    charLock.frozenPos = hrp.CFrame
+
+    -- BodyPosition — fiziksel olarak sabit tutar
+    local bp = Instance.new("BodyPosition")
+    bp.Name     = "RaiLockBP"
+    bp.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    bp.P        = 1e6
+    bp.D        = 1e4
+    bp.Position = hrp.Position
+    bp.Parent   = hrp
+
+    -- BodyGyro — dönmeyi engeller
+    local bg = Instance.new("BodyGyro")
+    bg.Name      = "RaiLockBG"
+    bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+    bg.P         = 1e6
+    bg.D         = 1e3
+    bg.CFrame    = hrp.CFrame
+    bg.Parent    = hrp
+
+    -- Humanoid: hız ve zıplamayı sıfırla
+    local hum = getHum()
+    if hum then
+        hum.WalkSpeed  = 0
+        hum.JumpPower  = 0
+        hum.AutoRotate = false
+    end
+
+    -- Her frame'de sabit pozisyonu zorla
+    if charLock.stepped then charLock.stepped:Disconnect() end
+    charLock.stepped = RunService.Stepped:Connect(function()
+        if not charLock.enabled then return end
+        local h   = getHRP()
+        local bp2 = h and h:FindFirstChild("RaiLockBP")
+        local bg2 = h and h:FindFirstChild("RaiLockBG")
+        if bp2 then bp2.Position = charLock.frozenPos.Position end
+        if bg2 then bg2.CFrame   = charLock.frozenPos end
+        local hm = getHum()
+        if hm then hm.WalkSpeed = 0; hm.JumpPower = 0 end
+    end)
+end
+
+local function charLockRelease()
+    -- Stepped bağlantısını kes
+    if charLock.stepped then
+        charLock.stepped:Disconnect()
+        charLock.stepped = nil
+    end
+    -- BodyPosition ve BodyGyro'yu kaldır
+    local hrp = getHRP()
+    if hrp then
+        for _, n in ipairs({"RaiLockBP", "RaiLockBG"}) do
+            local o = hrp:FindFirstChild(n); if o then o:Destroy() end
+        end
+    end
+    -- Humanoid'i eski haline döndür
+    local hum = getHum()
+    if hum then
+        hum.WalkSpeed  = S.speed and S.speedVal or 16
+        hum.JumpPower  = S.infJump and S.jumpVal or 50
+        hum.AutoRotate = true
+    end
+    charLock.frozenPos = nil
+end
+
+checkRow(t1, "Karakter Kilidi  (hareketi dondur)", false, 19, function(v)
+    charLock.enabled = v
+    if v then charLockApply() else charLockRelease() end
+end)
+
+-- Respawn sonrası kilidi yeniden uygula
+player.CharacterAdded:Connect(function()
+    if charLock.enabled then task.wait(0.8); charLockApply() end
+end)
+
+sep(t1, 20)
+secHdr(t1, "🕹️  THUMBSTICK JOYSTİCK FİXLEME", 21)
+infoRow(t1, "ℹ️  Açıkken ThumbstickFrame boyutu düzeltilir. Joystick büyür ve dokunma alanı genişler.", 22)
+
+-- Joystick Fix orijinal değerlerini sakla
+local joyFix = {
+    origThumbPos   = nil,
+    origOuterSize  = nil,
+    origStickSize  = nil,
+}
+
+checkRow(t1, "Joystick Fix  (thumbstick düzelt)", false, 23, function(v)
+    local ok, err = pcall(function()
+        local ctrlFrame  = player.PlayerGui
+            :WaitForChild("TouchGui", 3)
+            :WaitForChild("TouchControlFrame", 3)
+        local thumbFrame = ctrlFrame:WaitForChild("ThumbstickFrame", 3)
+        local outerImg   = ctrlFrame:WaitForChild("OuterImage", 3)
+        local stickImg   = ctrlFrame:WaitForChild("StickImage", 3)
+
+        if v then
+            -- Orijinal değerleri bir kez kaydet
+            if not joyFix.origThumbPos  then joyFix.origThumbPos  = thumbFrame.Position end
+            if not joyFix.origOuterSize then joyFix.origOuterSize = outerImg.Size       end
+            if not joyFix.origStickSize then joyFix.origStickSize = stickImg.Size       end
+
+            thumbFrame.Position = UDim2.new(0, 60, 1, -250)
+            outerImg.Size       = UDim2.new(0, 200, 0, 200)
+            stickImg.Size       = UDim2.new(0, 100, 0, 100)
+        else
+            -- Orijinal değerlere geri dön
+            if joyFix.origThumbPos  then thumbFrame.Position = joyFix.origThumbPos  end
+            if joyFix.origOuterSize then outerImg.Size       = joyFix.origOuterSize end
+            if joyFix.origStickSize then stickImg.Size       = joyFix.origStickSize end
+            joyFix.origThumbPos  = nil
+            joyFix.origOuterSize = nil
+            joyFix.origStickSize = nil
+        end
+    end)
+    if not ok then
+        warn("[Raiwesy] Joystick Fix: TouchGui bulunamadı — " .. tostring(err))
+    end
+end)
+
+sep(t1, 24)
+secHdr(t1, "📌  SABİT JOYSTİCK  (Kaymayı Engelle)", 25)
+infoRow(t1, "ℹ️  Açıkken joystick dokunulan yere kaymaz, sabit konumda kalır.", 26)
+
+-- ── Sabit Joystick state ─────────────────────────────────────
+local staticJoy = {
+    enabled  = false,
+    origPos  = nil,   -- ThumbstickFrame'in orijinal Position'ı
+    conn     = nil,   -- Position değişimini izleyen bağlantı
+}
+
+checkRow(t1, "Sabit Joystick  (kaymayı engelle)", false, 27, function(v)
+    staticJoy.enabled = v
+
+    local ok, err = pcall(function()
+        local touchGui   = player.PlayerGui:WaitForChild("TouchGui", 3)
+        local ctrlFrame  = touchGui:WaitForChild("TouchControlFrame", 3)
+        local thumbFrame = ctrlFrame:WaitForChild("ThumbstickFrame", 3)
+
+        if v then
+            -- Mevcut pozisyonu kaydet (bir kez)
+            staticJoy.origPos = thumbFrame.Position
+
+            -- Roblox'un DynamicThumbstick scripti her dokunuşta
+            -- ThumbstickFrame.Position'ı günceller.
+            -- GetPropertyChangedSignal ile bunu anında geri alıyoruz.
+            if staticJoy.conn then staticJoy.conn:Disconnect() end
+            staticJoy.conn = thumbFrame:GetPropertyChangedSignal("Position"):Connect(function()
+                if staticJoy.enabled and staticJoy.origPos then
+                    thumbFrame.Position = staticJoy.origPos
+                end
+            end)
+        else
+            -- Bağlantıyı kes, orijinal pozisyonu geri yaz
+            if staticJoy.conn then
+                staticJoy.conn:Disconnect()
+                staticJoy.conn = nil
+            end
+            if staticJoy.origPos then
+                thumbFrame.Position = staticJoy.origPos
+                staticJoy.origPos   = nil
+            end
+        end
+    end)
+
+    if not ok then
+        warn("[Raiwesy] Sabit Joystick: TouchGui bulunamadı — " .. tostring(err))
+    end
+end)
+
 -- ══════════════════════════════════════
 --  TAB 2 — VISUAL
 -- ══════════════════════════════════════
@@ -806,6 +996,120 @@ end
 Players.PlayerAdded:Connect(function() task.wait(0.5); _G.RaiwesyRefreshPlayers() end)
 Players.PlayerRemoving:Connect(function() task.wait(0.2); _G.RaiwesyRefreshPlayers() end)
 task.defer(_G.RaiwesyRefreshPlayers)
+
+sep(t3, 19)
+secHdr(t3, "🔁  LOOP TELEPORT", 20)
+infoRow(t3, "ℹ️  Seçilen hedefe (Waypoint veya Oyuncu) belirlenen aralıkla döngüsel ışınlanır.", 21)
+
+-- ── Loop TP state ──────────────────────────────────────────
+local loopTP = {
+    enabled   = false,
+    interval  = 1.0,
+    mode      = "waypoint",   -- "waypoint" | "player"
+    wpIndex   = 1,
+    plrIndex  = 1,
+    thread    = nil,
+    statusLbl = nil,
+}
+
+-- Durum satırı
+local loopStatusRow = frame(t3, UDim2.new(1,0,0,36), UDim2.new(0,0,0,0), C.row_b)
+loopStatusRow.LayoutOrder = 22; corner(loopStatusRow, 5)
+local loopStatusLbl = lbl(loopStatusRow,
+    "⏸  Döngü: Kapalı",
+    UDim2.new(1,-12,1,0), UDim2.new(0,10,0,0),
+    C.txt_dim, 12)
+loopTP.statusLbl = loopStatusLbl
+
+local function loopTPUpdateStatus()
+    if not loopTP.enabled then
+        loopStatusLbl.Text       = "⏸  Döngü: Kapalı"
+        loopStatusLbl.TextColor3 = C.txt_dim
+        return
+    end
+    local modeStr = loopTP.mode == "waypoint" and "Waypoint" or "Oyuncu"
+    local idxStr
+    if loopTP.mode == "waypoint" then
+        local wp = S.waypoints[loopTP.wpIndex]
+        idxStr = wp and wp.name or "?"
+    else
+        local others = {}
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= player then table.insert(others, p) end
+        end
+        local tgt = others[loopTP.plrIndex]
+        idxStr = tgt and tgt.DisplayName or "?"
+    end
+    loopStatusLbl.Text       = string.format("▶  %s  →  %s  (%.1f sn)", modeStr, idxStr, loopTP.interval)
+    loopStatusLbl.TextColor3 = C.green
+end
+
+-- Döngü iş parçacığı
+local function loopTPStart()
+    loopTP.thread = task.spawn(function()
+        while loopTP.enabled do
+            if loopTP.mode == "waypoint" then
+                if #S.waypoints > 0 then
+                    -- index sınır kontrolü
+                    if loopTP.wpIndex > #S.waypoints then loopTP.wpIndex = 1 end
+                    local wp = S.waypoints[loopTP.wpIndex]
+                    if wp then teleportTo(wp.position) end
+                    loopTP.wpIndex = (loopTP.wpIndex % #S.waypoints) + 1
+                end
+            else  -- player modu
+                local others = {}
+                for _, p in ipairs(Players:GetPlayers()) do
+                    if p ~= player then table.insert(others, p) end
+                end
+                if #others > 0 then
+                    if loopTP.plrIndex > #others then loopTP.plrIndex = 1 end
+                    local tgt = others[loopTP.plrIndex]
+                    if tgt and tgt.Character then
+                        local th = tgt.Character:FindFirstChild("HumanoidRootPart")
+                        if th then teleportTo(th.Position) end
+                    end
+                    loopTP.plrIndex = (loopTP.plrIndex % #others) + 1
+                end
+            end
+            loopTPUpdateStatus()
+            task.wait(loopTP.interval)
+        end
+        loopTPUpdateStatus()
+    end)
+end
+
+local function loopTPStop()
+    loopTP.enabled = false
+    loopTP.wpIndex  = 1
+    loopTP.plrIndex = 1
+    loopTPUpdateStatus()
+end
+
+-- Mod seçici (Waypoint / Oyuncu)
+dropdown(t3, "Loop Hedefi", {"Waypoint", "Oyuncu"}, "Waypoint", 23, function(v)
+    loopTP.mode = (v == "Waypoint") and "waypoint" or "player"
+    loopTP.wpIndex  = 1
+    loopTP.plrIndex = 1
+    loopTPUpdateStatus()
+end)
+
+-- Interval slider
+sliderRow(t3, "Işınlanma Aralığı (sn)", 0.1, 3.0, 1.0, 24, function(v)
+    loopTP.interval = v
+    loopTPUpdateStatus()
+end)
+
+-- Başlat / Durdur toggle
+checkRow(t3, "Loop TP  (döngüsel ışınlan)", false, 25, function(v)
+    loopTP.enabled = v
+    if v then
+        loopTP.wpIndex  = 1
+        loopTP.plrIndex = 1
+        loopTPStart()
+    else
+        loopTPStop()
+    end
+end)
 
 -- ══════════════════════════════════════
 --  TAB 4 — MISC
