@@ -1,0 +1,973 @@
+--[[
+	FreecamMobile v4
+	══════════════════════════════════════════════════════
+	HAREKETLENDİRME:
+	  • Mobil  → Sürüklenebilir WASD UI pad (sol altta)
+	  • PC     → W/A/S/D klavye tuşları
+
+	KAMERA:
+	  • Mobil  → Sağ taraf drag
+	  • PC     → Mouse
+
+	FOV:
+	  • Mobil  → + / − UI butonları
+	  • PC     → Mouse wheel
+
+	YENİ: Karakter Kilidi
+	  Config panelinden "Character Lock" açılınca
+	  karakter hiçbir şekilde hareket edemez
+	  (HumanoidRootPart Anchored + Humanoid kontrolü durdurulur)
+	══════════════════════════════════════════════════════
+]]
+
+------------------------------------------------------------------------
+-- Servisler
+------------------------------------------------------------------------
+local pi    = math.pi
+local abs   = math.abs
+local clamp = math.clamp
+local exp   = math.exp
+local rad   = math.rad
+local sign  = math.sign
+local sqrt  = math.sqrt
+local tan   = math.tan
+
+local cloneref = cloneref or function(o) return o end
+local CoreGui              = cloneref(game:GetService("CoreGui"))
+local ContextActionService = cloneref(game:GetService("ContextActionService"))
+local Players              = cloneref(game:GetService("Players"))
+local RunService           = cloneref(game:GetService("RunService"))
+local StarterGui           = cloneref(game:GetService("StarterGui"))
+local UserInputService     = cloneref(game:GetService("UserInputService"))
+local Workspace            = cloneref(game:GetService("Workspace"))
+
+local LocalPlayer = Players.LocalPlayer
+if not LocalPlayer then
+	Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+	LocalPlayer = Players.LocalPlayer
+end
+
+local Camera = Workspace.CurrentCamera
+Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
+	if Workspace.CurrentCamera then Camera = Workspace.CurrentCamera end
+end)
+
+local IsMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+
+------------------------------------------------------------------------
+-- CONFIG
+------------------------------------------------------------------------
+local Config = {
+	MoveSpeed    = 1.0,
+	MoveSmooth   = 1.5,
+	UpDownSpeed  = 1.0,
+	LookSens     = 1.0,
+	LookSmooth   = 1.0,
+	InvertX      = false,
+	InvertY      = false,
+	FovSpeed     = 1.0,
+	FovSmooth    = 4.0,
+	RollSmooth   = 1.0,
+	CharLock     = false,   -- Karakter kilidi
+}
+
+------------------------------------------------------------------------
+-- Karakter kilidi
+------------------------------------------------------------------------
+local charLockConns = {}
+local savedWalkSpeed, savedJumpPower
+
+local function ApplyCharLock(locked)
+	-- Önceki bağlantıları temizle
+	for _, c in ipairs(charLockConns) do c:Disconnect() end
+	charLockConns = {}
+
+	local char = LocalPlayer.Character
+	if not char then return end
+
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	local hum = char:FindFirstChildOfClass("Humanoid")
+
+	if locked then
+		-- HumanoidRootPart'ı sabitle
+		if hrp then
+			hrp.Anchored = true
+		end
+		-- Humanoid hızını sıfırla
+		if hum then
+			savedWalkSpeed = hum.WalkSpeed
+			savedJumpPower = hum.JumpPower
+			hum.WalkSpeed = 0
+			hum.JumpPower = 0
+		end
+		-- Karakter yeniden yüklenirse tekrar uygula
+		charLockConns[#charLockConns+1] = LocalPlayer.CharacterAdded:Connect(function(newChar)
+			task.wait(0.1)
+			local newHrp = newChar:FindFirstChild("HumanoidRootPart")
+			local newHum = newChar:FindFirstChildOfClass("Humanoid")
+			if newHrp then newHrp.Anchored = true end
+			if newHum then newHum.WalkSpeed = 0; newHum.JumpPower = 0 end
+		end)
+	else
+		-- Kilidi kaldır
+		if hrp then
+			hrp.Anchored = false
+		end
+		if hum then
+			hum.WalkSpeed = savedWalkSpeed or 16
+			hum.JumpPower = savedJumpPower or 50
+		end
+	end
+end
+
+------------------------------------------------------------------------
+-- Spring
+------------------------------------------------------------------------
+local Spring = {} do
+	Spring.__index = Spring
+	function Spring.new(freq, pos)
+		local s = setmetatable({}, Spring)
+		s.f = freq; s.p = pos; s.v = pos*0
+		return s
+	end
+	function Spring:Update(dt, goal)
+		local f      = self.f * 2*pi
+		local p0, v0 = self.p, self.v
+		local offset = goal - p0
+		local decay  = exp(-f*dt)
+		self.p = goal + (v0*dt - offset*(f*dt+1))*decay
+		self.v = (f*dt*(offset*f - v0) + v0)*decay
+		return self.p
+	end
+	function Spring:SetFreq(f) self.f = f end
+	function Spring:Reset(pos) self.p = pos; self.v = pos*0 end
+end
+
+------------------------------------------------------------------------
+-- Kamera state
+------------------------------------------------------------------------
+local cameraPos = Vector3.new()
+local cameraRot = Vector3.new()
+local cameraFov = 70
+
+local velSpring  = Spring.new(Config.MoveSmooth, Vector3.new())
+local panSpring  = Spring.new(Config.LookSmooth, Vector2.new())
+local fovSpring  = Spring.new(Config.FovSmooth,  0)
+local rollSpring = Spring.new(Config.RollSmooth, 0)
+
+local BASE_NAV_GAIN  = 64
+local BASE_FOV_GAIN  = 300
+local BASE_ROLL_GAIN = -pi/2
+local BASE_PAN_GAIN  = Vector2.new(0.75, 1) * 8
+local PITCH_LIMIT    = rad(90)
+
+local function thumbstickCurve(x)
+	local K_C = 2.0; local K_D = 0.15
+	local function fC(v) return (exp(K_C*v)-1)/(exp(K_C)-1) end
+	local function fD(v) return fC((v-K_D)/(1-K_D)) end
+	return sign(x)*clamp(fD(abs(x)), 0, 1)
+end
+
+------------------------------------------------------------------------
+-- WASD UI pad durumu  (mobil için sanal tuşlar)
+------------------------------------------------------------------------
+local Pad = {
+	W = 0, A = 0, S = 0, D = 0,
+	Up = 0, Down = 0,
+	FovUp = 0, FovDown = 0,
+	RollL = 0, RollR = 0,
+}
+
+------------------------------------------------------------------------
+-- Look drag (sağ taraf)
+------------------------------------------------------------------------
+local Look = {
+	active  = false,
+	last    = Vector2.new(),
+	touchId = nil,
+	delta   = Vector2.new(),
+}
+
+local touchConns = {}
+
+local function StartTouchCapture()
+	touchConns[#touchConns+1] = UserInputService.TouchStarted:Connect(function(input, processed)
+		if processed then return end   -- Roblox'un kendi UI'ı (varsa) tarafından işlendi
+		if not Look.active then
+			local pos = Vector2.new(input.Position.X, input.Position.Y)
+			Look.active  = true
+			Look.last    = pos
+			Look.touchId = input
+			Look.delta   = Vector2.new()
+		end
+	end)
+
+	touchConns[#touchConns+1] = UserInputService.TouchMoved:Connect(function(input, processed)
+		if processed then return end
+		if input == Look.touchId then
+			local pos = Vector2.new(input.Position.X, input.Position.Y)
+			Look.delta = pos - Look.last
+			Look.last  = pos
+		end
+	end)
+
+	touchConns[#touchConns+1] = UserInputService.TouchEnded:Connect(function(input, processed)
+		if input == Look.touchId then
+			Look.active  = false
+			Look.touchId = nil
+			Look.delta   = Vector2.new()
+		end
+	end)
+end
+
+local function StopTouchCapture()
+	for _, c in ipairs(touchConns) do c:Disconnect() end
+	touchConns = {}
+	Look.active = false; Look.touchId = nil; Look.delta = Vector2.new()
+end
+
+------------------------------------------------------------------------
+-- Input modülü
+------------------------------------------------------------------------
+local Input = {} do
+	local keyboard = { W=0,A=0,S=0,D=0,E=0,Q=0,Z=0,C=0,Up=0,Down=0 }
+	local mouse    = { Delta=Vector2.new(), MouseWheel=0 }
+
+	function Input.Vel(dt)
+		velSpring:SetFreq(Config.MoveSmooth)
+		-- Klavye + WASD pad birleşik
+		local kbVel = Vector3.new(
+			(keyboard.D - keyboard.A) + (Pad.D - Pad.A),
+			(keyboard.E - keyboard.Q) + (Pad.Up - Pad.Down),
+			(keyboard.S - keyboard.W) + (Pad.S - Pad.W)
+		)
+		-- UpDownSpeed sadece pad'in up/down butonlarına uygulanır
+		local upDown = (Pad.Up - Pad.Down) * Config.UpDownSpeed
+		local base   = Vector3.new(kbVel.X, (keyboard.E - keyboard.Q) + upDown, kbVel.Z)
+		return base * Config.MoveSpeed
+	end
+
+	function Input.Pan(dt)
+		panSpring:SetFreq(Config.LookSmooth)
+		-- Mouse (PC)
+		local kMouse = Vector2.new()
+		if dt > 0 then
+			kMouse = (mouse.Delta/dt) * (pi/64/60)
+			mouse.Delta = Vector2.new()
+		end
+		-- Sağ drag (mobil)
+		local kTouch = Vector2.new()
+		if Look.active and dt > 0 then
+			local d = Look.delta
+			kTouch = Vector2.new(-d.Y, -d.X) * (0.003 * Config.LookSens) / dt
+		end
+		Look.delta = Vector2.new()
+		local pan = kMouse + kTouch
+		if Config.InvertX then pan = Vector2.new(pan.X, -pan.Y) end
+		if Config.InvertY then pan = Vector2.new(-pan.X, pan.Y) end
+		return pan
+	end
+
+	function Input.Fov(dt)
+		fovSpring:SetFreq(Config.FovSmooth)
+		local kMouse = 0
+		if dt > 0 then
+			kMouse = (mouse.MouseWheel/dt)*(1/60)
+			mouse.MouseWheel = 0
+		end
+		local kBtn = (Pad.FovUp - Pad.FovDown) * 0.5 * Config.FovSpeed
+		return kMouse + kBtn
+	end
+
+	function Input.Roll(dt)
+		rollSpring:SetFreq(Config.RollSmooth)
+		return (keyboard.C - keyboard.Z + Pad.RollR - Pad.RollL) * 1.0
+	end
+
+	local function Keypress(action, state, input)
+		local n = input.KeyCode.Name
+		if keyboard[n] ~= nil then
+			keyboard[n] = state == Enum.UserInputState.Begin and 1 or 0
+		end
+		return Enum.ContextActionResult.Sink
+	end
+	local function MousePanFn(action, state, input)
+		local d = input.Delta
+		mouse.Delta = Vector2.new(-d.y, -d.x)
+		return Enum.ContextActionResult.Sink
+	end
+	local function MouseWheelFn(action, state, input)
+		mouse.MouseWheel = -input.Position.z
+		return Enum.ContextActionResult.Sink
+	end
+
+	function Input.StartCapture()
+		ContextActionService:BindActionAtPriority("FCKeyboard", Keypress, false,
+			Enum.ContextActionPriority.High.Value,
+			Enum.KeyCode.W, Enum.KeyCode.A, Enum.KeyCode.S, Enum.KeyCode.D,
+			Enum.KeyCode.E, Enum.KeyCode.Q, Enum.KeyCode.Z, Enum.KeyCode.C,
+			Enum.KeyCode.Up, Enum.KeyCode.Down)
+		ContextActionService:BindActionAtPriority("FCMousePan",   MousePanFn,   false, Enum.ContextActionPriority.High.Value, Enum.UserInputType.MouseMovement)
+		ContextActionService:BindActionAtPriority("FCMouseWheel", MouseWheelFn, false, Enum.ContextActionPriority.High.Value, Enum.UserInputType.MouseWheel)
+		if IsMobile then StartTouchCapture() end
+	end
+
+	function Input.StopCapture()
+		for k in pairs(keyboard) do keyboard[k] = 0 end
+		mouse.Delta = Vector2.new(); mouse.MouseWheel = 0
+		ContextActionService:UnbindAction("FCKeyboard")
+		ContextActionService:UnbindAction("FCMousePan")
+		ContextActionService:UnbindAction("FCMouseWheel")
+		if IsMobile then StopTouchCapture() end
+	end
+end
+
+------------------------------------------------------------------------
+-- StepFreecam
+------------------------------------------------------------------------
+local function StepFreecam(dt)
+	local vel  = velSpring:Update(dt, Input.Vel(dt))
+	local pan  = panSpring:Update(dt, Input.Pan(dt))
+	local fov  = fovSpring:Update(dt, Input.Fov(dt))
+	local roll = rollSpring:Update(dt, Input.Roll(dt))
+
+	local zf = sqrt(tan(rad(70/2)) / tan(rad(cameraFov/2)))
+	cameraFov = clamp(cameraFov + fov * BASE_FOV_GAIN * (dt/zf), 1, 120)
+
+	local pv = pan * BASE_PAN_GAIN * (dt/zf)
+	cameraRot = Vector3.new(
+		clamp(cameraRot.x + pv.X, -PITCH_LIMIT, PITCH_LIMIT),
+		(cameraRot.y + pv.Y) % (2*pi),
+		cameraRot.z + roll * BASE_ROLL_GAIN * (dt/zf)
+	)
+
+	local navGain = Vector3.new(1,1,1) * BASE_NAV_GAIN * Config.MoveSpeed
+	local cf = CFrame.new(cameraPos)
+		* CFrame.fromOrientation(cameraRot.x, cameraRot.y, cameraRot.z)
+		* CFrame.new(vel * navGain * dt)
+
+	cameraPos          = cf.p
+	Camera.CFrame      = cf
+	Camera.Focus       = cf
+	Camera.FieldOfView = cameraFov
+end
+
+------------------------------------------------------------------------
+-- PlayerState
+------------------------------------------------------------------------
+local PlayerState = {} do
+	local saved = {}
+	local setCores = { BadgesNotificationsActive=true, PointsNotificationsActive=true }
+	function PlayerState.Push()
+		for k in pairs(setCores) do
+			saved[k] = StarterGui:GetCore(k); StarterGui:SetCore(k, false)
+		end
+		saved.fov=Camera.FieldOfView; Camera.FieldOfView=70
+		saved.ct=Camera.CameraType;   Camera.CameraType=Enum.CameraType.Custom
+		saved.cf=Camera.CFrame;       saved.foc=Camera.Focus
+		saved.mb=UserInputService.MouseBehavior
+		UserInputService.MouseBehavior=Enum.MouseBehavior.Default
+	end
+	function PlayerState.Pop()
+		for k,v in pairs(setCores) do StarterGui:SetCore(k, saved[k] or v) end
+		Camera.FieldOfView=saved.fov; Camera.CameraType=saved.ct
+		Camera.CFrame=saved.cf;       Camera.Focus=saved.foc
+		UserInputService.MouseBehavior=saved.mb
+	end
+end
+
+------------------------------------------------------------------------
+-- Start / Stop / Toggle
+------------------------------------------------------------------------
+local freecamEnabled = false
+
+local function StartFreecam()
+	local cf = Camera.CFrame
+	cameraRot = Vector3.new(cf:toEulerAnglesYXZ())
+	cameraPos = cf.p
+	cameraFov = Camera.FieldOfView
+	velSpring:Reset(Vector3.new()); panSpring:Reset(Vector2.new())
+	fovSpring:Reset(0);            rollSpring:Reset(0)
+	PlayerState.Push()
+	if Config.CharLock then ApplyCharLock(true) end
+	RunService:BindToRenderStep("Freecam", Enum.RenderPriority.Camera.Value, StepFreecam)
+	Input.StartCapture()
+end
+
+local function StopFreecam()
+	Input.StopCapture()
+	RunService:UnbindFromRenderStep("Freecam")
+	ApplyCharLock(false)
+	PlayerState.Pop()
+end
+
+local function ToggleFreecam()
+	freecamEnabled = not freecamEnabled
+	if freecamEnabled then StartFreecam() else StopFreecam() end
+	script:SetAttribute("FreecamEnabled", freecamEnabled)
+end
+
+------------------------------------------------------------------------
+-- GUI: renk paleti
+------------------------------------------------------------------------
+local C = {
+	bg        = Color3.fromRGB(18, 22, 30),
+	bgDark    = Color3.fromRGB(11, 14, 20),
+	header    = Color3.fromRGB(8,  11, 17),
+	tabActive = Color3.fromRGB(48, 120, 210),
+	tabInact  = Color3.fromRGB(22, 30, 44),
+	border    = Color3.fromRGB(45, 62, 90),
+	text      = Color3.fromRGB(205, 218, 238),
+	textDim   = Color3.fromRGB(105, 130, 160),
+	accent    = Color3.fromRGB(48,  120, 210),
+	red       = Color3.fromRGB(200, 50,  50),
+	green     = Color3.fromRGB(45,  170, 90),
+	sliderBg  = Color3.fromRGB(32,  42,  58),
+	sliderFill= Color3.fromRGB(48,  120, 210),
+	padBg     = Color3.fromRGB(15,  20,  32),
+	padBtn    = Color3.fromRGB(30,  42,  66),
+	padBtnAct = Color3.fromRGB(48, 120, 210),
+}
+
+local function UICornerR(r,p) local c=Instance.new("UICorner"); c.CornerRadius=UDim.new(0,r); c.Parent=p end
+local function UIStrokeC(col,th,p) local s=Instance.new("UIStroke"); s.Color=col; s.Thickness=th; s.Parent=p end
+
+local function Lbl(text,size,color,parent,ax)
+	local l=Instance.new("TextLabel")
+	l.BackgroundTransparency=1; l.Text=text; l.TextSize=size
+	l.Font=Enum.Font.Code; l.TextColor3=color
+	l.TextXAlignment=ax or Enum.TextXAlignment.Left
+	l.Parent=parent; return l
+end
+
+------------------------------------------------------------------------
+-- WASD PAD GUI  (sürüklenebilir)
+------------------------------------------------------------------------
+local padGui
+
+local function CreateWASDPad()
+	if padGui then padGui:Destroy(); padGui=nil end
+
+	padGui = Instance.new("ScreenGui")
+	padGui.Name="FCPad"; padGui.ResetOnSpawn=false
+	padGui.IgnoreGuiInset=true; padGui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
+	padGui.Parent=CoreGui
+
+	-- Ana çerçeve (sürüklenebilir)
+	local BTN = 54    -- buton boyutu
+	local GAP = 4     -- boşluk
+	local PAD_W = BTN*3 + GAP*4
+	local PAD_H = BTN*4 + GAP*5 + 20  -- +20 başlık
+
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(0, PAD_W, 0, PAD_H)
+	-- Başlangıç: sol alt
+	frame.Position = UDim2.new(0, 12, 1, -(PAD_H+12))
+	frame.BackgroundColor3 = C.padBg
+	frame.BackgroundTransparency = 0.1
+	frame.BorderSizePixel = 0
+	frame.Parent = padGui
+	UICornerR(12, frame)
+	UIStrokeC(C.border, 1, frame)
+
+	-- Başlık + sürükleme tutacağı
+	local header = Instance.new("TextButton")
+	header.Size = UDim2.new(1,0,0,20)
+	header.BackgroundColor3 = C.bgDark
+	header.BackgroundTransparency = 0.1
+	header.BorderSizePixel = 0
+	header.Text = "✥ MOVE"
+	header.Font = Enum.Font.Code
+	header.TextSize = 11
+	header.TextColor3 = C.textDim
+	header.Parent = frame
+	UICornerR(10, header)
+	-- Alt köşeleri düz yap
+	local hFix = Instance.new("Frame")
+	hFix.Size=UDim2.new(1,0,0,6); hFix.Position=UDim2.new(0,0,1,-6)
+	hFix.BackgroundColor3=C.bgDark; hFix.BorderSizePixel=0; hFix.Parent=header
+
+	-- Sürükleme mantığı
+	local dragging, dragStart, frameStart = false, nil, nil
+	header.InputBegan:Connect(function(inp)
+		if inp.UserInputType==Enum.UserInputType.MouseButton1
+		or inp.UserInputType==Enum.UserInputType.Touch then
+			dragging   = true
+			dragStart  = Vector2.new(inp.Position.X, inp.Position.Y)
+			frameStart = frame.Position
+		end
+	end)
+	UserInputService.InputChanged:Connect(function(inp)
+		if not dragging then return end
+		if inp.UserInputType==Enum.UserInputType.MouseMovement
+		or inp.UserInputType==Enum.UserInputType.Touch then
+			local d = Vector2.new(inp.Position.X, inp.Position.Y) - dragStart
+			frame.Position = UDim2.new(
+				frameStart.X.Scale, frameStart.X.Offset + d.X,
+				frameStart.Y.Scale, frameStart.Y.Offset + d.Y
+			)
+		end
+	end)
+	UserInputService.InputEnded:Connect(function(inp)
+		if inp.UserInputType==Enum.UserInputType.MouseButton1
+		or inp.UserInputType==Enum.UserInputType.Touch then
+			dragging = false
+		end
+	end)
+
+	-- Buton fabrikası
+	-- col/row: grid pozisyonu (0-tabanlı), padKey: Pad tablosundaki key
+	local function MakeKey(label, col, row, padKey, extraW)
+		extraW = extraW or 0
+		local x = GAP + col*(BTN+GAP)
+		local y = 20 + GAP + row*(BTN+GAP)
+		local w = BTN + extraW
+
+		local btn = Instance.new("TextButton")
+		btn.Size = UDim2.new(0, w, 0, BTN)
+		btn.Position = UDim2.new(0, x, 0, y)
+		btn.BackgroundColor3 = C.padBtn
+		btn.BackgroundTransparency = 0.15
+		btn.BorderSizePixel = 0
+		btn.Text = label
+		btn.Font = Enum.Font.Code
+		btn.TextSize = 20
+		btn.TextColor3 = C.text
+		btn.AutoButtonColor = false
+		btn.Parent = frame
+		UICornerR(8, btn)
+		UIStrokeC(Color3.fromRGB(60, 82, 120), 1, btn)
+
+		local function Press()
+			Pad[padKey] = 1
+			btn.BackgroundColor3 = C.padBtnAct
+		end
+		local function Release()
+			Pad[padKey] = 0
+			btn.BackgroundColor3 = C.padBtn
+		end
+
+		btn.MouseButton1Down:Connect(Press)
+		btn.MouseButton1Up:Connect(Release)
+		btn.MouseLeave:Connect(Release)
+		-- Touch desteği
+		btn.TouchLongPress:Connect(function() end)
+		btn.InputBegan:Connect(function(inp)
+			if inp.UserInputType == Enum.UserInputType.Touch then Press() end
+		end)
+		btn.InputEnded:Connect(function(inp)
+			if inp.UserInputType == Enum.UserInputType.Touch then Release() end
+		end)
+		return btn
+	end
+
+	--[[
+		Düzen:
+		   [  ↑ W  ]
+		[← A][   ][D →]
+		   [  ↓ S  ]
+		   ─────────
+		[↑ E]      [Q ↓]   ← yukarı/aşağı
+		[ ↺ ]      [ ↻ ]   ← roll
+		─────────────────
+		[FOV+]    [FOV-]
+	]]
+
+	-- Satır 0: W (ortada)
+	MakeKey("▲", 1, 0, "W")
+	-- Satır 1: A, boşluk, D
+	MakeKey("◀", 0, 1, "A")
+	MakeKey("▶", 2, 1, "D")
+	-- Satır 2: S (ortada)
+	MakeKey("▼", 1, 2, "S")
+	-- Satır 3: E (yukarı çık) ve Q (aşağı in)
+	MakeKey("E↑", 0, 3, "Up")
+	MakeKey("Q↓", 2, 3, "Down")
+
+	-- FOV ve Roll: çerçevenin dışında değil, 4. satırda
+	-- PAD_H'i yeniden hesapla
+	-- (zaten 4 satır + başlık ile PAD_H doğru)
+
+	return padGui
+end
+
+local function DestroyWASDPad()
+	if padGui then padGui:Destroy(); padGui=nil end
+	-- Pad durumunu sıfırla
+	for k in pairs(Pad) do Pad[k] = 0 end
+end
+
+------------------------------------------------------------------------
+-- CONFIG PANELİ
+------------------------------------------------------------------------
+local confGui  = nil
+local confOpen = false
+
+local function MakeSlider(parent, configKey, minVal, maxVal, yPos, labelText, fmt)
+	fmt = fmt or "%.2f"
+	local ROW = 30
+
+	local row = Instance.new("Frame")
+	row.Size=UDim2.new(1,0,0,ROW); row.Position=UDim2.new(0,0,0,yPos)
+	row.BackgroundTransparency=1; row.Parent=parent
+
+	local lbl=Lbl(labelText,11,C.textDim,row)
+	lbl.Size=UDim2.new(0,138,1,0)
+
+	local valLbl=Lbl(string.format(fmt,Config[configKey]),11,C.text,row,Enum.TextXAlignment.Right)
+	valLbl.Size=UDim2.new(0,46,1,0); valLbl.Position=UDim2.new(1,-46,0,0)
+
+	local track=Instance.new("Frame")
+	track.Size=UDim2.new(1,-192,0,6); track.Position=UDim2.new(0,142,0.5,-3)
+	track.BackgroundColor3=C.sliderBg; track.BorderSizePixel=0; track.Parent=row
+	UICornerR(3,track)
+
+	local fill=Instance.new("Frame")
+	fill.BackgroundColor3=C.sliderFill; fill.BorderSizePixel=0
+	fill.Size=UDim2.new(0,0,1,0); fill.Parent=track; UICornerR(3,fill)
+
+	local knob=Instance.new("Frame")
+	knob.Size=UDim2.new(0,14,0,14); knob.AnchorPoint=Vector2.new(0.5,0.5)
+	knob.BackgroundColor3=Color3.fromRGB(240,245,255)
+	knob.BorderSizePixel=0; knob.Parent=track; UICornerR(7,knob)
+
+	local function SetVal(t)
+		t = clamp(t,0,1)
+		Config[configKey] = math.floor((minVal + t*(maxVal-minVal))*100+0.5)/100
+		fill.Size = UDim2.new(t,0,1,0)
+		knob.Position = UDim2.new(t,0,0.5,0)
+		valLbl.Text = string.format(fmt, Config[configKey])
+	end
+	SetVal((Config[configKey]-minVal)/(maxVal-minVal))
+
+	local dragging = false
+	local function ApplyX(absX)
+		local ap=track.AbsolutePosition; local as=track.AbsoluteSize
+		if as.X==0 then return end
+		SetVal((absX-ap.X)/as.X)
+	end
+	track.InputBegan:Connect(function(inp)
+		if inp.UserInputType==Enum.UserInputType.MouseButton1
+		or inp.UserInputType==Enum.UserInputType.Touch then
+			dragging=true; ApplyX(inp.Position.X)
+		end
+	end)
+	UserInputService.InputChanged:Connect(function(inp)
+		if not dragging then return end
+		if inp.UserInputType==Enum.UserInputType.MouseMovement
+		or inp.UserInputType==Enum.UserInputType.Touch then
+			ApplyX(inp.Position.X)
+		end
+	end)
+	UserInputService.InputEnded:Connect(function(inp)
+		if inp.UserInputType==Enum.UserInputType.MouseButton1
+		or inp.UserInputType==Enum.UserInputType.Touch then
+			dragging=false
+		end
+	end)
+end
+
+local function MakeCheckbox(parent, configKey, yPos, labelText, onChange)
+	local ROW=28
+	local row=Instance.new("Frame")
+	row.Size=UDim2.new(1,0,0,ROW); row.Position=UDim2.new(0,0,0,yPos)
+	row.BackgroundTransparency=1; row.Parent=parent
+
+	local box=Instance.new("Frame")
+	box.Size=UDim2.new(0,16,0,16); box.Position=UDim2.new(0,0,0.5,-8)
+	box.BackgroundColor3=C.sliderBg; box.BorderSizePixel=0; box.Parent=row
+	UICornerR(3,box); UIStrokeC(C.border,1,box)
+
+	local tick=Lbl("✓",12,C.accent,box,Enum.TextXAlignment.Center)
+	tick.Size=UDim2.fromScale(1,1); tick.Visible=Config[configKey]
+
+	local lbl=Lbl(labelText,11,C.textDim,row)
+	lbl.Size=UDim2.new(1,-24,1,0); lbl.Position=UDim2.new(0,22,0,0)
+
+	local btn=Instance.new("TextButton")
+	btn.Size=UDim2.fromScale(1,1); btn.BackgroundTransparency=1; btn.Text=""
+	btn.Parent=row
+	btn.MouseButton1Click:Connect(function()
+		Config[configKey] = not Config[configKey]
+		tick.Visible = Config[configKey]
+		if onChange then onChange(Config[configKey]) end
+	end)
+end
+
+local TABS = {
+	{
+		name="Movement",
+		build=function(p)
+			local y=0
+			MakeSlider(p,"MoveSpeed",  0.1,4.0, y,"Move Speed",  "%.2f"); y=y+32
+			MakeSlider(p,"MoveSmooth", 0.1,10.0,y,"Move Smooth", "%.2f"); y=y+32
+			MakeSlider(p,"UpDownSpeed",0.1,4.0, y,"Up/Down Spd", "%.2f"); y=y+32
+		end,
+	},
+	{
+		name="Look",
+		build=function(p)
+			local y=0
+			MakeSlider(p,"LookSens",  0.1,5.0, y,"Sensitivity","%.2f"); y=y+32
+			MakeSlider(p,"LookSmooth",0.1,10.0,y,"Look Smooth","%.2f"); y=y+32
+			MakeCheckbox(p,"InvertX",y,"Invert Horizontal"); y=y+30
+			MakeCheckbox(p,"InvertY",y,"Invert Vertical");   y=y+30
+		end,
+	},
+	{
+		name="FOV/Roll",
+		build=function(p)
+			local y=0
+			MakeSlider(p,"FovSpeed", 0.1,4.0, y,"FOV Speed",  "%.2f"); y=y+32
+			MakeSlider(p,"FovSmooth",0.1,10.0,y,"FOV Smooth", "%.2f"); y=y+32
+			MakeSlider(p,"RollSmooth",0.1,10.0,y,"Roll Smooth","%.2f"); y=y+32
+		end,
+	},
+	{
+		name="Misc",
+		build=function(p)
+			local y=0
+			-- Karakter kilidi
+			MakeCheckbox(p,"CharLock",y,"Character Lock",function(val)
+				if freecamEnabled then
+					ApplyCharLock(val)
+				end
+			end); y=y+30
+
+			-- Açıklama
+			local desc=Lbl("Karakterin hareket etmesini engeller.",10,C.textDim,p)
+			desc.Size=UDim2.new(1,0,0,18); desc.Position=UDim2.new(0,22,0,y)
+			y=y+22
+
+			local desc2=Lbl("Freecam kapatılınca otomatik kaldırılır.",10,C.textDim,p)
+			desc2.Size=UDim2.new(1,0,0,18); desc2.Position=UDim2.new(0,22,0,y)
+		end,
+	},
+}
+
+local function CreateConfigPanel()
+	if confGui then confGui:Destroy(); confGui=nil end
+
+	local W,H = 460,310
+	confGui=Instance.new("ScreenGui")
+	confGui.Name="FCConfig"; confGui.ResetOnSpawn=false
+	confGui.IgnoreGuiInset=true; confGui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
+	confGui.Parent=CoreGui
+
+	local win=Instance.new("Frame")
+	win.Size=UDim2.new(0,W,0,H); win.Position=UDim2.new(0.5,-W/2,0.5,-H/2)
+	win.BackgroundColor3=C.bg; win.BorderSizePixel=0; win.Parent=confGui
+	UICornerR(5,win); UIStrokeC(C.border,1,win)
+
+	-- Başlık barı
+	local titleBar=Instance.new("Frame")
+	titleBar.Size=UDim2.new(1,0,0,28); titleBar.BackgroundColor3=C.header
+	titleBar.BorderSizePixel=0; titleBar.Parent=win; UICornerR(5,titleBar)
+	local fix=Instance.new("Frame")
+	fix.Size=UDim2.new(1,0,0,6); fix.Position=UDim2.new(0,0,1,-6)
+	fix.BackgroundColor3=C.header; fix.BorderSizePixel=0; fix.Parent=titleBar
+
+	local tLbl=Lbl("Freecam  ·  Configuration",13,C.text,titleBar)
+	tLbl.Size=UDim2.new(1,-50,1,0); tLbl.Position=UDim2.new(0,10,0,0)
+
+	-- Kapat butonu
+	local closeDot=Instance.new("Frame")
+	closeDot.Size=UDim2.new(0,12,0,12); closeDot.Position=UDim2.new(1,-18,0.5,-6)
+	closeDot.BackgroundColor3=C.red; closeDot.BorderSizePixel=0; closeDot.Parent=titleBar
+	UICornerR(6,closeDot)
+	local closeHit=Instance.new("TextButton")
+	closeHit.Size=UDim2.fromScale(1,1); closeHit.BackgroundTransparency=1
+	closeHit.Text=""; closeHit.Parent=closeDot
+	closeHit.MouseButton1Click:Connect(function()
+		confOpen=false; confGui:Destroy(); confGui=nil
+	end)
+
+	-- Pencere sürükleme
+	local ds,dws
+	titleBar.InputBegan:Connect(function(inp)
+		if inp.UserInputType==Enum.UserInputType.MouseButton1
+		or inp.UserInputType==Enum.UserInputType.Touch then
+			ds=Vector2.new(inp.Position.X,inp.Position.Y); dws=win.Position
+		end
+	end)
+	UserInputService.InputChanged:Connect(function(inp)
+		if not ds then return end
+		if inp.UserInputType==Enum.UserInputType.MouseMovement
+		or inp.UserInputType==Enum.UserInputType.Touch then
+			local d=Vector2.new(inp.Position.X,inp.Position.Y)-ds
+			win.Position=UDim2.new(dws.X.Scale,dws.X.Offset+d.X,dws.Y.Scale,dws.Y.Offset+d.Y)
+		end
+	end)
+	UserInputService.InputEnded:Connect(function(inp)
+		if inp.UserInputType==Enum.UserInputType.MouseButton1
+		or inp.UserInputType==Enum.UserInputType.Touch then ds=nil end
+	end)
+
+	-- Sekme barı
+	local TABY=28
+	local tabBar=Instance.new("Frame")
+	tabBar.Size=UDim2.new(1,0,0,26); tabBar.Position=UDim2.new(0,0,0,TABY)
+	tabBar.BackgroundColor3=C.bgDark; tabBar.BorderSizePixel=0; tabBar.Parent=win
+
+	local content=Instance.new("Frame")
+	content.Size=UDim2.new(1,-16,1,-(TABY+26+42)); content.Position=UDim2.new(0,8,0,TABY+26+8)
+	content.BackgroundTransparency=1; content.ClipsDescendants=true; content.Parent=win
+
+	local curPage=nil; local tabBtns={}
+
+	local function SwitchTab(idx)
+		if curPage then curPage:Destroy() end
+		for i,btn in ipairs(tabBtns) do
+			btn.BackgroundColor3=i==idx and C.tabActive or C.tabInact
+			btn.TextColor3=i==idx and Color3.fromRGB(255,255,255) or C.textDim
+		end
+		curPage=Instance.new("Frame")
+		curPage.Size=UDim2.fromScale(1,1); curPage.BackgroundTransparency=1
+		curPage.Parent=content
+		TABS[idx].build(curPage)
+	end
+
+	local tabW=math.floor(W/#TABS)
+	for i,tab in ipairs(TABS) do
+		local btn=Instance.new("TextButton")
+		btn.Size=UDim2.new(0,tabW,1,0); btn.Position=UDim2.new(0,(i-1)*tabW,0,0)
+		btn.BackgroundColor3=C.tabInact; btn.BorderSizePixel=0
+		btn.Text=tab.name; btn.Font=Enum.Font.Code; btn.TextSize=12
+		btn.TextColor3=C.textDim; btn.Parent=tabBar
+		tabBtns[i]=btn
+		btn.MouseButton1Click:Connect(function() SwitchTab(i) end)
+	end
+	SwitchTab(1)
+
+	-- Alt bar
+	local bot=Instance.new("Frame")
+	bot.Size=UDim2.new(1,0,0,34); bot.Position=UDim2.new(0,0,1,-34)
+	bot.BackgroundColor3=C.bgDark; bot.BorderSizePixel=0; bot.Parent=win
+
+	local togBtn=Instance.new("TextButton")
+	togBtn.Size=UDim2.new(0,148,0,24); togBtn.Position=UDim2.new(0,8,0.5,-12)
+	togBtn.BackgroundColor3=freecamEnabled and C.red or C.green
+	togBtn.BorderSizePixel=0; togBtn.Parent=bot
+	togBtn.Font=Enum.Font.Code; togBtn.TextSize=12
+	togBtn.TextColor3=Color3.fromRGB(255,255,255)
+	togBtn.Text=freecamEnabled and "■  Stop Freecam" or "▶  Start Freecam"
+	UICornerR(5,togBtn)
+	togBtn.MouseButton1Click:Connect(function()
+		ToggleFreecam()
+		togBtn.BackgroundColor3=freecamEnabled and C.red or C.green
+		togBtn.Text=freecamEnabled and "■  Stop Freecam" or "▶  Start Freecam"
+	end)
+
+	local statusLbl=Lbl("",10,C.textDim,bot)
+	statusLbl.Size=UDim2.new(1,-164,1,0); statusLbl.Position=UDim2.new(0,158,0,0)
+	RunService.Heartbeat:Connect(function()
+		if not confGui or not confGui.Parent then return end
+		statusLbl.Text=string.format("FOV:%d  Spd:%.1f  Sens:%.1f  %s%s",
+			math.floor(cameraFov), Config.MoveSpeed, Config.LookSens,
+			freecamEnabled and "● ACTIVE" or "○ Standby",
+			Config.CharLock and "  🔒" or "")
+	end)
+end
+
+local function ToggleConfig()
+	confOpen=not confOpen
+	if confOpen then CreateConfigPanel()
+	elseif confGui then confGui:Destroy(); confGui=nil end
+end
+
+------------------------------------------------------------------------
+-- HUD (üst bar + mobil aksiyonlar)
+------------------------------------------------------------------------
+local hudGui
+
+local function CreateHUD()
+	hudGui=Instance.new("ScreenGui")
+	hudGui.Name="FreecamHUD"; hudGui.ResetOnSpawn=false
+	hudGui.IgnoreGuiInset=true; hudGui.Parent=CoreGui
+
+	-- ⚙ Config butonu
+	local cfgBtn=Instance.new("TextButton")
+	cfgBtn.Size=UDim2.new(0,90,0,30); cfgBtn.Position=UDim2.new(0.5,-45,0,6)
+	cfgBtn.BackgroundColor3=Color3.fromRGB(15,20,32)
+	cfgBtn.BackgroundTransparency=0.05; cfgBtn.BorderSizePixel=0
+	cfgBtn.Text="⚙  Config"; cfgBtn.Font=Enum.Font.Code; cfgBtn.TextSize=13
+	cfgBtn.TextColor3=Color3.fromRGB(140,190,255); cfgBtn.Parent=hudGui
+	UICornerR(8,cfgBtn); UIStrokeC(C.border,1,cfgBtn)
+	cfgBtn.MouseButton1Click:Connect(ToggleConfig)
+
+	if IsMobile then
+		-- FOV butonları (sağ orta)
+		local function MakeBtn(lbl, xO, yO, bgCol, downFn, upFn)
+			local b=Instance.new("TextButton")
+			b.Size=UDim2.new(0,52,0,52); b.Position=UDim2.new(1,xO,0.5,yO)
+			b.BackgroundColor3=bgCol; b.BackgroundTransparency=0.15
+			b.BorderSizePixel=0; b.Text=lbl
+			b.Font=Enum.Font.Code; b.TextSize=22
+			b.TextColor3=Color3.fromRGB(220,235,255); b.Parent=hudGui
+			UICornerR(10,b)
+			b.MouseButton1Down:Connect(downFn)
+			b.MouseButton1Up:Connect(upFn)
+			b.InputBegan:Connect(function(inp)
+				if inp.UserInputType==Enum.UserInputType.Touch then downFn() end
+			end)
+			b.InputEnded:Connect(function(inp)
+				if inp.UserInputType==Enum.UserInputType.Touch then upFn() end
+			end)
+			return b
+		end
+
+		MakeBtn("+", -62, -56, Color3.fromRGB(32,88,160),
+			function() Pad.FovUp=1 end, function() Pad.FovUp=0 end)
+		MakeBtn("−", -62, 8,  Color3.fromRGB(22,55,110),
+			function() Pad.FovDown=1 end, function() Pad.FovDown=0 end)
+
+		-- Roll butonları (sol orta, WASD'ın üstü)
+		MakeBtn("↺", -62+(-62-8), -56, Color3.fromRGB(60,40,100),
+			function() Pad.RollL=1 end, function() Pad.RollL=0 end)
+		MakeBtn("↻", -62+(-62-8), 8,  Color3.fromRGB(60,40,100),
+			function() Pad.RollR=1 end, function() Pad.RollR=0 end)
+
+		-- İpucu
+		local hint=Instance.new("TextLabel")
+		hint.Size=UDim2.new(0.5,0,0,16); hint.Position=UDim2.new(0.25,0,1,-18)
+		hint.BackgroundTransparency=1; hint.Text="Drag right side: look camera"
+		hint.Font=Enum.Font.Code; hint.TextSize=10
+		hint.TextColor3=Color3.fromRGB(80,110,150); hint.TextTransparency=0.4
+		hint.Parent=hudGui
+	end
+end
+
+------------------------------------------------------------------------
+-- Init
+------------------------------------------------------------------------
+CreateHUD()
+CreateWASDPad()   -- WASD pad her zaman görünür
+
+-- Desktop Shift+P toggle
+if not IsMobile then
+	ContextActionService:BindActionAtPriority("FCToggle", function(_, state, input)
+		if state==Enum.UserInputState.Begin and input.KeyCode==Enum.KeyCode.P then
+			if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
+				ToggleFreecam()
+			end
+		end
+		return Enum.ContextActionResult.Pass
+	end, false, Enum.ContextActionPriority.Low.Value, Enum.KeyCode.P)
+end
+
+script:SetAttribute("FreecamEnabled", false)
+script:GetAttributeChangedSignal("FreecamEnabled"):Connect(function()
+	local v=script:GetAttribute("FreecamEnabled")
+	if typeof(v)~="boolean" then script:SetAttribute("FreecamEnabled",freecamEnabled); return end
+	if v~=freecamEnabled then
+		if v then StartFreecam() else StopFreecam() end
+		freecamEnabled=v
+	end
+end)
+
+if not IsMobile then
+	StarterGui:SetCore("SendNotification",{
+		Title="Freecam v4",
+		Text="Shift+P toggle  ·  ⚙ Config  ·  WASD pad aktif"
+	})
+end
