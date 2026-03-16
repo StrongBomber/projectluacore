@@ -17,7 +17,7 @@
 	  Config panelinden "Character Lock" açılınca
 	  karakter hiçbir şekilde hareket edemez
 	  (HumanoidRootPart Anchored + Humanoid kontrolü durdurulur)
-	══════════════════════════════════════════════════════
+══════════════════════════════════════════════════════
 ]]
 
 ------------------------------------------------------------------------
@@ -192,7 +192,9 @@ local touchConns = {}
 
 local function StartTouchCapture()
 	touchConns[#touchConns+1] = UserInputService.TouchStarted:Connect(function(input, processed)
-		if processed then return end   -- Roblox'un kendi UI'ı (varsa) tarafından işlendi
+		if processed then return end
+		-- Config paneli açıkken drag-to-look devre dışı
+		if confOpen then return end
 		if not Look.active then
 			local pos = Vector2.new(input.Position.X, input.Position.Y)
 			Look.active  = true
@@ -204,6 +206,11 @@ local function StartTouchCapture()
 
 	touchConns[#touchConns+1] = UserInputService.TouchMoved:Connect(function(input, processed)
 		if processed then return end
+		-- Config paneli açıkken drag-to-look devre dışı
+		if confOpen then
+			Look.delta = Vector2.new()
+			return
+		end
 		if input == Look.touchId then
 			local pos = Vector2.new(input.Position.X, input.Position.Y)
 			Look.delta = pos - Look.last
@@ -249,15 +256,17 @@ local Input = {} do
 
 	function Input.Pan(dt)
 		panSpring:SetFreq(Config.LookSmooth)
-		-- Mouse (PC)
+		-- Mouse (PC) — config paneli açıkken mouse pan devre dışı
 		local kMouse = Vector2.new()
-		if dt > 0 then
+		if dt > 0 and not confOpen then
 			kMouse = (mouse.Delta/dt) * (pi/64/60)
 			mouse.Delta = Vector2.new()
+		else
+			mouse.Delta = Vector2.new()
 		end
-		-- Sağ drag (mobil)
+		-- Sağ drag (mobil) — config paneli açıkken devre dışı
 		local kTouch = Vector2.new()
-		if Look.active and dt > 0 then
+		if Look.active and dt > 0 and not confOpen then
 			local d = Look.delta
 			kTouch = Vector2.new(-d.Y, -d.X) * (0.003 * Config.LookSens) / dt
 		end
@@ -292,6 +301,8 @@ local Input = {} do
 		return Enum.ContextActionResult.Sink
 	end
 	local function MousePanFn(action, state, input)
+		-- Config paneli açıkken mouse pan'i biriktirme
+		if confOpen then return Enum.ContextActionResult.Sink end
 		local d = input.Delta
 		mouse.Delta = Vector2.new(-d.y, -d.x)
 		return Enum.ContextActionResult.Sink
@@ -441,6 +452,13 @@ local function Lbl(text,size,color,parent,ax)
 end
 
 ------------------------------------------------------------------------
+-- Forward declarations (DestroyScript ve Look capture tarafından kullanılır)
+------------------------------------------------------------------------
+local confOpen = false
+local confGui  = nil
+local hudGui   = nil
+
+------------------------------------------------------------------------
 -- WASD PAD GUI  (sürüklenebilir)
 ------------------------------------------------------------------------
 local padGui
@@ -516,7 +534,6 @@ local function CreateWASDPad()
 	end)
 
 	-- Buton fabrikası
-	-- col/row: grid pozisyonu (0-tabanlı), padKey: Pad tablosundaki key
 	local function MakeKey(label, col, row, padKey, extraW)
 		extraW = extraW or 0
 		local x = GAP + col*(BTN+GAP)
@@ -550,7 +567,6 @@ local function CreateWASDPad()
 		btn.MouseButton1Down:Connect(Press)
 		btn.MouseButton1Up:Connect(Release)
 		btn.MouseLeave:Connect(Release)
-		-- Touch desteği
 		btn.TouchLongPress:Connect(function() end)
 		btn.InputBegan:Connect(function(inp)
 			if inp.UserInputType == Enum.UserInputType.Touch then Press() end
@@ -561,48 +577,62 @@ local function CreateWASDPad()
 		return btn
 	end
 
-	--[[
-		Düzen:
-		   [  ↑ W  ]
-		[← A][   ][D →]
-		   [  ↓ S  ]
-		   ─────────
-		[↑ E]      [Q ↓]   ← yukarı/aşağı
-		[ ↺ ]      [ ↻ ]   ← roll
-		─────────────────
-		[FOV+]    [FOV-]
-	]]
-
-	-- Satır 0: W (ortada)
 	MakeKey("▲", 1, 0, "W")
-	-- Satır 1: A, boşluk, D
 	MakeKey("◀", 0, 1, "A")
 	MakeKey("▶", 2, 1, "D")
-	-- Satır 2: S (ortada)
 	MakeKey("▼", 1, 2, "S")
-	-- Satır 3: E (yukarı çık) ve Q (aşağı in)
 	MakeKey("E↑", 0, 3, "Up")
 	MakeKey("Q↓", 2, 3, "Down")
-
-	-- FOV ve Roll: çerçevenin dışında değil, 4. satırda
-	-- PAD_H'i yeniden hesapla
-	-- (zaten 4 satır + başlık ile PAD_H doğru)
 
 	return padGui
 end
 
 local function DestroyWASDPad()
 	if padGui then padGui:Destroy(); padGui=nil end
-	-- Pad durumunu sıfırla
 	for k in pairs(Pad) do Pad[k] = 0 end
+end
+
+------------------------------------------------------------------------
+-- DestroyScript: Tüm sistemi temiz bir şekilde kapat ve imha et
+------------------------------------------------------------------------
+local function DestroyScript()
+	-- 1) Freecam aktifse durdur (kamera ve karakter kilidi geri alınır)
+	if freecamEnabled then
+		StopFreecam()
+		freecamEnabled = false
+	end
+
+	-- 2) Config panelini kapat
+	confOpen = false
+	if confGui then confGui:Destroy(); confGui = nil end
+
+	-- 3) HUD'u kapat
+	if hudGui then hudGui:Destroy(); hudGui = nil end
+
+	-- 4) WASD pad'i kapat
+	DestroyWASDPad()
+
+	-- 5) FCToggle bağlamasını kaldır
+	pcall(function()
+		ContextActionService:UnbindAction("FCToggle")
+	end)
+
+	-- 6) Karakter kilit bağlantılarını temizle
+	for _, c in ipairs(charLockConns) do c:Disconnect() end
+	charLockConns = {}
+
+	-- 7) Script attribute'unu temizle ve script'i destroy et
+	pcall(function()
+		script:SetAttribute("FreecamEnabled", nil)
+	end)
+	pcall(function()
+		script:Destroy()
+	end)
 end
 
 ------------------------------------------------------------------------
 -- CONFIG PANELİ
 ------------------------------------------------------------------------
-local confGui  = nil
-local confOpen = false
-
 local function MakeSlider(parent, configKey, minVal, maxVal, yPos, labelText, fmt)
 	fmt = fmt or "%.2f"
 	local ROW = 30
@@ -741,6 +771,48 @@ local TABS = {
 
 			local desc2=Lbl("Freecam kapatılınca otomatik kaldırılır.",10,C.textDim,p)
 			desc2.Size=UDim2.new(1,0,0,18); desc2.Position=UDim2.new(0,22,0,y)
+			y=y+28
+
+			-- Ayırıcı çizgi
+			local sep=Instance.new("Frame")
+			sep.Size=UDim2.new(1,0,0,1); sep.Position=UDim2.new(0,0,0,y)
+			sep.BackgroundColor3=C.border; sep.BorderSizePixel=0; sep.Parent=p
+			y=y+10
+
+			-- Destroy Script butonu
+			local destroyBtn=Instance.new("TextButton")
+			destroyBtn.Size=UDim2.new(1,0,0,28)
+			destroyBtn.Position=UDim2.new(0,0,0,y)
+			destroyBtn.BackgroundColor3=Color3.fromRGB(140, 30, 30)
+			destroyBtn.BorderSizePixel=0
+			destroyBtn.Text="⊘  Destroy Script"
+			destroyBtn.Font=Enum.Font.Code
+			destroyBtn.TextSize=12
+			destroyBtn.TextColor3=Color3.fromRGB(255, 200, 200)
+			destroyBtn.AutoButtonColor=false
+			destroyBtn.Parent=p
+			UICornerR(5, destroyBtn)
+			UIStrokeC(Color3.fromRGB(180, 50, 50), 1, destroyBtn)
+
+			destroyBtn.MouseEnter:Connect(function()
+				destroyBtn.BackgroundColor3=Color3.fromRGB(180, 40, 40)
+			end)
+			destroyBtn.MouseLeave:Connect(function()
+				destroyBtn.BackgroundColor3=Color3.fromRGB(140, 30, 30)
+			end)
+			destroyBtn.MouseButton1Click:Connect(function()
+				DestroyScript()
+			end)
+			-- Touch desteği
+			destroyBtn.InputBegan:Connect(function(inp)
+				if inp.UserInputType==Enum.UserInputType.Touch then
+					DestroyScript()
+				end
+			end)
+
+			y=y+30
+			local destroyDesc=Lbl("Tüm UI ve sistemi temizler.",10,C.textDim,p)
+			destroyDesc.Size=UDim2.new(1,0,0,16); destroyDesc.Position=UDim2.new(0,0,0,y)
 		end,
 	},
 }
@@ -878,8 +950,6 @@ end
 ------------------------------------------------------------------------
 -- HUD (üst bar + mobil aksiyonlar)
 ------------------------------------------------------------------------
-local hudGui
-
 local function CreateHUD()
 	hudGui=Instance.new("ScreenGui")
 	hudGui.Name="FreecamHUD"; hudGui.ResetOnSpawn=false
@@ -921,7 +991,7 @@ local function CreateHUD()
 		MakeBtn("−", -62, 8,  Color3.fromRGB(22,55,110),
 			function() Pad.FovDown=1 end, function() Pad.FovDown=0 end)
 
-		-- Roll butonları (sol orta, WASD'ın üstü)
+		-- Roll butonları
 		MakeBtn("↺", -62+(-62-8), -56, Color3.fromRGB(60,40,100),
 			function() Pad.RollL=1 end, function() Pad.RollL=0 end)
 		MakeBtn("↻", -62+(-62-8), 8,  Color3.fromRGB(60,40,100),
@@ -941,7 +1011,7 @@ end
 -- Init
 ------------------------------------------------------------------------
 CreateHUD()
-CreateWASDPad()   -- WASD pad her zaman görünür
+CreateWASDPad()
 
 -- Desktop Shift+P toggle
 if not IsMobile then
