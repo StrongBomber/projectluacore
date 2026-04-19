@@ -1,0 +1,177 @@
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Ana GUI oluştur
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "GuiTransferTool"
+ScreenGui.Parent = playerGui
+ScreenGui.ResetOnSpawn = false
+
+-- Ana Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 300, 0, 150)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -75)
+MainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+-- Frame köşeleri yuvarlat
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 12)
+MainCorner.Parent = MainFrame
+
+-- Başlık
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, 0, 0, 40)
+TitleLabel.Position = UDim2.new(0, 0, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "CoreGui → StarterGui Taşıyıcı"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextScaled = true
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.Parent = MainFrame
+
+-- GUI Adı TextBox
+local NameBox = Instance.new("TextBox")
+NameBox.Size = UDim2.new(0.85, 0, 0, 35)
+NameBox.Position = UDim2.new(0.075, 0, 0, 50)
+NameBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+NameBox.BorderSizePixel = 0
+NameBox.Text = "GUI Adını Girin"
+NameBox.TextColor3 = Color3.fromRGB(200, 200, 200)
+NameBox.TextScaled = true
+NameBox.Font = Enum.Font.Gotham
+NameBox.ClearTextOnFocus = true
+NameBox.Parent = MainFrame
+
+local NameCorner = Instance.new("UICorner")
+NameCorner.CornerRadius = UDim.new(0, 8)
+NameCorner.Parent = NameBox
+
+-- Transfer Butonu
+local TransferButton = Instance.new("TextButton")
+TransferButton.Size = UDim2.new(0.4, 0, 0, 35)
+TransferButton.Position = UDim2.new(0.05, 0, 0, 95)
+TransferButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+TransferButton.BorderSizePixel = 0
+TransferButton.Text = "TAŞI"
+TransferButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+TransferButton.TextScaled = true
+TransferButton.Font = Enum.Font.GothamBold
+TransferButton.Parent = MainFrame
+
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.CornerRadius = UDim.new(0, 8)
+ButtonCorner.Parent = TransferButton
+
+-- Kapat Butonu
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0.4, 0, 0, 35)
+CloseButton.Position = UDim2.new(0.55, 0, 0, 95)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+CloseButton.BorderSizePixel = 0
+CloseButton.Text = "KAPAT"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextScaled = true
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Parent = MainFrame
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 8)
+CloseCorner.Parent = CloseButton
+
+-- Durum Label
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, -20, 0, 25)
+StatusLabel.Position = UDim2.new(0, 10, 0, 135)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = "Hazır"
+StatusLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
+StatusLabel.TextScaled = true
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.Parent = MainFrame
+
+-- Animasyon fonksiyonu
+local function tweenFrame(frame, goal)
+    local tween = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quart), goal)
+    tween:Play()
+end
+
+-- GUI Taşıma Fonksiyonu
+local function transferGui(guiName)
+    local success = false
+    
+    -- CoreGui'de GUI ara
+    local targetGui = CoreGui:FindFirstChild(guiName)
+    
+    if targetGui and targetGui:IsA("ScreenGui") then
+        -- StarterGui'ye kopyala
+        local newGui = targetGui:Clone()
+        newGui.Parent = StarterGui
+        newGui.ResetOnSpawn = false
+        
+        -- PlayerGui'ye de ekle (hemen görünmesi için)
+        local playerCopy = newGui:Clone()
+        playerCopy.Parent = playerGui
+        
+        success = true
+        StatusLabel.Text = "'" .. guiName .. "' başarıyla taşındı!"
+        StatusLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
+    else
+        StatusLabel.Text = "Hata: '" .. guiName .. "' bulunamadı!"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 150, 150)
+    end
+    
+    return success
+end
+
+-- Buton olayları
+TransferButton.MouseButton1Click:Connect(function()
+    local guiName = NameBox.Text
+    
+    if guiName ~= "" and guiName ~= "GUI Adını Girin" then
+        StatusLabel.Text = "Taşıyor..."
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 150)
+        
+        wait(0.5)
+        transferGui(guiName)
+    else
+        StatusLabel.Text = "Lütfen GUI adını girin!"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 150, 150)
+    end
+end)
+
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Hover efektleri
+TransferButton.MouseEnter:Connect(function()
+    tweenFrame(TransferButton, {BackgroundColor3 = Color3.fromRGB(0, 200, 255)})
+end)
+
+TransferButton.MouseLeave:Connect(function()
+    tweenFrame(TransferButton, {BackgroundColor3 = Color3.fromRGB(0, 170, 255)})
+end)
+
+CloseButton.MouseEnter:Connect(function()
+    tweenFrame(CloseButton, {BackgroundColor3 = Color3.fromRGB(255, 120, 120)})
+end)
+
+CloseButton.MouseLeave:Connect(function()
+    tweenFrame(CloseButton, {BackgroundColor3 = Color3.fromRGB(255, 85, 85)})
+end)
+
+-- Enter tuşu ile taşıma
+NameBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        TransferButton.MouseButton1Click:Fire()
+    end
+end)
+
+print("GUI Taşıyıcı hazır! CoreGui'deki GUI'leri StarterGui'ye taşıyabilirsiniz.")
