@@ -1,0 +1,1382 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+-- ==========================================
+-- ANTI-DUPLICATION SYSTEM (NEW)
+-- ==========================================
+if LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("FlyCMD_Gui") then
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Zenith Fly",
+        Text = "The script is already running! 🚀",
+        Duration = 5
+    })
+    return
+end
+
+-- ==========================================
+-- ORPHAN TOOLS CLEANUP (NEW)
+-- ==========================================
+local function CleanupOldTools()
+    local function check(parent)
+        for _, item in pairs(parent:GetChildren()) do
+            if item:IsA("Tool") and item:GetAttribute("FlyGuiTool") then
+                item:Destroy()
+            end
+        end
+    end
+    check(LocalPlayer.Backpack)
+    if LocalPlayer.Character then check(LocalPlayer.Character) end
+end
+CleanupOldTools()
+
+local saveFileName = "FlyGUI_Config_" .. tostring(LocalPlayer.UserId) .. ".json"
+local isReturningUser = false
+
+pcall(function()
+    if isfile and isfile(saveFileName) then
+        isReturningUser = true
+    end
+end)
+
+local returnMessages = {
+    "great to see you back friend!!! ♡",
+    "friend??? You're back! It's great to see you here : ]",
+    "YAYYY thanks for using my script again!!! ♡♡♡",
+    "you don't know how happy I am to see you here! :))))",
+    "just have fun! :DDDDD"
+}
+
+local notifText = "Have fun with this super fly script 🚀 ♡"
+if isReturningUser then
+    math.randomseed(tick())
+    notifText = returnMessages[math.random(1, #returnMessages)]
+end
+
+local function SafeNotification(title, text, duration)
+    task.spawn(function()
+        local success = false
+        local tries = 0
+        while not success and tries < 10 do
+            success = pcall(function()
+                game:GetService("StarterGui"):SetCore("SendNotification", {
+                    Title = title,
+                    Text = text,
+                    Duration = duration or 5
+                })
+            end)
+            if not success then 
+                task.wait(1) 
+                tries = tries + 1
+            end
+        end
+    end)
+end
+
+local startSound = Instance.new("Sound", game.Workspace)
+startSound.SoundId = "rbxassetid://3951847031"
+startSound.Volume = 2 
+startSound:Play()
+
+SafeNotification("Welcome " .. LocalPlayer.DisplayName .. "!", notifText, 7)
+
+local flying = false
+local isFlyingViaGUI = false
+local isFlyingViaTool = false
+local speed = 25
+local noclipEnabled = true 
+local hasFlyTool = false
+local minimized = false 
+local canAnimate = true 
+local canChangeTheme = true 
+local bg_color = Color3.fromRGB(35, 35, 35)
+local accent_color = Color3.fromRGB(0, 200, 100)
+
+local noclipCooldown = false
+local confirmCooldown = false
+local giveToolCooldown = false
+local deleteToolCooldown = false
+local flyBtnCooldown = false 
+local respawnCooldown = false
+
+local flyConnection
+local noclipConnection 
+local bv, bg, lvAttachment
+local originalCollisions = {} 
+
+local isRGBMode = false
+local canToggleRGB = true
+local currentTrailColorIndex = 1
+local rgbConnection 
+local trailInstance, att0, att1
+
+local freeCamEnabled = false
+local freeCamZoomed = false
+local freeCamPart = nil
+local freeCamBv, freeCamBg, freeCamAtt
+local freeCamConnection
+local originalMinZoom, originalMaxZoom
+local originalFOV = 70 
+local freeCamBtnCooldown = false
+
+local floatEnabled = false
+local floatPart = nil
+local floatConnection = nil
+local floatBtnCooldown = false
+
+local trailColors = {
+    {name = "none :(", color = Color3.fromRGB(60, 60, 60), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "blue", color = Color3.fromRGB(0, 0, 255), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "red", color = Color3.fromRGB(255, 0, 0), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "green", color = Color3.fromRGB(0, 255, 0), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "yellow", color = Color3.fromRGB(255, 255, 0), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "purple", color = Color3.fromRGB(128, 0, 128), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "pink", color = Color3.fromRGB(255, 105, 180), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "orange", color = Color3.fromRGB(255, 165, 0), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "cyan", color = Color3.fromRGB(0, 255, 255), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "white", color = Color3.fromRGB(255, 255, 255), textColor = Color3.fromRGB(80, 80, 80)},
+    {name = "black", color = Color3.fromRGB(20, 20, 20), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "brown", color = Color3.fromRGB(139, 69, 19), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "lime", color = Color3.fromRGB(50, 205, 50), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "magenta", color = Color3.fromRGB(255, 0, 255), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "gold", color = Color3.fromRGB(255, 215, 0), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "silver", color = Color3.fromRGB(192, 192, 192), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "peach", color = Color3.fromRGB(255, 218, 185), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "burgundy", color = Color3.fromRGB(128, 0, 0), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "indigo", color = Color3.fromRGB(75, 0, 130), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "mint", color = Color3.fromRGB(152, 255, 152), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "lavender", color = Color3.fromRGB(230, 190, 255), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "crimson", color = Color3.fromRGB(150, 0, 0), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "turquoise", color = Color3.fromRGB(64, 224, 208), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "charcoal", color = Color3.fromRGB(40, 40, 40), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "beige", color = Color3.fromRGB(245, 245, 220), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "emerald", color = Color3.fromRGB(0, 150, 80), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "ruby", color = Color3.fromRGB(224, 17, 95), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "sapphire", color = Color3.fromRGB(15, 82, 186), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "amethyst", color = Color3.fromRGB(153, 102, 204), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "sky blue", color = Color3.fromRGB(135, 206, 235), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "neon green", color = Color3.fromRGB(57, 255, 20), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "hot pink", color = Color3.fromRGB(255, 20, 147), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "navy", color = Color3.fromRGB(0, 0, 128), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "olive", color = Color3.fromRGB(128, 128, 0), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "coral", color = Color3.fromRGB(255, 127, 80), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "chocolate", color = Color3.fromRGB(210, 105, 30), textColor = Color3.fromRGB(255, 255, 255)},
+    {name = "amber", color = Color3.fromRGB(255, 191, 0), textColor = Color3.fromRGB(50, 50, 50)},
+    {name = "cherry", color = Color3.fromRGB(222, 49, 99), textColor = Color3.fromRGB(255, 255, 255)}
+}
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "FlyCMD_Gui"
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 180, 0, 365) 
+MainFrame.Position = UDim2.new(0.5, -90, 0.5, -182)
+MainFrame.BackgroundColor3 = bg_color
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.ClipsDescendants = true 
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(0, 70, 0, 30) 
+Title.Position = UDim2.new(0, 10, 0, 0) 
+Title.Text = "FLY GUI"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 13
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = MainFrame
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseBtn.Position = UDim2.new(1, -30, 0, 2)
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+CloseBtn.BackgroundTransparency = 1
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 14
+CloseBtn.Parent = MainFrame
+
+local MiniBtn = Instance.new("TextButton")
+MiniBtn.Size = UDim2.new(0, 25, 0, 25)
+MiniBtn.Position = UDim2.new(1, -60, 0, 2)
+MiniBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+MiniBtn.Text = "-" 
+MiniBtn.TextColor3 = Color3.fromRGB(255, 50, 50) 
+MiniBtn.Font = Enum.Font.GothamBold
+MiniBtn.TextSize = 18
+MiniBtn.Parent = MainFrame
+Instance.new("UICorner", MiniBtn).CornerRadius = UDim.new(0, 6)
+
+local ThemeBtn = Instance.new("TextButton")
+ThemeBtn.Size = UDim2.new(0, 25, 0, 25)
+ThemeBtn.Position = UDim2.new(1, -90, 0, 2)
+ThemeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60) 
+ThemeBtn.Text = "🌙"
+ThemeBtn.Font = Enum.Font.GothamBold
+ThemeBtn.TextSize = 12
+ThemeBtn.Parent = MainFrame
+Instance.new("UICorner", ThemeBtn).CornerRadius = UDim.new(0, 6)
+
+local RGBBtn = Instance.new("TextButton")
+RGBBtn.Size = UDim2.new(0, 25, 0, 25)
+RGBBtn.Position = UDim2.new(1, -120, 0, 2)
+RGBBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60) 
+RGBBtn.Text = "🌫"
+RGBBtn.Font = Enum.Font.GothamBold
+RGBBtn.TextSize = 12
+RGBBtn.Parent = MainFrame
+Instance.new("UICorner", RGBBtn).CornerRadius = UDim.new(0, 6)
+
+local ShiftTitle = Instance.new("TextLabel")
+ShiftTitle.Size = UDim2.new(1, 0, 0, 20)
+ShiftTitle.Position = UDim2.new(0, 0, 0, 30)
+ShiftTitle.Text = "fly up/down shift:"
+ShiftTitle.TextColor3 = Color3.fromRGB(200, 200, 200)
+ShiftTitle.BackgroundTransparency = 1
+ShiftTitle.Font = Enum.Font.Gotham
+ShiftTitle.TextSize = 9
+ShiftTitle.Parent = MainFrame
+
+local BtnUp = Instance.new("TextButton")
+BtnUp.Size = UDim2.new(0, 30, 0, 30)
+BtnUp.Position = UDim2.new(0.5, -80, 0, 50)
+BtnUp.BackgroundColor3 = Color3.fromRGB(0, 100, 0) 
+BtnUp.Text = "⬆️"
+BtnUp.TextColor3 = Color3.fromRGB(255, 255, 255)
+BtnUp.Font = Enum.Font.GothamBold
+BtnUp.TextSize = 14
+BtnUp.Parent = MainFrame
+Instance.new("UICorner", BtnUp).CornerRadius = UDim.new(0, 6)
+
+local BtnDown = Instance.new("TextButton")
+BtnDown.Size = UDim2.new(0, 30, 0, 30)
+BtnDown.Position = UDim2.new(0.5, -45, 0, 50)
+BtnDown.BackgroundColor3 = Color3.fromRGB(150, 0, 0) 
+BtnDown.Text = "⬇️"
+BtnDown.TextColor3 = Color3.fromRGB(255, 255, 255)
+BtnDown.Font = Enum.Font.GothamBold
+BtnDown.TextSize = 14
+BtnDown.Parent = MainFrame
+Instance.new("UICorner", BtnDown).CornerRadius = UDim.new(0, 6)
+
+local ShiftInput = Instance.new("TextBox")
+ShiftInput.Size = UDim2.new(0, 75, 0, 30)
+ShiftInput.Position = UDim2.new(0.5, -10, 0, 50)
+ShiftInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+ShiftInput.Text = "" 
+ShiftInput.PlaceholderText = "enter studs power here!"
+ShiftInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+ShiftInput.Font = Enum.Font.Gotham
+ShiftInput.TextSize = 8
+ShiftInput.TextWrapped = true
+ShiftInput.TextScaled = true 
+ShiftInput.ClearTextOnFocus = false
+ShiftInput.Parent = MainFrame
+Instance.new("UICorner", ShiftInput).CornerRadius = UDim.new(0, 6)
+
+local FlyOptionsTitle = Instance.new("TextLabel")
+FlyOptionsTitle.Size = UDim2.new(1, 0, 0, 20)
+FlyOptionsTitle.Position = UDim2.new(0, 0, 0, 85)
+FlyOptionsTitle.Text = "fly options"
+FlyOptionsTitle.TextColor3 = Color3.fromRGB(200, 200, 200)
+FlyOptionsTitle.BackgroundTransparency = 1
+FlyOptionsTitle.Font = Enum.Font.Gotham
+FlyOptionsTitle.TextSize = 12
+FlyOptionsTitle.Parent = MainFrame
+
+local NoclipBtn = Instance.new("TextButton")
+NoclipBtn.Size = UDim2.new(0, 73, 0, 35)
+NoclipBtn.Position = UDim2.new(0.5, -75, 0, 105)
+NoclipBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 180) 
+NoclipBtn.Text = "fly noclip: on"
+NoclipBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+NoclipBtn.Font = Enum.Font.GothamSemibold
+NoclipBtn.TextSize = 9
+NoclipBtn.TextWrapped = true
+NoclipBtn.Parent = MainFrame
+Instance.new("UICorner", NoclipBtn).CornerRadius = UDim.new(0, 8)
+
+local FlyBtn = Instance.new("TextButton")
+FlyBtn.Size = UDim2.new(0, 73, 0, 35)
+FlyBtn.Position = UDim2.new(0.5, 2, 0, 105)
+FlyBtn.BackgroundColor3 = accent_color
+FlyBtn.Text = "ENABLE FLY"
+FlyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+FlyBtn.Font = Enum.Font.GothamSemibold
+FlyBtn.TextSize = 10 
+FlyBtn.TextWrapped = true
+FlyBtn.Parent = MainFrame
+Instance.new("UICorner", FlyBtn).CornerRadius = UDim.new(0, 8)
+
+local SpeedTitle = Instance.new("TextLabel")
+SpeedTitle.Size = UDim2.new(1, 0, 0, 20)
+SpeedTitle.Position = UDim2.new(0, 0, 0, 140)
+SpeedTitle.Text = "fly speed"
+SpeedTitle.TextColor3 = Color3.fromRGB(200, 200, 200)
+SpeedTitle.BackgroundTransparency = 1
+SpeedTitle.Font = Enum.Font.Gotham
+SpeedTitle.TextSize = 12
+SpeedTitle.Parent = MainFrame
+
+local SpeedInput = Instance.new("TextBox")
+SpeedInput.Size = UDim2.new(0, 70, 0, 30)
+SpeedInput.Position = UDim2.new(0.5, -75, 0, 165)
+SpeedInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SpeedInput.Text = "25"
+SpeedInput.PlaceholderText = "enter your fly speed here!"
+SpeedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedInput.Font = Enum.Font.Gotham
+SpeedInput.TextSize = 12
+SpeedInput.TextScaled = true 
+SpeedInput.ClearTextOnFocus = false
+SpeedInput.Parent = MainFrame
+Instance.new("UICorner", SpeedInput).CornerRadius = UDim.new(0, 6)
+
+local ConfirmBtn = Instance.new("TextButton")
+ConfirmBtn.Size = UDim2.new(0, 70, 0, 30)
+ConfirmBtn.Position = UDim2.new(0.5, 5, 0, 165)
+ConfirmBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+ConfirmBtn.Text = "confirm"
+ConfirmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ConfirmBtn.Font = Enum.Font.Gotham
+ConfirmBtn.TextSize = 12
+ConfirmBtn.TextScaled = true 
+ConfirmBtn.Parent = MainFrame
+Instance.new("UICorner", ConfirmBtn).CornerRadius = UDim.new(0, 6)
+
+local ExtraOptionsTitle = Instance.new("TextLabel")
+ExtraOptionsTitle.Size = UDim2.new(1, 0, 0, 20)
+ExtraOptionsTitle.Position = UDim2.new(0, 0, 0, 195)
+ExtraOptionsTitle.Text = "extra fly options"
+ExtraOptionsTitle.TextColor3 = Color3.fromRGB(200, 200, 200)
+ExtraOptionsTitle.BackgroundTransparency = 1
+ExtraOptionsTitle.Font = Enum.Font.Gotham
+ExtraOptionsTitle.TextSize = 12
+ExtraOptionsTitle.Parent = MainFrame
+
+local ToolBtn = Instance.new("TextButton")
+ToolBtn.Size = UDim2.new(0, 70, 0, 30) 
+ToolBtn.Position = UDim2.new(0.5, -75, 0, 220)
+ToolBtn.BackgroundColor3 = Color3.fromRGB(100, 80, 200)
+ToolBtn.Text = "FLY TOOL"
+ToolBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToolBtn.Font = Enum.Font.GothamSemibold
+ToolBtn.TextSize = 9
+ToolBtn.TextWrapped = true
+ToolBtn.Parent = MainFrame
+Instance.new("UICorner", ToolBtn).CornerRadius = UDim.new(0, 8)
+
+local DeleteToolBtn = Instance.new("TextButton")
+DeleteToolBtn.Size = UDim2.new(0, 70, 0, 30) 
+DeleteToolBtn.Position = UDim2.new(0.5, -75, 0, 255) 
+DeleteToolBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+DeleteToolBtn.Text = "DELETE FLY TOOL"
+DeleteToolBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+DeleteToolBtn.Font = Enum.Font.GothamSemibold
+DeleteToolBtn.TextSize = 8
+DeleteToolBtn.TextWrapped = true
+DeleteToolBtn.Parent = MainFrame
+Instance.new("UICorner", DeleteToolBtn).CornerRadius = UDim.new(0, 8)
+
+local TpClickBtn = Instance.new("TextButton")
+TpClickBtn.Size = UDim2.new(0, 70, 0, 30) 
+TpClickBtn.Position = UDim2.new(0.5, 5, 0, 220)
+TpClickBtn.BackgroundColor3 = Color3.fromRGB(20, 40, 120)
+TpClickBtn.Text = "click tp 🏹 : off ❌️"
+TpClickBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+TpClickBtn.Font = Enum.Font.GothamSemibold
+TpClickBtn.TextSize = 8
+TpClickBtn.TextWrapped = true
+TpClickBtn.Parent = MainFrame
+Instance.new("UICorner", TpClickBtn).CornerRadius = UDim.new(0, 8)
+
+local FreeCamBtn = Instance.new("TextButton")
+FreeCamBtn.Size = UDim2.new(0, 70, 0, 30) 
+FreeCamBtn.Position = UDim2.new(0.5, 5, 0, 255)
+FreeCamBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50) 
+FreeCamBtn.Text = "free cam 📷 : off ❌️"
+FreeCamBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+FreeCamBtn.Font = Enum.Font.GothamSemibold
+FreeCamBtn.TextSize = 8
+FreeCamBtn.TextWrapped = true
+FreeCamBtn.Parent = MainFrame
+Instance.new("UICorner", FreeCamBtn).CornerRadius = UDim.new(0, 8)
+
+local FloatBtn = Instance.new("TextButton")
+FloatBtn.Size = UDim2.new(0, 150, 0, 30) 
+FloatBtn.Position = UDim2.new(0.5, -75, 0, 290)
+FloatBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+FloatBtn.Text = "float 🕳 : off ❌️"
+FloatBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+FloatBtn.Font = Enum.Font.GothamSemibold
+FloatBtn.TextSize = 8
+FloatBtn.TextWrapped = true
+FloatBtn.Parent = MainFrame
+Instance.new("UICorner", FloatBtn).CornerRadius = UDim.new(0, 8)
+
+local TrailTitle = Instance.new("TextLabel")
+TrailTitle.Size = UDim2.new(1, 0, 0, 20)
+TrailTitle.Position = UDim2.new(0, 0, 0, 335)
+TrailTitle.Text = "select fly trail color:"
+TrailTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+TrailTitle.BackgroundTransparency = 1
+TrailTitle.TextTransparency = 1
+TrailTitle.Font = Enum.Font.Gotham
+TrailTitle.TextSize = 11
+TrailTitle.Parent = MainFrame
+
+local TrailColorBtn = Instance.new("TextButton")
+TrailColorBtn.Size = UDim2.new(0, 150, 0, 30)
+TrailColorBtn.Position = UDim2.new(0.5, -75, 0, 355)
+TrailColorBtn.BackgroundColor3 = trailColors[1].color
+TrailColorBtn.Text = "color: " .. trailColors[1].name
+TrailColorBtn.TextColor3 = trailColors[1].textColor
+TrailColorBtn.Font = Enum.Font.GothamSemibold
+TrailColorBtn.TextSize = 12
+TrailColorBtn.BackgroundTransparency = 1
+TrailColorBtn.TextTransparency = 1
+TrailColorBtn.Parent = MainFrame
+Instance.new("UICorner", TrailColorBtn).CornerRadius = UDim.new(0, 8)
+
+local LeftTrailBtn = Instance.new("TextButton")
+LeftTrailBtn.Size = UDim2.new(0, 45, 1, 0)
+LeftTrailBtn.Position = UDim2.new(0, 0, 0, 0)
+LeftTrailBtn.BackgroundTransparency = 1
+LeftTrailBtn.TextTransparency = 1
+LeftTrailBtn.Text = "◀️"
+LeftTrailBtn.Font = Enum.Font.Gotham
+LeftTrailBtn.TextSize = 16
+LeftTrailBtn.Parent = TrailColorBtn
+
+local RightTrailBtn = Instance.new("TextButton")
+RightTrailBtn.Size = UDim2.new(0, 45, 1, 0)
+RightTrailBtn.Position = UDim2.new(1, -45, 0, 0)
+RightTrailBtn.BackgroundTransparency = 1
+RightTrailBtn.TextTransparency = 1
+RightTrailBtn.Text = "▶️"
+RightTrailBtn.Font = Enum.Font.Gotham
+RightTrailBtn.TextSize = 16
+RightTrailBtn.Parent = TrailColorBtn
+
+local isLightMode = false
+
+local function SaveData()
+    if writefile then
+        local data = {
+            lightMode = isLightMode,
+            mini = minimized,
+            rgb = isRGBMode,
+            trailIdx = currentTrailColorIndex,
+            spdTxt = SpeedInput and SpeedInput.Text or "25",
+            shfTxt = ShiftInput and ShiftInput.Text or ""
+        }
+        pcall(function() writefile(saveFileName, HttpService:JSONEncode(data)) end)
+    end
+end
+
+pcall(function()
+    if readfile and isfile and isfile(saveFileName) then
+        local result = readfile(saveFileName)
+        local loadedData = HttpService:JSONDecode(result)
+        
+        if loadedData then
+            if loadedData.lightMode then
+                isLightMode = true
+                ThemeBtn.Text = "☀️"
+                MainFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+                ThemeBtn.BackgroundColor3 = Color3.fromRGB(255, 150, 0)
+                Title.TextColor3 = Color3.fromRGB(30, 30, 30)
+                ShiftTitle.TextColor3 = Color3.fromRGB(80, 80, 80)
+                FlyOptionsTitle.TextColor3 = Color3.fromRGB(80, 80, 80)
+                SpeedTitle.TextColor3 = Color3.fromRGB(80, 80, 80)
+                ExtraOptionsTitle.TextColor3 = Color3.fromRGB(80, 80, 80)
+                TrailTitle.TextColor3 = Color3.fromRGB(30, 30, 30)
+            end
+            
+            if loadedData.spdTxt then 
+                SpeedInput.Text = loadedData.spdTxt 
+                speed = tonumber(loadedData.spdTxt) or 25 
+            end
+            if loadedData.shfTxt then 
+                ShiftInput.Text = loadedData.shfTxt 
+            end
+            
+            if loadedData.trailIdx then
+                currentTrailColorIndex = loadedData.trailIdx
+                local cData = trailColors[currentTrailColorIndex]
+                TrailColorBtn.BackgroundColor3 = cData.color
+                TrailColorBtn.TextColor3 = cData.textColor
+                TrailColorBtn.Text = "color: " .. cData.name
+            end
+            
+            if loadedData.rgb then
+                isRGBMode = true
+                RGBBtn.Text = "🌈"
+                TrailTitle.TextTransparency = 0
+                TrailColorBtn.BackgroundTransparency = 0
+                TrailColorBtn.TextTransparency = 0
+                LeftTrailBtn.TextTransparency = 0 
+                RightTrailBtn.TextTransparency = 0 
+                
+                local hue = 0
+                rgbConnection = RunService.RenderStepped:Connect(function(dt)
+                    hue = (hue + dt * 0.3) % 1
+                    RGBBtn.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+                end)
+            end
+            
+            if loadedData.mini then
+                minimized = true
+                MiniBtn.Text = "+"
+                MiniBtn.TextColor3 = Color3.fromRGB(0, 255, 100)
+                MainFrame.Size = UDim2.new(0, 180, 0, 30)
+            else
+                minimized = false
+                if isRGBMode then
+                    MainFrame.Size = UDim2.new(0, 180, 0, 395)
+                else
+                    MainFrame.Size = UDim2.new(0, 180, 0, 365)
+                end
+            end
+        end
+    end
+end)
+
+local limitNotifCooldown = false
+
+local function applyCharacterLimit(box)
+    box:GetPropertyChangedSignal("Text"):Connect(function()
+        if #box.Text > 6 then
+            box.Text = string.sub(box.Text, 1, 6)
+            
+            if not limitNotifCooldown then
+                limitNotifCooldown = true
+                SafeNotification("limit reached ⚠️", "The character limit is 6. Do not exceed this limit!", 4)
+                task.delay(4, function()
+                    limitNotifCooldown = false
+                end)
+            end
+        end
+    end)
+end
+
+applyCharacterLimit(SpeedInput)
+applyCharacterLimit(ShiftInput)
+
+local function findMyFlyTool()
+    for _, item in pairs(LocalPlayer.Backpack:GetChildren()) do
+        if item:IsA("Tool") and item:GetAttribute("FlyGuiTool") then return item end
+    end
+    if LocalPlayer.Character then
+        for _, item in pairs(LocalPlayer.Character:GetChildren()) do
+            if item:IsA("Tool") and item:GetAttribute("FlyGuiTool") then return item end
+        end
+    end
+    return nil
+end
+
+RunService.Heartbeat:Connect(function()
+    local toolsFound = {}
+    local function collect(parent)
+        for _, item in pairs(parent:GetChildren()) do
+            if item:IsA("Tool") and item:GetAttribute("FlyGuiTool") then
+                table.insert(toolsFound, item)
+            end
+        end
+    end
+    collect(LocalPlayer.Backpack)
+    if LocalPlayer.Character then collect(LocalPlayer.Character) end
+    if #toolsFound > 1 then
+        for i = 2, #toolsFound do toolsFound[i]:Destroy() end
+    end
+end)
+
+local function updateTrailNow()
+    local char = LocalPlayer.Character
+    if not char or not flying then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    if isRGBMode and currentTrailColorIndex > 1 then
+        if not trailInstance then
+            att0 = Instance.new("Attachment", root) att0.Position = Vector3.new(0, 1, 0)
+            att1 = Instance.new("Attachment", root) att1.Position = Vector3.new(0, -1, 0)
+            trailInstance = Instance.new("Trail", root)
+            trailInstance.Attachment0 = att0 trailInstance.Attachment1 = att1
+            trailInstance.Lifetime = 0.5
+        end
+        trailInstance.Enabled = true
+        trailInstance.Color = ColorSequence.new(trailColors[currentTrailColorIndex].color)
+    else
+        if trailInstance then trailInstance.Enabled = false end
+    end
+end
+
+local cachedControls
+local function getAnalogMagnitude()
+    if not cachedControls then
+        pcall(function()
+            cachedControls = require(LocalPlayer.PlayerScripts:FindFirstChild("PlayerModule")):GetControls()
+        end)
+    end
+    if cachedControls then
+        local moveVec = cachedControls:GetMoveVector()
+        if moveVec and moveVec.Magnitude > 0 then
+            return math.clamp(moveVec.Magnitude, 0, 1)
+        end
+    end
+    return 1 
+end
+
+local function toggleFly(state, isGuiSource)
+    flying = state
+    local char = LocalPlayer.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChild("Humanoid")
+    local cam = workspace.CurrentCamera
+    local animateScript = char:FindFirstChild("Animate") 
+    local tInfo = TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+    
+    if flying then
+        if animateScript then animateScript.Disabled = true end
+        if hum then
+            hum.PlatformStand = true 
+            local animator = hum:FindFirstChildOfClass("Animator") or hum
+            for _, track in pairs(animator:GetPlayingAnimationTracks()) do track:Stop() end
+        end
+        if isGuiSource then
+            TweenService:Create(FlyBtn, tInfo, {BackgroundColor3 = Color3.fromRGB(200, 50, 50)}):Play()
+            task.spawn(function()
+                TweenService:Create(FlyBtn, TweenInfo.new(0.2), {TextTransparency = 1}):Play()
+                task.wait(0.2)
+                FlyBtn.Text = "DISABLE FLY"
+                TweenService:Create(FlyBtn, TweenInfo.new(0.2), {TextTransparency = 0}):Play()
+            end)
+        end
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then originalCollisions[part] = part.CanCollide end
+        end
+        lvAttachment = Instance.new("Attachment", root)
+        bv = Instance.new("LinearVelocity", root)
+        bg = Instance.new("AlignOrientation", root)
+        bv.Attachment0 = lvAttachment
+        bv.MaxForce = math.huge
+        bv.RelativeTo = Enum.ActuatorRelativeTo.World
+        bv.VectorVelocity = Vector3.new(0, 0, 0) 
+        bg.Mode = Enum.OrientationAlignmentMode.OneAttachment
+        bg.Attachment0 = lvAttachment
+        bg.MaxTorque = math.huge
+        bg.Responsiveness = 14 
+        bg.RigidityEnabled = false 
+        updateTrailNow()
+        flyConnection = RunService.RenderStepped:Connect(function()
+            if not flying or not root or not hum then if flyConnection then flyConnection:Disconnect() end return end
+            hum:ChangeState(Enum.HumanoidStateType.Physics)
+            hum.PlatformStand = true 
+            bg.CFrame = cam.CFrame
+            local moveDir = hum.MoveDirection
+            local targetVelocity = Vector3.new(0, 0, 0)
+            if moveDir.Magnitude > 0 then
+                local analogMagnitude = getAnalogMagnitude() 
+                local camY = select(2, cam.CFrame:ToEulerAnglesYXZ())
+                local flatRot = CFrame.Angles(0, camY, 0)
+                local localInput = flatRot:VectorToObjectSpace(moveDir)
+                targetVelocity = cam.CFrame:VectorToWorldSpace(localInput) * (speed * analogMagnitude)
+            end
+            bv.VectorVelocity = bv.VectorVelocity:Lerp(targetVelocity, 0.18) 
+        end)
+        noclipConnection = RunService.Stepped:Connect(function()
+            if not flying or not char then if noclipConnection then noclipConnection:Disconnect() end return end
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    if noclipEnabled then
+                        part.CanCollide = false
+                    else
+                        if originalCollisions[part] ~= nil then
+                            part.CanCollide = originalCollisions[part]
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        if animateScript then animateScript.Disabled = false end
+        if isGuiSource then
+            TweenService:Create(FlyBtn, tInfo, {BackgroundColor3 = accent_color}):Play()
+            task.spawn(function()
+                TweenService:Create(FlyBtn, TweenInfo.new(0.2), {TextTransparency = 1}):Play()
+                task.wait(0.2)
+                FlyBtn.Text = "ENABLE FLY"
+                TweenService:Create(FlyBtn, TweenInfo.new(0.2), {TextTransparency = 0}):Play()
+            end)
+        end
+        if bv then bv:Destroy() end if bg then bg:Destroy() end if lvAttachment then lvAttachment:Destroy() end
+        if flyConnection then flyConnection:Disconnect() end if noclipConnection then noclipConnection:Disconnect() end
+        if trailInstance then
+            trailInstance:Destroy() trailInstance = nil
+            if att0 then att0:Destroy() att0 = nil end if att1 then att1:Destroy() att1 = nil end
+        end
+        if char and hum then
+            hum.PlatformStand = false 
+            hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    if originalCollisions[part] ~= nil then
+                        part.CanCollide = originalCollisions[part]
+                    end
+                end
+            end
+        end
+        originalCollisions = {}
+    end
+end
+
+NoclipBtn.MouseButton1Click:Connect(function()
+    if noclipCooldown then return end
+    noclipCooldown = true
+    noclipEnabled = not noclipEnabled
+    local tweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+    if noclipEnabled then
+        TweenService:Create(NoclipBtn, tweenInfo, {BackgroundColor3 = Color3.fromRGB(0, 200, 180)}):Play()
+        NoclipBtn.Text = "fly noclip: on"
+    else
+        TweenService:Create(NoclipBtn, tweenInfo, {BackgroundColor3 = Color3.fromRGB(150, 0, 0)}):Play()
+        NoclipBtn.Text = "fly noclip: off"
+    end
+    local myTool = findMyFlyTool()
+    if myTool then
+        local noclipStateStr = noclipEnabled and "On" or "Off"
+        myTool.Name = "Fly Tool Speed: " .. speed .. " Noclip: " .. noclipStateStr
+    end
+    task.wait(0.5)
+    noclipCooldown = false
+end)
+
+ThemeBtn.MouseButton1Click:Connect(function()
+    if not canChangeTheme then return end 
+    canChangeTheme = false 
+    isLightMode = not isLightMode
+    local targetBgColor = isLightMode and Color3.fromRGB(240, 240, 240) or bg_color 
+    local targetThemeBtnColor = isLightMode and Color3.fromRGB(255, 150, 0) or Color3.fromRGB(60, 60, 60) 
+    local targetTextColor = isLightMode and Color3.fromRGB(30, 30, 30) or Color3.fromRGB(255, 255, 255) 
+    local targetSubTextColor = isLightMode and Color3.fromRGB(80, 80, 80) or Color3.fromRGB(200, 200, 200) 
+    ThemeBtn.Text = isLightMode and "☀️" or "🌙"
+    if isLightMode then
+        SafeNotification("Light Mode", "light mode active! Now everything is brighter 🤯", 4.5)
+    else
+        SafeNotification("Dark Mode", "dark mode active! 🌙. Now it's good for sleeping!", 4.5)
+    end
+    local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+    TweenService:Create(MainFrame, tweenInfo, {BackgroundColor3 = targetBgColor}):Play()
+    TweenService:Create(ThemeBtn, tweenInfo, {BackgroundColor3 = targetThemeBtnColor}):Play()
+    TweenService:Create(Title, tweenInfo, {TextColor3 = targetTextColor}):Play()
+    TweenService:Create(ShiftTitle, tweenInfo, {TextColor3 = targetSubTextColor}):Play()
+    TweenService:Create(FlyOptionsTitle, tweenInfo, {TextColor3 = targetSubTextColor}):Play()
+    TweenService:Create(SpeedTitle, tweenInfo, {TextColor3 = targetSubTextColor}):Play()
+    TweenService:Create(ExtraOptionsTitle, tweenInfo, {TextColor3 = targetSubTextColor}):Play()
+    TweenService:Create(TrailTitle, tweenInfo, {TextColor3 = targetTextColor}):Play()
+    SaveData() 
+    task.wait(1) 
+    canChangeTheme = true 
+end)
+
+RGBBtn.MouseButton1Click:Connect(function()
+    if not canToggleRGB or minimized then return end 
+    canToggleRGB = false
+    isRGBMode = not isRGBMode
+    local tInfo = TweenInfo.new(1.25, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+    if isRGBMode then
+        RGBBtn.Text = "🌈"
+        SafeNotification("Trail Effect", "trail effect active 🌈. This will make your fly twice as cool!", 5)
+        TweenService:Create(MainFrame, tInfo, {Size = UDim2.new(0, 180, 0, 395)}):Play()
+        task.wait(1.25) 
+        TweenService:Create(TrailTitle, tInfo, {TextTransparency = 0}):Play()
+        TweenService:Create(TrailColorBtn, tInfo, {BackgroundTransparency = 0, TextTransparency = 0}):Play()
+        TweenService:Create(LeftTrailBtn, tInfo, {TextTransparency = 0}):Play()  
+        TweenService:Create(RightTrailBtn, tInfo, {TextTransparency = 0}):Play() 
+        updateTrailNow()
+        local hue = 0
+        rgbConnection = RunService.RenderStepped:Connect(function(dt)
+            hue = (hue + dt * 0.3) % 1
+            RGBBtn.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+        end)
+    else
+        RGBBtn.Text = "🌫"
+        if rgbConnection then rgbConnection:Disconnect() end
+        TweenService:Create(RGBBtn, tInfo, {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
+        TweenService:Create(TrailTitle, tInfo, {TextTransparency = 1}):Play()
+        TweenService:Create(TrailColorBtn, tInfo, {BackgroundTransparency = 1, TextTransparency = 1}):Play()
+        TweenService:Create(LeftTrailBtn, tInfo, {TextTransparency = 1}):Play()  
+        TweenService:Create(RightTrailBtn, tInfo, {TextTransparency = 1}):Play() 
+        task.wait(1.25) 
+        TweenService:Create(MainFrame, tInfo, {Size = UDim2.new(0, 180, 0, 365)}):Play()
+        if trailInstance then
+            trailInstance:Destroy() trailInstance = nil
+            if att0 then att0:Destroy() att0 = nil end if att1 then att1:Destroy() att1 = nil end
+        end
+    end
+    SaveData() 
+    canToggleRGB = true 
+end)
+
+local colorCooldown = false
+local function changeTrailColorLogic(direction)
+    if not isRGBMode or colorCooldown then return end
+    colorCooldown = true
+    local oldColor = trailColors[currentTrailColorIndex].color
+    if direction == "next" then
+        currentTrailColorIndex = currentTrailColorIndex + 1
+        if currentTrailColorIndex > #trailColors then currentTrailColorIndex = 1 end
+    elseif direction == "prev" then
+        currentTrailColorIndex = currentTrailColorIndex - 1
+        if currentTrailColorIndex < 1 then currentTrailColorIndex = #trailColors end
+    end
+    local cData = trailColors[currentTrailColorIndex]
+    local targetColor = cData.color
+    local tInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+    TweenService:Create(TrailColorBtn, tInfo, {BackgroundColor3 = targetColor}):Play()
+    TweenService:Create(TrailColorBtn, tInfo, {TextColor3 = cData.textColor}):Play()
+    TrailColorBtn.Text = "color: " .. cData.name
+    if cData.name == "none :(" then
+        if trailInstance then
+            trailInstance:Destroy() trailInstance = nil
+            if att0 then att0:Destroy() att0 = nil end if att1 then att1:Destroy() att1 = nil end
+        end
+    elseif trailInstance and flying then
+        task.spawn(function()
+            local duration = 0.5
+            local startTime = tick()
+            while tick() - startTime < duration do
+                local alpha = (tick() - startTime) / duration
+                local lerpedColor = oldColor:Lerp(targetColor, alpha)
+                if trailInstance then trailInstance.Color = ColorSequence.new(lerpedColor) end
+                task.wait()
+            end
+            if trailInstance then trailInstance.Color = ColorSequence.new(targetColor) end
+        end)
+    else updateTrailNow() end
+    SaveData() 
+    task.wait(0.5)
+    colorCooldown = false
+end
+
+TrailColorBtn.MouseButton1Click:Connect(function() changeTrailColorLogic("next") end)
+RightTrailBtn.MouseButton1Click:Connect(function() changeTrailColorLogic("next") end)
+LeftTrailBtn.MouseButton1Click:Connect(function() changeTrailColorLogic("prev") end)
+
+local shiftCooldown = false
+BtnUp.MouseButton1Click:Connect(function()
+    if shiftCooldown then return end
+    shiftCooldown = true
+    local studs = tonumber(ShiftInput.Text) or 1
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0, studs, 0)
+    end
+    task.wait(0.2)
+    shiftCooldown = false
+end)
+
+BtnDown.MouseButton1Click:Connect(function()
+    if shiftCooldown then return end
+    shiftCooldown = true
+    local studs = tonumber(ShiftInput.Text) or 1
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame - Vector3.new(0, studs, 0)
+    end
+    task.wait(0.2)
+    shiftCooldown = false
+end)
+
+MiniBtn.MouseButton1Click:Connect(function()
+    if not canAnimate or not canToggleRGB then return end 
+    canAnimate = false 
+    minimized = not minimized
+    local targetSize
+    local tInfoText = TweenInfo.new(0.25, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+    task.spawn(function()
+        TweenService:Create(MiniBtn, tInfoText, {TextTransparency = 1, Rotation = 90}):Play()
+        task.wait(0.25)
+        if minimized then
+            MiniBtn.Text = "+"
+            MiniBtn.TextColor3 = Color3.fromRGB(0, 255, 100) 
+        else
+            MiniBtn.Text = "-"
+            MiniBtn.TextColor3 = Color3.fromRGB(255, 50, 50) 
+        end
+        TweenService:Create(MiniBtn, tInfoText, {TextTransparency = 0, Rotation = 0}):Play()
+    end)
+    local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+    if minimized then
+        targetSize = UDim2.new(0, 180, 0, 30)
+    else
+        if isRGBMode then
+            targetSize = UDim2.new(0, 180, 0, 395)
+        else
+            targetSize = UDim2.new(0, 180, 0, 365)
+        end
+    end
+    TweenService:Create(MainFrame, tweenInfo, {Size = targetSize}):Play()
+    SaveData() 
+    task.wait(2)
+    canAnimate = true
+end)
+
+local function giveFlyTool()
+    local tool = Instance.new("Tool")
+    tool:SetAttribute("FlyGuiTool", true)
+    local noclipStateStr = noclipEnabled and "On" or "Off"
+    tool.Name = "Fly Tool Speed: " .. speed .. " Noclip: " .. noclipStateStr
+    tool.RequiresHandle = false tool.Parent = LocalPlayer.Backpack
+    tool.Equipped:Connect(function() 
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if not char or not char.Parent or respawnCooldown or (hum and hum.Health <= 0) or freeCamEnabled or floatEnabled then
+            if floatEnabled then
+                SafeNotification("Action blocked! ⚠️", "Disable Float before using the Tool.", 4)
+            end
+            task.defer(function() if hum then hum:UnequipTools() end end)
+            return
+        end
+        if isFlyingViaGUI then
+            task.defer(function() if hum then hum:UnequipTools() end end)
+            return
+        end
+        if not flying then 
+            isFlyingViaTool = true
+            toggleFly(true, false) 
+        end 
+    end)
+    tool.Unequipped:Connect(function() 
+        if isFlyingViaTool then 
+            isFlyingViaTool = false
+            toggleFly(false, false) 
+        end 
+    end)
+end
+
+FlyBtn.MouseButton1Click:Connect(function() 
+    local char = LocalPlayer.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if not char or not char.Parent or flyBtnCooldown or isFlyingViaTool or respawnCooldown or (hum and hum.Health <= 0) or freeCamEnabled or floatEnabled then 
+        if floatEnabled and not isFlyingViaGUI then
+            SafeNotification("Action blocked! ⚠️", "Disable Float before enabling Fly.", 4)
+        end
+        return 
+    end
+    flyBtnCooldown = true 
+    isFlyingViaGUI = not isFlyingViaGUI
+    toggleFly(isFlyingViaGUI, true) 
+    task.wait(0.3) 
+    flyBtnCooldown = false 
+end)
+
+ConfirmBtn.MouseButton1Click:Connect(function()
+    if confirmCooldown then return end
+    confirmCooldown = true
+    local inputText = SpeedInput.Text
+    local feedbackText, waitTime = "", 0.6
+    if inputText == "" or inputText:match("^%s*$") or tonumber(inputText) == 0 then
+        feedbackText, waitTime = "invalid number ❌️", 1.2
+    elseif not tonumber(inputText) then
+        feedbackText, waitTime = "enter a number! Ex: 45", 1.8 
+    else
+        speed = tonumber(inputText)
+        feedbackText = "ok!"
+        local myTool = findMyFlyTool() 
+        if myTool then 
+            local noclipStateStr = noclipEnabled and "On" or "Off"
+            myTool.Name = "Fly Tool Speed: " .. speed .. " Noclip: " .. noclipStateStr 
+        end
+    end
+    local tFast = TweenInfo.new(0.15, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+    TweenService:Create(ConfirmBtn, tFast, {BackgroundColor3 = Color3.fromRGB(50, 50, 50), TextTransparency = 1}):Play()
+    task.wait(0.15)
+    ConfirmBtn.Text = feedbackText 
+    TweenService:Create(ConfirmBtn, tFast, {TextTransparency = 0}):Play()
+    task.wait(waitTime)
+    TweenService:Create(ConfirmBtn, tFast, {TextTransparency = 1}):Play()
+    task.wait(0.15)
+    ConfirmBtn.Text = "confirm"
+    TweenService:Create(ConfirmBtn, tFast, {BackgroundColor3 = Color3.fromRGB(80, 80, 80), TextTransparency = 0}):Play()
+    SaveData() 
+    confirmCooldown = false
+end)
+
+ToolBtn.MouseButton1Click:Connect(function()
+    if giveToolCooldown then return end
+    giveToolCooldown = true
+    local myTool = findMyFlyTool()
+    if myTool then
+        local tFast = TweenInfo.new(0.15, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+        TweenService:Create(ToolBtn, tFast, {BackgroundColor3 = Color3.fromRGB(140, 30, 30), TextTransparency = 1}):Play()
+        task.wait(0.15)
+        ToolBtn.TextScaled = true
+        ToolBtn.Text = "❌️ Limit of 1 fly tool"
+        TweenService:Create(ToolBtn, tFast, {TextTransparency = 0}):Play()
+        task.wait(1.5)
+        TweenService:Create(ToolBtn, tFast, {TextTransparency = 1}):Play()
+        task.wait(0.15)
+        ToolBtn.TextScaled = false
+        ToolBtn.Text = "FLY TOOL"
+        TweenService:Create(ToolBtn, tFast, {BackgroundColor3 = Color3.fromRGB(100, 80, 200), TextTransparency = 0}):Play()
+        giveToolCooldown = false
+        return
+    end
+    hasFlyTool = true giveFlyTool()
+    local tFast = TweenInfo.new(0.15, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+    TweenService:Create(ToolBtn, tFast, {BackgroundColor3 = Color3.fromRGB(70, 50, 150), TextTransparency = 1}):Play()
+    task.wait(0.15)
+    ToolBtn.Text = "tool received!"
+    TweenService:Create(ToolBtn, tFast, {TextTransparency = 0}):Play()
+    task.wait(0.6)
+    TweenService:Create(ToolBtn, tFast, {TextTransparency = 1}):Play()
+    task.wait(0.15)
+    ToolBtn.Text = "FLY TOOL"
+    TweenService:Create(ToolBtn, tFast, {BackgroundColor3 = Color3.fromRGB(100, 80, 200), TextTransparency = 0}):Play()
+    task.wait(1.5)
+    giveToolCooldown = false
+end)
+
+DeleteToolBtn.MouseButton1Click:Connect(function()
+    if deleteToolCooldown then return end
+    deleteToolCooldown = true
+    local myTool = findMyFlyTool()
+    local feedbackText, waitTime = "", 0.6
+    if myTool then 
+        local isEquipped = (myTool.Parent == LocalPlayer.Character)
+        myTool:Destroy() 
+        hasFlyTool = false 
+        if isEquipped then
+            if isFlyingViaTool then
+                isFlyingViaTool = false
+                toggleFly(false, false)
+            end
+            SafeNotification("fly disabled! 😞", "I apologize for this, fly is automatically stopped if you delete it...", 7)
+        end
+        feedbackText = "tool deleted!"
+    else
+        feedbackText, waitTime = "no fly tool found :(", 1.2
+        DeleteToolBtn.TextScaled = true 
+    end
+    local tFast = TweenInfo.new(0.15, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+    TweenService:Create(DeleteToolBtn, tFast, {BackgroundColor3 = Color3.fromRGB(140, 30, 30), TextTransparency = 1}):Play()
+    task.wait(0.15)
+    DeleteToolBtn.Text = feedbackText 
+    TweenService:Create(DeleteToolBtn, tFast, {TextTransparency = 0}):Play()
+    task.wait(waitTime)
+    TweenService:Create(DeleteToolBtn, tFast, {TextTransparency = 1}):Play()
+    task.wait(0.15)
+    DeleteToolBtn.TextScaled = false
+    DeleteToolBtn.Text = "DELETE FLY TOOL"
+    TweenService:Create(DeleteToolBtn, tFast, {BackgroundColor3 = Color3.fromRGB(200, 50, 50), TextTransparency = 0}):Play()
+    task.wait(1.5)
+    deleteToolCooldown = false
+end)
+
+FreeCamBtn.MouseButton1Click:Connect(function()
+    if freeCamBtnCooldown then return end
+    freeCamBtnCooldown = true
+    local char = LocalPlayer.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    local cam = workspace.CurrentCamera
+    if not freeCamEnabled and (isFlyingViaGUI or isFlyingViaTool) then
+        SafeNotification("Action blocked! ⚠️", "Disable Fly before using Free Cam.", 5)
+        freeCamBtnCooldown = false 
+        return 
+    end
+    if not freeCamEnabled and floatEnabled then
+        SafeNotification("Action blocked! ⚠️", "Disable Float before using Free Cam.", 5)
+        freeCamBtnCooldown = false 
+        return 
+    end
+    if not char or not hum or not hrp then freeCamBtnCooldown = false return end
+    freeCamEnabled = not freeCamEnabled
+    local tInfo = TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+    local tFade = TweenInfo.new(0.2)
+    if freeCamEnabled then
+        originalFOV = cam.FieldOfView
+        TweenService:Create(FreeCamBtn, tInfo, {BackgroundColor3 = Color3.fromRGB(0, 180, 80)}):Play()
+        task.spawn(function()
+            TweenService:Create(FreeCamBtn, tFade, {TextTransparency = 1}):Play()
+            task.wait(0.2)
+            FreeCamBtn.Text = "free cam 📷 : on ✅️"
+            TweenService:Create(FreeCamBtn, tFade, {TextTransparency = 0}):Play()
+        end)
+        hrp.Anchored = true
+        freeCamPart = Instance.new("Part", workspace)
+        freeCamPart.Name = "ZenithFreeCamPart"
+        freeCamPart.Size = Vector3.new(1, 1, 1)
+        freeCamPart.Transparency = 1
+        freeCamPart.CanCollide = false
+        freeCamPart.CFrame = cam.CFrame
+        originalMinZoom, originalMaxZoom = LocalPlayer.CameraMinZoomDistance, LocalPlayer.CameraMaxZoomDistance
+        LocalPlayer.CameraMinZoomDistance, LocalPlayer.CameraMaxZoomDistance = 0, 0
+        cam.CameraSubject = freeCamPart
+        freeCamAtt = Instance.new("Attachment", freeCamPart)
+        freeCamBv = Instance.new("LinearVelocity", freeCamPart)
+        freeCamBg = Instance.new("AlignOrientation", freeCamPart)
+        freeCamBv.Attachment0 = freeCamAtt
+        freeCamBv.MaxForce = math.huge
+        freeCamBv.RelativeTo = Enum.ActuatorRelativeTo.World
+        freeCamBg.Mode = Enum.OrientationAlignmentMode.OneAttachment
+        freeCamBg.Attachment0 = freeCamAtt
+        freeCamBg.MaxTorque = math.huge
+        freeCamBg.Responsiveness = 200 
+        freeCamConnection = RunService.RenderStepped:Connect(function()
+            if not freeCamEnabled or not freeCamPart then return end
+            freeCamBg.CFrame = cam.CFrame
+            local moveDir = hum.MoveDirection
+            local targetVelocity = Vector3.new(0, 0, 0)
+            if moveDir.Magnitude > 0 then
+                local analogMagnitude = getAnalogMagnitude()
+                local camY = select(2, cam.CFrame:ToEulerAnglesYXZ())
+                local flatRot = CFrame.Angles(0, camY, 0)
+                local localInput = flatRot:VectorToObjectSpace(moveDir)
+                targetVelocity = cam.CFrame:VectorToWorldSpace(localInput) * (speed * analogMagnitude)
+            end
+            freeCamBv.VectorVelocity = freeCamBv.VectorVelocity:Lerp(targetVelocity, 0.18)
+        end)
+    else
+        TweenService:Create(FreeCamBtn, tInfo, {BackgroundColor3 = Color3.fromRGB(200, 50, 50)}):Play()
+        task.spawn(function()
+            TweenService:Create(FreeCamBtn, tFade, {TextTransparency = 1}):Play()
+            task.wait(0.2)
+            FreeCamBtn.Text = "free cam 📷 : off ❌️"
+            TweenService:Create(FreeCamBtn, tFade, {TextTransparency = 0}):Play()
+        end)
+        if freeCamConnection then freeCamConnection:Disconnect() end
+        if freeCamPart then freeCamPart:Destroy() freeCamPart = nil end
+        if originalMinZoom then LocalPlayer.CameraMinZoomDistance = originalMinZoom end
+        if originalMaxZoom then LocalPlayer.CameraMaxZoomDistance = originalMaxZoom end
+        cam.CameraSubject = hum
+        if hrp then hrp.Anchored = false end
+        if freeCamZoomed or cam.FieldOfView ~= originalFOV then
+            freeCamZoomed = false
+            TweenService:Create(cam, TweenInfo.new(0.3), {FieldOfView = originalFOV}):Play()
+        end
+    end
+    task.wait(0.6)
+    freeCamBtnCooldown = false
+end)
+
+local function toggleFloat(state)
+    if state then
+        if floatPart then floatPart:Destroy() end
+        floatPart = Instance.new("Part", workspace)
+        floatPart.Name = "ZenithFloatPart"
+        floatPart.Size = Vector3.new(20, 0.5, 20)
+        floatPart.Transparency = 0.8
+        floatPart.Color = Color3.fromRGB(0, 0, 0)
+        floatPart.Anchored, floatPart.CanCollide = true, true
+        local char = LocalPlayer.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if hrp then floatPart.CFrame = CFrame.new(hrp.Position.X, hrp.Position.Y - 3.2, hrp.Position.Z) end
+        if floatConnection then floatConnection:Disconnect() end
+        floatConnection = RunService.Stepped:Connect(function()
+            local c = LocalPlayer.Character
+            local h = c and c:FindFirstChild("HumanoidRootPart")
+            if h and floatPart then
+                local newY = math.max(floatPart.Position.Y, h.Position.Y - 3.2)
+                floatPart.CFrame = CFrame.new(h.Position.X, newY, h.Position.Z)
+            end
+        end)
+    else
+        if floatConnection then floatConnection:Disconnect() floatConnection = nil end
+        if floatPart then floatPart:Destroy() floatPart = nil end
+    end
+end
+
+FloatBtn.MouseButton1Click:Connect(function()
+    if floatBtnCooldown then return end
+    floatBtnCooldown = true
+    if not floatEnabled and (isFlyingViaGUI or isFlyingViaTool or freeCamEnabled) then
+        SafeNotification("Action blocked! ⚠️", "Disable Fly and Free Cam before using Float.", 5)
+        floatBtnCooldown = false
+        return
+    end
+    floatEnabled = not floatEnabled
+    local tInfo = TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+    local tFade = TweenInfo.new(0.2)
+    if floatEnabled then
+        TweenService:Create(FloatBtn, tInfo, {BackgroundColor3 = Color3.fromRGB(0, 200, 80)}):Play()
+        task.spawn(function()
+            TweenService:Create(FloatBtn, tFade, {TextTransparency = 1}):Play()
+            task.wait(0.2)
+            FloatBtn.Text = "float 🕳 : on ✅️"
+            TweenService:Create(FloatBtn, tFade, {TextTransparency = 0}):Play()
+        end)
+        toggleFloat(true)
+    else
+        TweenService:Create(FloatBtn, tInfo, {BackgroundColor3 = Color3.fromRGB(0, 100, 0)}):Play()
+        task.spawn(function()
+            TweenService:Create(FloatBtn, tFade, {TextTransparency = 1}):Play()
+            task.wait(0.2)
+            FloatBtn.Text = "float 🕳 : off ❌️"
+            TweenService:Create(FloatBtn, tFade, {TextTransparency = 0}):Play()
+        end)
+        toggleFloat(false)
+    end
+    task.wait(0.6)
+    floatBtnCooldown = false
+end)
+
+local tpClickEnabled, tpClickCooldown, tpBtnCooldown = false, false, false
+local clickDownTime, clickStartPosition = 0, Vector2.new()
+local mouse = LocalPlayer:GetMouse()
+local lastTapTime, lastTapPos = 0, Vector2.new()
+
+TpClickBtn.MouseButton1Click:Connect(function()
+    if tpBtnCooldown then return end
+    tpBtnCooldown, tpClickEnabled = true, not tpClickEnabled
+    local tFast = TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+    TweenService:Create(TpClickBtn, tFast, {TextTransparency = 1}):Play()
+    task.wait(0.3)
+    if tpClickEnabled then
+        TpClickBtn.Text = "click tp 🏹 : on ✅️"
+        TweenService:Create(TpClickBtn, tFast, {BackgroundColor3 = Color3.fromRGB(30, 60, 180)}):Play()
+    else
+        TpClickBtn.Text = "click tp 🏹 : off ❌️"
+        TweenService:Create(TpClickBtn, tFast, {BackgroundColor3 = Color3.fromRGB(20, 40, 120)}):Play()
+    end
+    TweenService:Create(TpClickBtn, tFast, {TextTransparency = 0}):Play()
+    task.wait(0.3)
+    tpBtnCooldown = false
+end)
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if freeCamEnabled then
+            local currentTime, currentPos = tick(), Vector2.new(input.Position.X, input.Position.Y)
+            if currentTime - lastTapTime < 0.35 and (currentPos - lastTapPos).Magnitude < 25 then
+                freeCamZoomed = not freeCamZoomed
+                local targetFOV = freeCamZoomed and 25 or originalFOV
+                TweenService:Create(workspace.CurrentCamera, TweenInfo.new(0.3), {FieldOfView = targetFOV}):Play()
+                lastTapTime = 0 
+            else lastTapTime, lastTapPos = currentTime, currentPos end
+        end
+        if tpClickEnabled then clickDownTime, clickStartPosition = tick(), input.Position end
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gameProcessed)
+    if gameProcessed or not tpClickEnabled then return end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if tick() - clickDownTime <= 0.3 and (input.Position - clickStartPosition).Magnitude <= 10 then
+            if tpClickCooldown then return end
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") and mouse.Target then
+                tpClickCooldown = true
+                char.HumanoidRootPart.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 3, 0)) * char.HumanoidRootPart.CFrame.Rotation
+                local nevoaAt = Instance.new("Attachment", char.HumanoidRootPart)
+                local nevoa = Instance.new("ParticleEmitter", nevoaAt)
+                nevoa.Color = ColorSequence.new(Color3.fromRGB(0, 0, 0))
+                nevoa.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 4), NumberSequenceKeypoint.new(1, 12)})
+                nevoa.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.1), NumberSequenceKeypoint.new(1, 1)})
+                nevoa.Lifetime, nevoa.Rate = NumberRange.new(1, 1.3), 200
+                task.delay(1.3, function() if nevoa then nevoa.Enabled = false end task.wait(1.3) if nevoaAt then nevoaAt:Destroy() end end)
+                task.wait(0.3)
+                tpClickCooldown = false
+            end
+        end
+    end
+end)
+
+local isClosing = false
+CloseBtn.MouseButton1Click:Connect(function()
+    if isClosing then return end
+    isClosing, tpClickEnabled = true, false
+    
+    local tInfoX = TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In)
+    TweenService:Create(CloseBtn, tInfoX, {
+        Rotation = 90,
+        TextSize = 0,
+        TextColor3 = Color3.fromRGB(255, 0, 0)
+    }):Play()
+    
+    if floatEnabled then toggleFloat(false) end
+    if freeCamEnabled then
+        freeCamEnabled = false
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then LocalPlayer.Character.HumanoidRootPart.Anchored = false end
+        if freeCamConnection then freeCamConnection:Disconnect() end
+        if freeCamPart then freeCamPart:Destroy() end
+        if originalMinZoom then LocalPlayer.CameraMinZoomDistance = originalMinZoom end
+        if originalMaxZoom then LocalPlayer.CameraMaxZoomDistance = originalMaxZoom end
+        workspace.CurrentCamera.CameraSubject = LocalPlayer.Character:FindFirstChild("Humanoid")
+        workspace.CurrentCamera.FieldOfView = originalFOV
+    end
+    if isFlyingViaGUI then toggleFly(false, true) end
+    SafeNotification("see you next time!", "I am very grateful for your use of this script! ♡ :D", 7)
+    local tExit = TweenInfo.new(2, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut)
+    TweenService:Create(MainFrame, tExit, {Position = UDim2.new(0.5, -90, 1.5, 0), BackgroundTransparency = 1}):Play()
+    for _, element in pairs(MainFrame:GetDescendants()) do
+        if element:IsA("TextLabel") or element:IsA("TextButton") or element:IsA("TextBox") then
+            TweenService:Create(element, tExit, {TextTransparency = 1, BackgroundTransparency = 1}):Play()
+        end
+    end
+    task.wait(2) ScreenGui:Destroy()
+end)
+
+local function onFocusLostPulse(box)
+    SaveData() 
+    if box.Text == "" or box.Text:match("^%s*$") then return end
+    local originalSize, originalPos, originalColor = box.Size, box.Position, box.BackgroundColor3
+    local tPulse = TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+    local tReturn = TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.In)
+    local expand = TweenService:Create(box, tPulse, {
+        Size = UDim2.new(originalSize.X.Scale, originalSize.X.Offset + 6, originalSize.Y.Scale, originalSize.Y.Offset + 4),
+        Position = UDim2.new(originalPos.X.Scale, originalPos.X.Offset - 3, originalPos.Y.Scale, originalPos.Y.Offset - 2),
+        BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    })
+    local contract = TweenService:Create(box, tReturn, {Size = originalSize, Position = originalPos, BackgroundColor3 = originalColor})
+    expand:Play() expand.Completed:Connect(function() contract:Play() end)
+end
+
+ShiftInput.FocusLost:Connect(function() onFocusLostPulse(ShiftInput) end)
+SpeedInput.FocusLost:Connect(function() onFocusLostPulse(SpeedInput) end)
+
+local function onCharacterAdded(char)
+    respawnCooldown = true
+    task.delay(0.7, function() respawnCooldown = false end)
+    if floatEnabled then task.delay(0.2, function() toggleFloat(true) end) end
+    local hum = char:WaitForChild("Humanoid", 10)
+    if hum then
+        hum.Died:Connect(function()
+            respawnCooldown = true 
+            if freeCamEnabled then
+                freeCamEnabled = false
+                FreeCamBtn.Text = "free cam 📷 : off ❌️"
+                TweenService:Create(FreeCamBtn, TweenInfo.new(0.6), {BackgroundColor3 = Color3.fromRGB(200, 50, 50)}):Play()
+                if freeCamConnection then freeCamConnection:Disconnect() end
+                if freeCamPart then freeCamPart:Destroy() end
+                if originalMinZoom then LocalPlayer.CameraMinZoomDistance = originalMinZoom end
+                if originalMaxZoom then LocalPlayer.CameraMaxZoomDistance = originalMaxZoom end
+                workspace.CurrentCamera.FieldOfView = originalFOV
+            end
+            if isFlyingViaGUI then isFlyingViaGUI = false toggleFly(false, true) end
+            if isFlyingViaTool then pcall(function() hum:UnequipTools() end) isFlyingViaTool = false toggleFly(false, false) end
+        end)
+    end
+end
+
+LocalPlayer.CharacterAdded:Connect(function(char) 
+    task.wait(0.1) originalCollisions = {} 
+    if hasFlyTool then giveFlyTool() end 
+    onCharacterAdded(char)
+end)
+
+if LocalPlayer.Character then onCharacterAdded(LocalPlayer.Character) end
