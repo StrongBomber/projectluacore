@@ -1,4 +1,4 @@
--- Raiwesy Mobile WalkSpeed & Dash & ShiftLock Engine (Smart Layout V26.1 - PATCHED)
+-- Raiwesy Mobile WalkSpeed & Dash & ShiftLock & Visual Engine (Smart Layout V26.1 - FIXED)
 -- [0 MS LATENCY RUN & STOP ENGINE - v4.2 ANTI-CHEAT ELYSIUM BYPASS]
 -- [PREMIUM MODERN UI OVERHAUL WITH INTERPOLATED CAMERA POV STABILIZER]
 
@@ -29,7 +29,7 @@ local CardBg = Color3.fromRGB(19, 19, 24)
 local BorderColor = Color3.fromRGB(38, 38, 46)
 local TextMuted = Color3.fromRGB(140, 140, 150)
 
--- Global Ayarlar (YENİ ÖZELLİKLER eklendi)
+-- Global Ayarlar (VISUAL ÖZELLİKLERİ EKLENDİ)
 local Settings = {
     Enabled = false,
     WalkSpeed = 50,
@@ -98,7 +98,15 @@ local Settings = {
     
     SoundBarrier = 135,
     SoundsEnabled = true,
-    VfxEnabled = true
+    VfxEnabled = true,
+
+    -- [YENİ VISUAL / ESP AYARLARI]
+    EspMasterEnabled = false,
+    EspBoxes = false,
+    EspTracers = false,
+    EspChams = false,
+    EspNames = false,
+    EspTeamCheck = false
 }
 
 local Connections = {
@@ -108,8 +116,27 @@ local Connections = {
     WaterLoop = nil,
     Respawn = nil,
     TouchConnection = nil,
-    InfJumpConnection = nil
+    InfJumpConnection = nil,
+    EspLoop = nil
 }
+
+-- =======================================================
+-- KANITLANMIŞ HIERARCHY FIX: UI KÖKÜ VE SCREEN_GUI TANIMLARI
+-- =======================================================
+local TargetGuiParent = pcall(function() return CoreGui.Name end) and CoreGui or LocalPlayer:WaitForChild("PlayerGui")
+if TargetGuiParent:FindFirstChild("RaiwesyWalkSpeed") then
+    TargetGuiParent.RaiwesyWalkSpeed:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "RaiwesyWalkSpeed"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = TargetGuiParent
+
+-- ESP Nesneleri Klasörü (Artık ScreenGui yukarıda tanımlandığı için çökmez)
+local EspFolder = ScreenGui:FindFirstChild("EspFolder") or Instance.new("Folder")
+EspFolder.Name = "EspFolder"
+EspFolder.Parent = ScreenGui
 
 -- VFX Klasörü Oluşturma ve Yalıtma
 local VfxFolder = workspace:FindFirstChild("RaiwesyVFX")
@@ -151,17 +178,6 @@ local DashSoundPool, RunSoundPool, SonicBoomPool, CrashWallPool, PlayerCrashPool
 local poolSize = 6
 local currentDashIndex, currentRunIndex, currentBoomIndex, currentWallIndex, currentPlayerIndex, currentFallIndex, currentShockwaveIndex = 1, 1, 1, 1, 1, 1, 1
 local lastShockwaveTime = 0
-
--- UI Temel Kökü
-local TargetGuiParent = pcall(function() return CoreGui.Name end) and CoreGui or LocalPlayer:WaitForChild("PlayerGui")
-if TargetGuiParent:FindFirstChild("RaiwesyWalkSpeed") then
-    TargetGuiParent.RaiwesyWalkSpeed:Destroy()
-end
-
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "RaiwesyWalkSpeed"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = TargetGuiParent
 
 -- ==========================================
 -- ÇEKİRDEK FONKSİYONLAR VE VFX MOTORU
@@ -226,7 +242,6 @@ local function createGhostAfterimage(char, color)
     end
 end
 
--- YENİ: Ses Duvarı Aşıldığında Çıkan Kamera Rüzgar Çizgileri FX
 local function createSpeedLinesVFX()
     if not Settings.VfxEnabled then return end
     local cam = workspace.CurrentCamera
@@ -327,7 +342,7 @@ local function addGradient(parent, colors)
 end
 
 -- ==========================================
--- PREMIUM MODERN UI DESIGN (4-TAB LAYOUT)
+-- PREMIUM MODERN UI DESIGN (5-TAB LAYOUT)
 -- ==========================================
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
@@ -374,51 +389,63 @@ TabBar.BackgroundTransparency = 1
 TabBar.Parent = MainFrame
 
 local SpeedTabBtn = Instance.new("TextButton")
-SpeedTabBtn.Size = UDim2.new(0, 54, 1, 0)
+SpeedTabBtn.Size = UDim2.new(0, 43, 1, 0)
 SpeedTabBtn.Position = UDim2.new(0, 0, 0, 0)
 SpeedTabBtn.BackgroundColor3 = CardBg
-SpeedTabBtn.Text = "SPEED"
+SpeedTabBtn.Text = "SPD"
 SpeedTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 SpeedTabBtn.Font = Enum.Font.GothamBold
-SpeedTabBtn.TextSize = 9
+SpeedTabBtn.TextSize = 8.5
 SpeedTabBtn.Parent = TabBar
-Instance.new("UICorner", SpeedTabBtn).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", SpeedTabBtn).CornerRadius = UDim.new(0, 6)
 addStroke(SpeedTabBtn, BorderColor, 1)
 
 local DashTabBtn = Instance.new("TextButton")
-DashTabBtn.Size = UDim2.new(0, 54, 1, 0)
-DashTabBtn.Position = UDim2.new(0, 58, 0, 0)
+DashTabBtn.Size = UDim2.new(0, 43, 1, 0)
+DashTabBtn.Position = UDim2.new(0, 46, 0, 0)
 DashTabBtn.BackgroundColor3 = DarkBg
-DashTabBtn.Text = "DASH"
+DashTabBtn.Text = "DSH"
 DashTabBtn.TextColor3 = TextMuted
 DashTabBtn.Font = Enum.Font.GothamBold
-DashTabBtn.TextSize = 9
+DashTabBtn.TextSize = 8.5
 DashTabBtn.Parent = TabBar
-Instance.new("UICorner", DashTabBtn).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", DashTabBtn).CornerRadius = UDim.new(0, 6)
 addStroke(DashTabBtn, BorderColor, 1)
 
 local CameraTabBtn = Instance.new("TextButton")
-CameraTabBtn.Size = UDim2.new(0, 54, 1, 0)
-CameraTabBtn.Position = UDim2.new(0, 116, 0, 0)
+CameraTabBtn.Size = UDim2.new(0, 43, 1, 0)
+CameraTabBtn.Position = UDim2.new(0, 92, 0, 0)
 CameraTabBtn.BackgroundColor3 = DarkBg
-CameraTabBtn.Text = "CAMERA"
+CameraTabBtn.Text = "CAM"
 CameraTabBtn.TextColor3 = TextMuted
 CameraTabBtn.Font = Enum.Font.GothamBold
-CameraTabBtn.TextSize = 9
+CameraTabBtn.TextSize = 8.5
 CameraTabBtn.Parent = TabBar
-Instance.new("UICorner", CameraTabBtn).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", CameraTabBtn).CornerRadius = UDim.new(0, 6)
 addStroke(CameraTabBtn, BorderColor, 1)
 
+local VisualTabBtn = Instance.new("TextButton") 
+VisualTabBtn.Size = UDim2.new(0, 43, 1, 0)
+VisualTabBtn.Position = UDim2.new(0, 138, 0, 0)
+VisualTabBtn.BackgroundColor3 = DarkBg
+VisualTabBtn.Text = "VIS"
+VisualTabBtn.TextColor3 = TextMuted
+VisualTabBtn.Font = Enum.Font.GothamBold
+VisualTabBtn.TextSize = 8.5
+VisualTabBtn.Parent = TabBar
+Instance.new("UICorner", VisualTabBtn).CornerRadius = UDim.new(0, 6)
+addStroke(VisualTabBtn, BorderColor, 1)
+
 local MiscTabBtn = Instance.new("TextButton")
-MiscTabBtn.Size = UDim2.new(0, 54, 1, 0)
-MiscTabBtn.Position = UDim2.new(0, 174, 0, 0)
+MiscTabBtn.Size = UDim2.new(0, 43, 1, 0)
+MiscTabBtn.Position = UDim2.new(0, 184, 0, 0)
 MiscTabBtn.BackgroundColor3 = DarkBg
-MiscTabBtn.Text = "MISC"
+MiscTabBtn.Text = "MSC"
 MiscTabBtn.TextColor3 = TextMuted
 MiscTabBtn.Font = Enum.Font.GothamBold
-MiscTabBtn.TextSize = 9
+MiscTabBtn.TextSize = 8.5
 MiscTabBtn.Parent = TabBar
-Instance.new("UICorner", MiscTabBtn).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", MiscTabBtn).CornerRadius = UDim.new(0, 6)
 addStroke(MiscTabBtn, BorderColor, 1)
 
 -- SAYFALARIN TANIMLANMASI
@@ -442,7 +469,16 @@ CameraPage.BackgroundTransparency = 1
 CameraPage.Visible = false
 CameraPage.Parent = MainFrame
 
--- MISC Sayfası için ScrollingFrame Entegrasyonu (Yeni butonlar sığsın diye kaydırılabilir yapıldı)
+local VisualPage = Instance.new("ScrollingFrame")
+VisualPage.Size = UDim2.new(1, -32, 1, -92)
+VisualPage.Position = UDim2.new(0, 16, 0, 86)
+VisualPage.BackgroundTransparency = 1
+VisualPage.ScrollBarThickness = 2
+VisualPage.ScrollBarImageColor3 = ATrainBlue
+VisualPage.CanvasSize = UDim2.new(0, 0, 0, 260)
+VisualPage.Visible = false
+VisualPage.Parent = MainFrame
+
 local MiscPage = Instance.new("ScrollingFrame")
 MiscPage.Size = UDim2.new(1, -32, 1, -92)
 MiscPage.Position = UDim2.new(0, 16, 0, 86)
@@ -598,7 +634,6 @@ BypassSpeedLabel.TextSize = 11
 BypassSpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
 BypassSpeedLabel.Parent = SpeedPage
 
-
 -- DASH PAGE
 local NormalCheck = Instance.new("TextButton")
 NormalCheck.Size = UDim2.new(0, 16, 0, 16)
@@ -718,7 +753,6 @@ MainDashButton.TextSize = 11
 MainDashButton.Parent = DashPage
 Instance.new("UICorner", MainDashButton).CornerRadius = UDim.new(0, 10)
 addStroke(MainDashButton, Color3.fromRGB(255, 255, 255), 1, 0.4)
-
 
 -- CAMERA PAGE (SHIFTLOCK & FOV OVERHAUL)
 local ShiftLockButton = Instance.new("TextButton")
@@ -900,6 +934,73 @@ FovSensSliderBtn.Parent = FovSensTrack
 Instance.new("UICorner", FovSensSliderBtn).CornerRadius = UDim.new(1, 0)
 addStroke(FovSensSliderBtn, ATrainBlue, 1)
 
+-- VISUAL (ESP) PAGE UI COMPONENTS
+local EspMasterBtn = Instance.new("TextButton")
+EspMasterBtn.Size = UDim2.new(1, 0, 0, 32)
+EspMasterBtn.Position = UDim2.new(0, 0, 0, 4)
+EspMasterBtn.BackgroundColor3 = CrimsonRed
+EspMasterBtn.Text = "MASTER ESP: DISABLED"
+EspMasterBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspMasterBtn.Font = Enum.Font.GothamBold
+EspMasterBtn.TextSize = 10
+EspMasterBtn.Parent = VisualPage
+Instance.new("UICorner", EspMasterBtn).CornerRadius = UDim.new(0, 8)
+addStroke(EspMasterBtn, Color3.fromRGB(255, 255, 255), 1, 0.4)
+
+local EspBoxesBtn = Instance.new("TextButton")
+EspBoxesBtn.Size = UDim2.new(1, 0, 0, 26)
+EspBoxesBtn.Position = UDim2.new(0, 0, 0, 42)
+EspBoxesBtn.BackgroundColor3 = CrimsonRed
+EspBoxesBtn.Text = "BOX ESP: OFF"
+EspBoxesBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspBoxesBtn.Font = Enum.Font.GothamBold
+EspBoxesBtn.TextSize = 9
+EspBoxesBtn.Parent = VisualPage
+Instance.new("UICorner", EspBoxesBtn).CornerRadius = UDim.new(0, 6)
+
+local EspTracersBtn = Instance.new("TextButton")
+EspTracersBtn.Size = UDim2.new(1, 0, 0, 26)
+EspTracersBtn.Position = UDim2.new(0, 0, 0, 72)
+EspTracersBtn.BackgroundColor3 = CrimsonRed
+EspTracersBtn.Text = "TRACER ESP: OFF"
+EspTracersBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspTracersBtn.Font = Enum.Font.GothamBold
+EspTracersBtn.TextSize = 9
+EspTracersBtn.Parent = VisualPage
+Instance.new("UICorner", EspTracersBtn).CornerRadius = UDim.new(0, 6)
+
+local EspChamsBtn = Instance.new("TextButton")
+EspChamsBtn.Size = UDim2.new(1, 0, 0, 26)
+EspChamsBtn.Position = UDim2.new(0, 0, 0, 102)
+EspChamsBtn.BackgroundColor3 = CrimsonRed
+EspChamsBtn.Text = "CHAMS ESP: OFF"
+EspChamsBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspChamsBtn.Font = Enum.Font.GothamBold
+EspChamsBtn.TextSize = 9
+EspChamsBtn.Parent = VisualPage
+Instance.new("UICorner", EspChamsBtn).CornerRadius = UDim.new(0, 6)
+
+local EspNamesBtn = Instance.new("TextButton")
+EspNamesBtn.Size = UDim2.new(1, 0, 0, 26)
+EspNamesBtn.Position = UDim2.new(0, 0, 0, 132)
+EspNamesBtn.BackgroundColor3 = CrimsonRed
+EspNamesBtn.Text = "NAME & DISTANCE ESP: OFF"
+EspNamesBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspNamesBtn.Font = Enum.Font.GothamBold
+EspNamesBtn.TextSize = 9
+EspNamesBtn.Parent = VisualPage
+Instance.new("UICorner", EspNamesBtn).CornerRadius = UDim.new(0, 6)
+
+local EspTeamBtn = Instance.new("TextButton")
+EspTeamBtn.Size = UDim2.new(1, 0, 0, 26)
+EspTeamBtn.Position = UDim2.new(0, 0, 0, 162)
+EspTeamBtn.BackgroundColor3 = CrimsonRed
+EspTeamBtn.Text = "TEAM CHECK: IGNORED"
+EspTeamBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspTeamBtn.Font = Enum.Font.GothamBold
+EspTeamBtn.TextSize = 9
+EspTeamBtn.Parent = VisualPage
+Instance.new("UICorner", EspTeamBtn).CornerRadius = UDim.new(0, 6)
 
 -- MISC PAGE
 local ShakeToggleButton = Instance.new("TextButton")
@@ -946,7 +1047,7 @@ local NoclipButton = Instance.new("TextButton")
 NoclipButton.Size = UDim2.new(1, 0, 0, 26)
 NoclipButton.Position = UDim2.new(0, 0, 0, 66)
 NoclipButton.BackgroundColor3 = CrimsonRed
-NoclipButton.Text = "MATRIX NOCLIP: RUNNING"
+NoclipButton.Text = "MATRIX NOCLIP: OFF"
 NoclipButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 NoclipButton.Font = Enum.Font.GothamBold
 NoclipButton.TextSize = 9
@@ -1022,9 +1123,6 @@ WaterSliderButton.Parent = WaterSliderTrack
 Instance.new("UICorner", WaterSliderButton).CornerRadius = UDim.new(0, 12)
 addStroke(WaterSliderButton, ATrainBlue, 1)
 
--- =======================================================
--- ENTEGRE EDİLEN YENİ ÖZELLİKLERİN UI BUTONLARI (MISC)
--- =======================================================
 local MomentumButton = Instance.new("TextButton")
 MomentumButton.Size = UDim2.new(1, 0, 0, 26)
 MomentumButton.Position = UDim2.new(0, 0, 0, 194)
@@ -1069,7 +1167,6 @@ CameraTiltButton.TextSize = 9
 CameraTiltButton.Parent = MiscPage
 Instance.new("UICorner", CameraTiltButton).CornerRadius = UDim.new(0, 6)
 
--- ESKİ BUTONLARIN POZİSYONLARI YENİLERİNE GÖRE ALT KISMA KAYDIRILDI
 local SoundToggleButton = Instance.new("TextButton")
 SoundToggleButton.Size = UDim2.new(1, 0, 0, 26)
 SoundToggleButton.Position = UDim2.new(0, 0, 0, 314)
@@ -1131,7 +1228,6 @@ local function toggleWalkSpeed(state)
                 local velocityVec = rootPart.AssemblyLinearVelocity
                 if velocityVec.Magnitude > 5 then lastVelocityVec = velocityVec end
 
-                -- [MOMENTUM & INERTIA LOGIC INTEGRATION]
                 local targetSpeed = Settings.WalkSpeed
                 if moveDir.Magnitude > 0.05 then
                     if Settings.MomentumEnabled then
@@ -1166,7 +1262,6 @@ local function toggleWalkSpeed(state)
                         wallParams.FilterType = Enum.RaycastFilterType.Exclude
                         wallParams.FilterDescendantsInstances = {char, CurrentCamera, VfxFolder}
 
-                        -- [AUTO-STEP / ENGEL AŞMA LOGIC INTEGRATION]
                         if Settings.AutoStepEnabled then
                             local kneeHeightOffset = Vector3.new(0, -1, 0)
                             local stepRay = workspace:Raycast(currentPos + kneeHeightOffset, flatMoveDir * 2.2, wallParams)
@@ -1174,7 +1269,7 @@ local function toggleWalkSpeed(state)
                                 local headHeightOffset = Vector3.new(0, Settings.StepHeight, 0)
                                 local clearRay = workspace:Raycast(currentPos + headHeightOffset, flatMoveDir * 2.2, wallParams)
                                 if not clearRay then
-                                    targetY = targetY + 0.85 -- Karakteri küçük engelin üstüne pürüzsüzce kaydırır
+                                    targetY = targetY + 0.85
                                 end
                             end
                         end
@@ -1195,7 +1290,6 @@ local function toggleWalkSpeed(state)
                     end
                 end
                 
-                -- INTERPOLATED DYNAMIC FOV ENGINE
                 if CurrentCamera then
                     local activeBaseFov = Settings.FovSystemEnabled and Settings.BaseFov or 70
                     if Settings.DynamicFovEnabled and moveDir.Magnitude > 0.05 then
@@ -1207,7 +1301,6 @@ local function toggleWalkSpeed(state)
                     end
                 end
 
-                -- WATER WALK CONTROLLER
                 if Settings.WaterEnabled and moveDir.Magnitude > 0.05 and actualSpeed >= Settings.WaterThreshold then
                     local waterParams = RaycastParams.new()
                     waterParams.FilterType = Enum.RaycastFilterType.Exclude
@@ -1225,9 +1318,8 @@ local function toggleWalkSpeed(state)
                     WaterPlatform.CanCollide = false
                 end
 
-                -- SOUND BARRIER & SPEED LINES EMITTER
                 if moveDir.Magnitude > 0 and actualSpeed >= Settings.SoundBarrier then
-                    createSpeedLinesVFX() -- Sürekli rüzgar çizgileri basar
+                    createSpeedLinesVFX()
                     if not crossedSoundBarrier then
                         crossedSoundBarrier = true playSonicBoomSound() createJetSonicBoomVFX(rootPart.Position, moveDir)
                     end
@@ -1294,6 +1386,155 @@ local function executeDashEngine()
     end
 end
 
+-- ==========================================
+-- [YENİ]: MOBİL UYUMLU GELİŞMİŞ ESP MOTORU
+-- ==========================================
+local function cleanEspOfPlayer(player)
+    local pName = player.Name
+    local b = EspFolder:FindFirstChild(pName .. "_Box") if b then b:Destroy() end
+    local t = EspFolder:FindFirstChild(pName .. "_Tracer") if t then t:Destroy() end
+    local n = EspFolder:FindFirstChild(pName .. "_Name") if n then n:Destroy() end
+    if player.Character then
+        local c = player.Character:FindFirstChild("RaiwesyChams") if c then c:Destroy() end
+    end
+end
+
+local function cleanAllEsp()
+    EspFolder:ClearAllChildren()
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p.Character then
+            local c = p.Character:FindFirstChild("RaiwesyChams") if c then c:Destroy() end
+        end
+    end
+end
+
+local function runEspEngine(state)
+    Settings.EspMasterEnabled = state
+    EspMasterBtn.Text = state and "MASTER ESP: OPERATIONAL" or "MASTER ESP: DISABLED"
+    tweenColor(EspMasterBtn, state and NeonGreen or CrimsonRed)
+    
+    if Connections.EspLoop then Connections.EspLoop:Disconnect() Connections.EspLoop = nil end
+    if not state then cleanAllEsp() return end
+    
+    Connections.EspLoop = RunService.RenderStepped:Connect(function()
+        local cam = workspace.CurrentCamera
+        if not cam then return end
+        
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p == LocalPlayer then continue end
+            
+            local char = p.Character
+            local root = char and char:FindFirstChild("HumanoidRootPart")
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            
+            -- Ölü karakter izolasyonu
+            if not (char and root and hum and hum.Health > 0) then
+                cleanEspOfPlayer(p)
+                continue
+            end
+            
+            -- Takım Kontrolü
+            if Settings.EspTeamCheck and p.Team == LocalPlayer.Team then
+                cleanEspOfPlayer(p)
+                continue
+            end
+            
+            local pos, onScreen = cam:WorldToViewportPoint(root.Position)
+            local pName = p.Name
+            
+            -- 1. BOX ESP
+            if Settings.EspBoxes and onScreen then
+                local box = EspFolder:FindFirstChild(pName .. "_Box")
+                if not box then
+                    box = Instance.new("BillboardGui")
+                    box.Name = pName .. "_Box"
+                    box.Size = UDim2.new(4.5, 0, 6, 0)
+                    box.AlwaysOnTop = true
+                    
+                    local frame = Instance.new("Frame")
+                    frame.Size = UDim2.new(1, 0, 1, 0)
+                    frame.BackgroundTransparency = 1
+                    frame.Parent = box
+                    addStroke(frame, ATrainBlue, 1.8, 0)
+                    box.Parent = EspFolder
+                end
+                box.Adornee = root
+            else
+                local b = EspFolder:FindFirstChild(pName .. "_Box") if b then b:Destroy() end
+            end
+            
+            -- 2. TRACER ESP
+            if Settings.EspTracers and onScreen then
+                local tracer = EspFolder:FindFirstChild(pName .. "_Tracer")
+                if not tracer then
+                    tracer = Instance.new("Frame")
+                    tracer.Name = pName .. "_Tracer"
+                    tracer.BorderSizePixel = 0
+                    tracer.BackgroundColor3 = ATrainBlue
+                    tracer.AnchorPoint = Vector2.new(0.5, 0.5)
+                    tracer.Parent = EspFolder
+                end
+                local screenCenter = Vector2.new(cam.ViewportSize.X / 2, cam.ViewportSize.Y / 1.1)
+                local targetPos = Vector2.new(pos.X, pos.Y)
+                local distance = (targetPos - screenCenter).Magnitude
+                tracer.Size = UDim2.new(0, distance, 0, 2)
+                tracer.Position = UDim2.new(0, (screenCenter.X + targetPos.X) / 2, 0, (screenCenter.Y + targetPos.Y) / 2)
+                tracer.Rotation = math.deg(math.atan2(targetPos.Y - screenCenter.Y, targetPos.X - screenCenter.X))
+            else
+                local t = EspFolder:FindFirstChild(pName .. "_Tracer") if t then t:Destroy() end
+            end
+            
+            -- 3. CHAMS ESP
+            if Settings.EspChams then
+                local cham = char:FindFirstChild("RaiwesyChams")
+                if not cham then
+                    cham = Instance.new("Highlight")
+                    cham.Name = "RaiwesyChams"
+                    cham.FillColor = ATrainBlue
+                    cham.FillTransparency = 0.45
+                    cham.OutlineColor = Color3.fromRGB(255, 255, 255)
+                    cham.OutlineTransparency = 0.1
+                    cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                    cham.Parent = char
+                end
+            else
+                local c = char:FindFirstChild("RaiwesyChams") if c then c:Destroy() end
+            end
+            
+            -- 4. NAME & DISTANCE ESP
+            if Settings.EspNames and onScreen then
+                local nameGui = EspFolder:FindFirstChild(pName .. "_Name")
+                if not nameGui then
+                    nameGui = Instance.new("BillboardGui")
+                    nameGui.Name = pName .. "_Name"
+                    nameGui.Size = UDim2.new(0, 150, 0, 30)
+                    nameGui.AlwaysOnTop = true
+                    nameGui.StudsOffset = Vector3.new(0, 3.8, 0)
+                    
+                    local lbl = Instance.new("TextLabel")
+                    lbl.Size = UDim2.new(1, 0, 1, 0)
+                    lbl.BackgroundTransparency = 1
+                    lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    lbl.Font = Enum.Font.GothamBold
+                    lbl.TextSize = 10
+                    lbl.Parent = nameGui
+                    addStroke(lbl, Color3.fromRGB(0,0,0), 1)
+                    nameGui.Parent = EspFolder
+                end
+                nameGui.Adornee = root
+                local dist = math.floor((root.Position - cam.CFrame.Position).Magnitude)
+                nameGui.TextLabel.Text = pName .. " [" .. dist .. "m]"
+            else
+                local n = EspFolder:FindFirstChild(pName .. "_Name") if n then n:Destroy() end
+            end
+            
+        end
+    end)
+end
+
+-- ==========================================
+-- DIGER MOTOR TOGGLE ENTEGRASYONLARI
+-- ==========================================
 local function toggleShake(state)
     Settings.ShakeEnabled = state ShakeToggleButton.Text = state and "SHAKE MECHANISM: ON" or "SHAKE MECHANISM: OFF"
     tweenColor(ShakeToggleButton, state and NeonGreen or CrimsonRed)
@@ -1364,9 +1605,6 @@ local function toggleVfx(state)
     tweenColor(VfxToggleButton, state and NeonGreen or CrimsonRed)
 end
 
--- =======================================================
--- NEW TOGGLE FUNCTIONS FOR ADDED FEATURES
--- =======================================================
 local function toggleMomentum(state)
     Settings.MomentumEnabled = state
     MomentumButton.Text = state and "SPEED INERTIA: ON" or "SPEED INERTIA: OFF"
@@ -1429,11 +1667,10 @@ RunService:BindToRenderStep("RaiwesyCameraEngine", Enum.RenderPriority.Camera.Va
     currentCameraOffset = currentCameraOffset:Lerp(targetOffset, math.clamp(smoothnessAlpha, 0, 1))
     humanoid.CameraOffset = currentCameraOffset
 
-    -- [CAMERA TILT / BANKING LOGIC INTEGRATION]
     if CurrentCamera then
         if Settings.CameraTiltEnabled and Settings.Enabled and humanoid.MoveDirection.Magnitude > 0.05 then
             local rightVector = CurrentCamera.CFrame.RightVector
-            local dotProduct = humanoid.MoveDirection:Dot(rightVector) -- Sağa sola hareket oranını bulur
+            local dotProduct = humanoid.MoveDirection:Dot(rightVector)
             local speedRatio = actualSpeed / Settings.MaxSpeed
             local targetTilt = -dotProduct * Settings.TiltIntensity * math.clamp(speedRatio * 2, 0.4, 1.5)
             currentCameraTilt = currentCameraTilt + (targetTilt - currentCameraTilt) * math.clamp(10 * deltaTime, 0, 1)
@@ -1495,7 +1732,6 @@ local function SetupSlider(button, track, min, max, onUpdate, isFloat)
     end)
 end
 
--- LOADING SLIDERS
 SetupSlider(SliderButton, SliderTrack, Settings.MinSpeed, Settings.MaxSpeed, function(v) Settings.WalkSpeed = v SpeedInput.Text = "Hız: " .. v end, false)
 SetupSlider(DashSliderButton, DashSliderTrack, Settings.MinDash, Settings.MaxDash, function(v) Settings.DashPower = v DashInput.Text = "Dash: " .. v end, false)
 SetupSlider(BlinkSliderButton, BlinkSliderTrack, Settings.MinBlink, Settings.MaxBlink, function(v) Settings.BlinkDistance = v BlinkInput.Text = "Blink: " .. v .. " Stud" end, false)
@@ -1536,13 +1772,15 @@ local function switchTab(tabName)
     SpeedTabBtn.BackgroundColor3 = inactiveColor SpeedTabBtn.TextColor3 = inactiveText
     DashTabBtn.BackgroundColor3 = inactiveColor DashTabBtn.TextColor3 = inactiveText
     CameraTabBtn.BackgroundColor3 = inactiveColor CameraTabBtn.TextColor3 = inactiveText
+    VisualTabBtn.BackgroundColor3 = inactiveColor VisualTabBtn.TextColor3 = inactiveText
     MiscTabBtn.BackgroundColor3 = inactiveColor MiscTabBtn.TextColor3 = inactiveText
     
-    SpeedPage.Visible = false DashPage.Visible = false CameraPage.Visible = false MiscPage.Visible = false
+    SpeedPage.Visible = false DashPage.Visible = false CameraPage.Visible = false VisualPage.Visible = false MiscPage.Visible = false
     
     if tabName == "SPEED" then SpeedTabBtn.BackgroundColor3 = activeColor SpeedTabBtn.TextColor3 = activeText SpeedPage.Visible = true
     elseif tabName == "DASH" then DashTabBtn.BackgroundColor3 = activeColor DashTabBtn.TextColor3 = activeText DashPage.Visible = true
     elseif tabName == "CAMERA" then CameraTabBtn.BackgroundColor3 = activeColor CameraTabBtn.TextColor3 = activeText CameraPage.Visible = true
+    elseif tabName == "VISUAL" then VisualTabBtn.BackgroundColor3 = activeColor VisualTabBtn.TextColor3 = activeText VisualPage.Visible = true
     elseif tabName == "MISC" then MiscTabBtn.BackgroundColor3 = activeColor MiscTabBtn.TextColor3 = activeText MiscPage.Visible = true end
 end
 
@@ -1556,10 +1794,11 @@ local function selectBypassSpeed()
     if Settings.Enabled then toggleWalkSpeed(false) toggleWalkSpeed(true) end
 end
 
--- TRIGGER ASSIGNMENTS
+-- TRIGGER MENULERI VE BUTON BAGLANTILARI
 SpeedTabBtn.Activated:Connect(function() switchTab("SPEED") end)
 DashTabBtn.Activated:Connect(function() switchTab("DASH") end)
 CameraTabBtn.Activated:Connect(function() switchTab("CAMERA") end)
+VisualTabBtn.Activated:Connect(function() switchTab("VISUAL") end)
 MiscTabBtn.Activated:Connect(function() switchTab("MISC") end)
 
 NormalCheck.Activated:Connect(function() Settings.DashType = "Normal" updateCheckboxes() end)
@@ -1569,6 +1808,44 @@ NormalSpeedCheck.Activated:Connect(selectNormalSpeed)
 NormalSpeedLabel.Activated:Connect(selectNormalSpeed)
 BypassSpeedCheck.Activated:Connect(selectBypassSpeed)
 BypassSpeedLabel.Activated:Connect(selectBypassSpeed)
+
+-- VISUAL INTERACTION HANDLERS
+EspMasterBtn.Activated:Connect(function() runEspEngine(not Settings.EspMasterEnabled) end)
+
+EspBoxesBtn.Activated:Connect(function()
+    Settings.EspBoxes = not Settings.EspBoxes
+    EspBoxesBtn.Text = Settings.EspBoxes and "BOX ESP: ON" or "BOX ESP: OFF"
+    tweenColor(EspBoxesBtn, Settings.EspBoxes and NeonGreen or CrimsonRed)
+    if not Settings.EspBoxes then cleanAllEsp() end
+end)
+
+EspTracersBtn.Activated:Connect(function()
+    Settings.EspTracers = not Settings.EspTracers
+    EspTracersBtn.Text = Settings.EspTracers and "TRACER ESP: ON" or "TRACER ESP: OFF"
+    tweenColor(EspTracersBtn, Settings.EspTracers and NeonGreen or CrimsonRed)
+    if not Settings.EspTracers then cleanAllEsp() end
+end)
+
+EspChamsBtn.Activated:Connect(function()
+    Settings.EspChams = not Settings.EspChams
+    EspChamsBtn.Text = Settings.EspChams and "CHAMS ESP: ON" or "CHAMS ESP: OFF"
+    tweenColor(EspChamsBtn, Settings.EspChams and NeonGreen or CrimsonRed)
+    if not Settings.EspChams then cleanAllEsp() end
+end)
+
+EspNamesBtn.Activated:Connect(function()
+    Settings.EspNames = not Settings.EspNames
+    EspNamesBtn.Text = Settings.EspNames and "NAME & DISTANCE ESP: ON" or "NAME & DISTANCE ESP: OFF"
+    tweenColor(EspNamesBtn, Settings.EspNames and NeonGreen or CrimsonRed)
+    if not Settings.EspNames then cleanAllEsp() end
+end)
+
+EspTeamBtn.Activated:Connect(function()
+    Settings.EspTeamCheck = not Settings.EspTeamCheck
+    EspTeamBtn.Text = Settings.EspTeamCheck and "TEAM CHECK: ENFORCED" or "TEAM CHECK: IGNORED"
+    tweenColor(EspTeamBtn, Settings.EspTeamCheck and NeonGreen or CrimsonRed)
+    cleanAllEsp()
+end)
 
 MinimizeButton.Activated:Connect(function()
     local tx, ty = MainFrame.AbsolutePosition.X + (MainFrame.AbsoluteSize.X / 2), MainFrame.AbsolutePosition.Y + (MainFrame.AbsoluteSize.Y / 2)
@@ -1599,7 +1876,6 @@ DynamicFovBtn.Activated:Connect(function() toggleDynamicFov(not Settings.Dynamic
 NoclipButton.Activated:Connect(function() toggleNoclip(not Settings.NoclipEnabled) end)
 WaterButton.Activated:Connect(function() toggleWaterWalk(not Settings.WaterEnabled) end)
 
--- NEW FEATURE ACTIVATORS
 MomentumButton.Activated:Connect(function() toggleMomentum(not Settings.MomentumEnabled) end)
 AutoStepButton.Activated:Connect(function() toggleAutoStep(not Settings.AutoStepEnabled) end)
 InfJumpButton.Activated:Connect(function() toggleInfiniteJump(not Settings.InfiniteJumpEnabled) end)
@@ -1652,7 +1928,7 @@ end)
 
 BaseFovInput.FocusLost:Connect(function()
     local num = tonumber(string.match(BaseFovInput.Text, "%d+"))
-    if num then Settings.BaseFov = math.clamp(num, Settings.MinFov, Settings.MaxFov) BaseFovSliderBtn.Position = UDim2.new(math.clamp((Settings.BaseFov - Settings.MinFov) / (Settings.MaxFov - Settings.MinFov), 0, 1), -6, 0, -4) local cc = workspace.CurrentCamera if cc and Settings.FovSystemEnabled then cc.FieldOfView = Settings.BaseFov end end
+    if num then Settings.BaseFov = math.clamp(num, Settings.MinFov, Settings.MaxFov) BaseFovSliderBtn.Position = UDim2.new(math.clamp((Settings.BaseFov - Settings.MinFov) / (Settings.MaxFov - Settings.MinFov), 0, 1), -6, 0, -4) local cc = workspace.CurrentCamera if cc and Settings.FovSystemEnabled then cc.FieldOfView = num end end
     BaseFovInput.Text = "Taban FOV: " .. Settings.BaseFov
 end)
 
@@ -1685,6 +1961,7 @@ local function onCharacterAdded(char)
     lastRootPosition = nil
     toggleWalkSpeed(Settings.Enabled) toggleShake(Settings.ShakeEnabled) toggleShiftLock(Settings.ShiftLockEnabled) toggleFovSystem(Settings.FovSystemEnabled) toggleNoclip(Settings.NoclipEnabled) toggleWaterWalk(Settings.WaterEnabled) setupCharacterPhysicsSenses(char)
     toggleInfiniteJump(Settings.InfiniteJumpEnabled)
+    if Settings.EspMasterEnabled then runEspEngine(false) runEspEngine(true) end
 end
 
 if LocalPlayer.Character then onCharacterAdded(LocalPlayer.Character) end
