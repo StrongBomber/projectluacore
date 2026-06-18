@@ -1,0 +1,2001 @@
+-- Raiwesy Mobile WalkSpeed & Dash & ShiftLock & Visual Engine (Smart Layout V26.1 - PATCHED)
+-- [0 MS LATENCY RUN & STOP ENGINE - v4.2 ANTI-CHEAT ELYSIUM BYPASS]
+-- [PREMIUM MODERN UI OVERHAUL WITH INTERPOLATED CAMERA POV STABILIZER]
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+local SoundService = game:GetService("SoundService")
+local ContentProvider = game:GetService("ContentProvider")
+local Debris = game:GetService("Debris")
+
+local LocalPlayer = Players.LocalPlayer
+local isDashing = false 
+local lastVelocityVec = Vector3.new() 
+local lastRootPosition = nil 
+local currentCameraOffset = Vector3.new() 
+local currentCameraTilt = 0 -- Kamera eğimi için yeni değişken
+local actualSpeed = 16 -- Momentum motoru için gerçek zamanlı hız tracking
+
+-- Premium Renk Paleti (Obsidian & Hyper Neon Concept)
+local ATrainBlue = Color3.fromRGB(0, 150, 255)
+local ATrainBlueGlow = Color3.fromRGB(0, 80, 200)
+local NeonGreen = Color3.fromRGB(0, 230, 130)
+local CrimsonRed = Color3.fromRGB(255, 60, 90)
+local DarkBg = Color3.fromRGB(11, 11, 14)
+local CardBg = Color3.fromRGB(19, 19, 24)
+local BorderColor = Color3.fromRGB(38, 38, 46)
+local TextMuted = Color3.fromRGB(140, 140, 150)
+
+-- Global Ayarlar (VISUAL ÖZELLİKLERİ EKLENDİ)
+local Settings = {
+    Enabled = false,
+    WalkSpeed = 50,
+    MinSpeed = 16,
+    MaxSpeed = 250, 
+    SpeedType = "Normal",
+    
+    -- Momentum Geliştirmesi
+    MomentumEnabled = true,
+    AccelerationRate = 180, -- Saniyede artacak hız birimi
+    
+    -- Auto-Step Geliştirmesi
+    AutoStepEnabled = true,
+    StepHeight = 2.5,
+    
+    DashType = "Normal", 
+    DashPower = 150,
+    MinDash = 0,
+    MaxDash = 300, 
+
+    BlinkDistance = 25,
+    MinBlink = 0,
+    MaxBlink = 50, 
+    
+    ShiftLockEnabled = false,
+    ShiftLockOffsetX = 2.2,
+    MinOffsetX = -10,
+    MaxOffsetX = 10,
+    ShiftLockOffsetY = 0.5,
+    MinOffsetY = -5,
+    MaxOffsetY = 5,
+    ShiftLockSmoothness = 14,
+    MinSmoothness = 1,
+    MaxSmoothness = 30,
+
+    -- Kamera Eğim Geliştirmesi
+    CameraTiltEnabled = true,
+    TiltIntensity = 0.04,
+
+    -- Sonsuz Zıplama Geliştirmesi
+    InfiniteJumpEnabled = false,
+
+    FovSystemEnabled = true, 
+    DynamicFovEnabled = true,
+    BaseFov = 70,
+    MinFov = 30,
+    MaxFov = 120,
+    FovSensitivity = 15,
+    MinFovSens = 0,
+    MaxFovSens = 40,
+
+    ShakeEnabled = false,
+    ShakePower = 10,
+    MinShake = 0,
+    MaxShake = 100, 
+
+    NoclipEnabled = false,
+    NoclipThreshold = 95, 
+    MinNoclip = 16,
+    MaxNoclip = 250,
+
+    WaterEnabled = false,
+    WaterThreshold = 45,
+    MinWater = 16,
+    MaxWater = 250,
+    
+    SoundBarrier = 135,
+    SoundsEnabled = true,
+    VfxEnabled = true,
+
+    -- [YENİ VISUAL / ESP AYARLARI]
+    EspMasterEnabled = false,
+    EspBoxes = false,
+    EspTracers = false,
+    EspChams = false,
+    EspNames = false,
+    EspTeamCheck = false
+}
+
+local Connections = {
+    SpeedLoop = nil,
+    ShakeLoop = nil,
+    NoclipLoop = nil,
+    WaterLoop = nil,
+    Respawn = nil,
+    TouchConnection = nil,
+    InfJumpConnection = nil,
+    EspLoop = nil
+}
+
+-- VFX Klasörü Oluşturma ve Yalıtma
+local VfxFolder = workspace:FindFirstChild("RaiwesyVFX")
+if not VfxFolder then
+    VfxFolder = Instance.new("Folder")
+    VfxFolder.Name = "RaiwesyVFX"
+    VfxFolder.Parent = workspace
+end
+
+-- ESP Nesneleri Klasörü
+local EspFolder = ScreenGui:FindFirstChild("EspFolder") or Instance.new("Folder")
+EspFolder.Name = "EspFolder"
+EspFolder.Parent = ScreenGui
+
+-- Walk on Water için Görünmez Katı Parça
+local WaterPlatform = Instance.new("Part")
+WaterPlatform.Name = "RaiwesyWaterPlatform"
+WaterPlatform.Size = Vector3.new(9, 1, 9)
+WaterPlatform.Anchored = true
+WaterPlatform.CanCollide = false
+WaterPlatform.Transparency = 1
+WaterPlatform.Material = Enum.Material.SmoothPlastic
+WaterPlatform.Parent = VfxFolder
+
+-- Animasyon Kontrolcü Değişkenleri
+local currentAnimTrack = nil
+local lastAnimId = nil
+
+-- Ses Havuzları Tanımlamaları
+local githubUrl = "https://raw.githubusercontent.com/StrongBomber/Assets/refs/heads/main/Sounds/ATrain.mp3" 
+local filename = "raiwesy_atrain_sound.mp3"
+local sonicBoomUrl = "https://raw.githubusercontent.com/StrongBomber/Assets/refs/heads/main/Sounds/SonicBoom.mp3"
+local sonicBoomFilename = "raiwesy_sonic_boom.mp3"
+local crashWallUrl = "https://raw.githubusercontent.com/StrongBomber/Assets/refs/heads/main/Sounds/CrashWall.mp3"
+local crashWallFilename = "raiwesy_crash_wall.mp3"
+local playerCrashUrl = "https://raw.githubusercontent.com/StrongBomber/Assets/refs/heads/main/Sounds/BrokenLimbEffect.mp3"
+local playerCrashFilename = "raiwesy_player_crash.mp3"
+local fallUrl = "https://raw.githubusercontent.com/StrongBomber/Assets/refs/heads/main/Sounds/FallWall.mp3"
+local fallFilename = "raiwesy_fall_wall.mp3"
+local shockwaveUrl = "https://raw.githubusercontent.com/StrongBomber/Assets/refs/heads/main/Sounds/Shockwave.mp3"
+local shockwaveFilename = "raiwesy_shockwave.mp3"
+
+local DashSoundPool, RunSoundPool, SonicBoomPool, CrashWallPool, PlayerCrashPool, FallSoundPool, ShockwavePool = {}, {}, {}, {}, {}, {}, {}
+local poolSize = 6
+local currentDashIndex, currentRunIndex, currentBoomIndex, currentWallIndex, currentPlayerIndex, currentFallIndex, currentShockwaveIndex = 1, 1, 1, 1, 1, 1, 1
+local lastShockwaveTime = 0
+
+-- UI Temel Kökü
+local TargetGuiParent = pcall(function() return CoreGui.Name end) and CoreGui or LocalPlayer:WaitForChild("PlayerGui")
+if TargetGuiParent:FindFirstChild("RaiwesyWalkSpeed") then
+    TargetGuiParent.RaiwesyWalkSpeed:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "RaiwesyWalkSpeed"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = TargetGuiParent
+EspFolder.Parent = ScreenGui
+
+-- ==========================================
+-- ÇEKİRDEK FONKSİYONLAR VE VFX MOTORU
+-- ==========================================
+local function stopPool(pool)
+    for _, snd in ipairs(pool) do if snd and snd.IsPlaying then snd:Stop() end end
+end
+
+local function playSmartSoundAI(soundType, timePos, baseVolume, characterVelocity)
+    if not Settings.SoundsEnabled then return end
+    local pool = (soundType == "Dash") and DashSoundPool or RunSoundPool
+    if #pool == 0 then return end
+    local index = (soundType == "Dash") and currentDashIndex or currentRunIndex
+    local sound = pool[index]
+    if soundType == "Dash" then currentDashIndex = (currentDashIndex % poolSize) + 1 else currentRunIndex = (currentRunIndex % poolSize) + 1 end
+    if not sound then return end
+    sound:Stop() sound.Volume = baseVolume * math.clamp(characterVelocity / 100, 0.5, 1.4) sound.PlaybackSpeed = math.clamp(1.0 + ((characterVelocity - 16) / 234) * 0.4, 0.85, 1.25) sound.TimePosition = timePos sound:Play()
+end
+
+local function playSonicBoomSound()
+    if not Settings.SoundsEnabled or #SonicBoomPool == 0 then return end
+    local sound = SonicBoomPool[currentBoomIndex] currentBoomIndex = (currentBoomIndex % #SonicBoomPool) + 1
+    if sound then sound:Stop() sound.Volume = 4.5 sound.PlaybackSpeed = math.random(92, 103) / 100 sound:Play() end
+    playSmartSoundAI("Dash", 0.0, 3.5, Settings.WalkSpeed)
+end
+
+local function playShockwaveSound()
+    if not Settings.SoundsEnabled or os.clock() - lastShockwaveTime < 1.2 or #ShockwavePool == 0 then return end
+    lastShockwaveTime = os.clock() stopPool(ShockwavePool)
+    local sound = ShockwavePool[currentShockwaveIndex] currentShockwaveIndex = (currentShockwaveIndex % #ShockwavePool) + 1
+    if sound then sound:Stop() sound.Volume = 4.0 sound.PlaybackSpeed = math.random(95, 105) / 100 sound:Play() end
+end
+
+local function playCrashWallSound()
+    if not Settings.SoundsEnabled or #CrashWallPool == 0 then return end
+    local sound = CrashWallPool[currentWallIndex] currentWallIndex = (currentWallIndex % #CrashWallPool) + 1
+    if sound then sound:Stop() sound.Volume = 4.0 sound:Play() end
+end
+
+local function playPlayerCrashSound()
+    if not Settings.SoundsEnabled or #PlayerCrashPool == 0 then return end
+    local sound = PlayerCrashPool[currentPlayerIndex] currentPlayerIndex = (currentPlayerIndex % #PlayerCrashPool) + 1
+    if sound then sound:Stop() sound.Volume = 4.5 sound:Play() end
+end
+
+local function createGhostAfterimage(char, color)
+    if not Settings.VfxEnabled or not char then return end
+    for _, part in ipairs(char:GetChildren()) do
+        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" and part.Transparency < 1 then
+            local ghost = Instance.new("Part") 
+            ghost.Size = part.Size 
+            ghost.CFrame = part.CFrame 
+            ghost.Anchored = true 
+            ghost.CanCollide = false 
+            ghost.Color = color 
+            ghost.Material = Enum.Material.Neon 
+            ghost.Transparency = 0.25 
+            ghost.Parent = VfxFolder 
+            TweenService:Create(ghost, TweenInfo.new(0.4), {Transparency = 1}):Play() 
+            Debris:AddItem(ghost, 0.41)
+        end
+    end
+end
+
+local function createSpeedLinesVFX()
+    if not Settings.VfxEnabled then return end
+    local cam = workspace.CurrentCamera
+    if not cam then return end
+    for i = 1, 5 do
+        local line = Instance.new("Part")
+        line.Anchored = true
+        line.CanCollide = false
+        line.Size = Vector3.new(0.1, 0.1, math.random(5, 15))
+        line.Material = Enum.Material.Neon
+        line.Color = Color3.fromRGB(255, 255, 255)
+        line.Transparency = 0.4
+        line.Parent = VfxFolder
+        
+        local rCFrame = cam.CFrame * CFrame.new(math.random(-15, 15), math.random(-10, 10), -math.random(10, 30))
+        line.CFrame = CFrame.lookAt(rCFrame.Position, cam.CFrame.Position)
+        
+        TweenService:Create(line, TweenInfo.new(0.3), {Transparency = 1, Size = Vector3.new(0,0,0)}):Play()
+        Debris:AddItem(line, 0.3)
+    end
+end
+
+local function createSonicBoomVFX(position, direction)
+    if not Settings.VfxEnabled then return end
+    local wave = Instance.new("Part") wave.Shape = Enum.PartType.Cylinder wave.Size = Vector3.new(0.5, 3, 3) wave.Material = Enum.Material.Neon wave.Color = Color3.fromRGB(230, 245, 255) wave.Transparency = 0.2 wave.Anchored = true wave.CanCollide = false wave.CFrame = CFrame.lookAt(position, position + direction) * CFrame.Angles(0, math.rad(90), 0) wave.Parent = VfxFolder
+    TweenService:Create(wave, TweenInfo.new(0.35), {Size = Vector3.new(0.1, 35, 35), Transparency = 1}):Play() Debris:AddItem(wave, 0.4)
+end
+
+local function createJetSonicBoomVFX(position, direction)
+    if not Settings.VfxEnabled then return end
+    local baseCFrame = CFrame.lookAt(position, position + direction)
+    for i = 1, 3 do
+        task.spawn(function()
+            local conePart = Instance.new("Part") conePart.Shape = Enum.PartType.Cylinder conePart.CFrame = (baseCFrame + (-direction * (i * 1.8))) * CFrame.Angles(0, math.rad(90), 0) conePart.Material = Enum.Material.Neon conePart.Color = ATrainBlue conePart.Transparency = 0.2 conePart.Anchored = true conePart.CanCollide = false conePart.Size = Vector3.new(0.2, 3, 3) conePart.Parent = VfxFolder
+            TweenService:Create(conePart, TweenInfo.new(0.45), {Size = Vector3.new(0.6, 35 - (i * i), 35 - (i * i)), Transparency = 1}):Play() Debris:AddItem(conePart, 0.5)
+        end)
+    end
+end
+
+local function stopCustomAnim()
+    if currentAnimTrack then
+        currentAnimTrack:Stop()
+        currentAnimTrack = nil
+        lastAnimId = nil
+    end
+end
+
+local function manageBypassAnimation(humanoid, moveDir)
+    if moveDir.Magnitude > 0.05 then
+        local animId = "rbxassetid://180426354" 
+        local animateScript = humanoid.Parent:FindFirstChild("Animate")
+        if animateScript then
+            local runObj = animateScript:FindFirstChild("run") or animateScript:FindFirstChild("walk")
+            local animNode = runObj and runObj:FindFirstChildOfClass("Animation")
+            if animNode and animNode.AnimationId ~= "" then animId = animNode.AnimationId end
+        end
+        local animator = humanoid:FindFirstChildOfClass("Animator")
+        if animator then
+            if lastAnimId ~= animId then
+                stopCustomAnim()
+                local newAnim = Instance.new("Animation")
+                newAnim.AnimationId = animId
+                local success, track = pcall(function() return animator:LoadAnimation(newAnim) end)
+                if success and track then
+                    currentAnimTrack = track
+                    currentAnimTrack.Looped = true
+                    currentAnimTrack:Play(0.1)
+                    lastAnimId = animId
+                end
+            end
+            if currentAnimTrack then
+                local targetSpeed = math.clamp(actualSpeed / 16, 1.0, 6.0)
+                currentAnimTrack:AdjustSpeed(targetSpeed)
+            end
+        end
+    else
+        stopCustomAnim()
+    end
+end
+
+-- UI Yardımcı Elemanları
+local function addStroke(parent, color, thickness, transparency)
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = color or BorderColor
+    stroke.Thickness = thickness or 1
+    stroke.Transparency = transparency or 0
+    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    stroke.Parent = parent
+    return stroke
+end
+
+local function addGradient(parent, colors)
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new(colors)
+    gradient.Rotation = 45
+    gradient.Parent = parent
+    return gradient
+end
+
+-- ==========================================
+-- PREMIUM MODERN UI DESIGN (5-TAB LAYOUT)
+-- ==========================================
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 260, 0, 420) 
+MainFrame.Position = UDim2.new(0.5, -130, 0.5, -210)
+MainFrame.BackgroundColor3 = DarkBg
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.ClipsDescendants = true
+MainFrame.Parent = ScreenGui
+
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
+addStroke(MainFrame, BorderColor, 1.5)
+addGradient(MainFrame, {
+    ColorSequenceKeypoint.new(0, DarkBg),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(22, 22, 28))
+})
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -40, 0, 42)
+Title.Position = UDim2.new(0, 16, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "RAIWESY ENGINE v26.1"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 13
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = MainFrame
+
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Size = UDim2.new(0, 32, 0, 32)
+MinimizeButton.Position = UDim2.new(1, -40, 0, 5)
+MinimizeButton.BackgroundTransparency = 1
+MinimizeButton.Text = "—"
+MinimizeButton.TextColor3 = TextMuted
+MinimizeButton.Font = Enum.Font.GothamBold
+MinimizeButton.TextSize = 14
+MinimizeButton.Parent = MainFrame
+
+local TabBar = Instance.new("Frame")
+TabBar.Size = UDim2.new(1, -32, 0, 32)
+TabBar.Position = UDim2.new(0, 16, 0, 44)
+TabBar.BackgroundTransparency = 1
+TabBar.Parent = MainFrame
+
+-- Tab genişlikleri 5 butona göre optimize edildi (44'er Genişlik, 3px boşluk)
+local SpeedTabBtn = Instance.new("TextButton")
+SpeedTabBtn.Size = UDim2.new(0, 43, 1, 0)
+SpeedTabBtn.Position = UDim2.new(0, 0, 0, 0)
+SpeedTabBtn.BackgroundColor3 = CardBg
+SpeedTabBtn.Text = "SPD"
+SpeedTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedTabBtn.Font = Enum.Font.GothamBold
+SpeedTabBtn.TextSize = 8.5
+SpeedTabBtn.Parent = TabBar
+Instance.new("UICorner", SpeedTabBtn).CornerRadius = UDim.new(0, 6)
+addStroke(SpeedTabBtn, BorderColor, 1)
+
+local DashTabBtn = Instance.new("TextButton")
+DashTabBtn.Size = UDim2.new(0, 43, 1, 0)
+DashTabBtn.Position = UDim2.new(0, 46, 0, 0)
+DashTabBtn.BackgroundColor3 = DarkBg
+DashTabBtn.Text = "DSH"
+DashTabBtn.TextColor3 = TextMuted
+DashTabBtn.Font = Enum.Font.GothamBold
+DashTabBtn.TextSize = 8.5
+DashTabBtn.Parent = TabBar
+Instance.new("UICorner", DashTabBtn).CornerRadius = UDim.new(0, 6)
+addStroke(DashTabBtn, BorderColor, 1)
+
+local CameraTabBtn = Instance.new("TextButton")
+CameraTabBtn.Size = UDim2.new(0, 43, 1, 0)
+CameraTabBtn.Position = UDim2.new(0, 92, 0, 0)
+CameraTabBtn.BackgroundColor3 = DarkBg
+CameraTabBtn.Text = "CAM"
+CameraTabBtn.TextColor3 = TextMuted
+CameraTabBtn.Font = Enum.Font.GothamBold
+CameraTabBtn.TextSize = 8.5
+CameraTabBtn.Parent = TabBar
+Instance.new("UICorner", CameraTabBtn).CornerRadius = UDim.new(0, 6)
+addStroke(CameraTabBtn, BorderColor, 1)
+
+local VisualTabBtn = Instance.new("TextButton") -- YENİ TAB BUTONU
+VisualTabBtn.Size = UDim2.new(0, 43, 1, 0)
+VisualTabBtn.Position = UDim2.new(0, 138, 0, 0)
+VisualTabBtn.BackgroundColor3 = DarkBg
+VisualTabBtn.Text = "VIS"
+VisualTabBtn.TextColor3 = TextMuted
+VisualTabBtn.Font = Enum.Font.GothamBold
+VisualTabBtn.TextSize = 8.5
+VisualTabBtn.Parent = TabBar
+Instance.new("UICorner", VisualTabBtn).CornerRadius = UDim.new(0, 6)
+addStroke(VisualTabBtn, BorderColor, 1)
+
+local MiscTabBtn = Instance.new("TextButton")
+MiscTabBtn.Size = UDim2.new(0, 43, 1, 0)
+MiscTabBtn.Position = UDim2.new(0, 184, 0, 0)
+MiscTabBtn.BackgroundColor3 = DarkBg
+MiscTabBtn.Text = "MSC"
+MiscTabBtn.TextColor3 = TextMuted
+MiscTabBtn.Font = Enum.Font.GothamBold
+MiscTabBtn.TextSize = 8.5
+MiscTabBtn.Parent = TabBar
+Instance.new("UICorner", MiscTabBtn).CornerRadius = UDim.new(0, 6)
+addStroke(MiscTabBtn, BorderColor, 1)
+
+-- SAYFALARIN TANIMLANMASI
+local SpeedPage = Instance.new("Frame")
+SpeedPage.Size = UDim2.new(1, -32, 1, -92)
+SpeedPage.Position = UDim2.new(0, 16, 0, 86)
+SpeedPage.BackgroundTransparency = 1
+SpeedPage.Parent = MainFrame
+
+local DashPage = Instance.new("Frame")
+DashPage.Size = UDim2.new(1, -32, 1, -92)
+DashPage.Position = UDim2.new(0, 16, 0, 86)
+DashPage.BackgroundTransparency = 1
+DashPage.Visible = false
+DashPage.Parent = MainFrame
+
+local CameraPage = Instance.new("Frame")
+CameraPage.Size = UDim2.new(1, -32, 1, -92)
+CameraPage.Position = UDim2.new(0, 16, 0, 86)
+CameraPage.BackgroundTransparency = 1
+CameraPage.Visible = false
+CameraPage.Parent = MainFrame
+
+-- YENİ: VISUAL PAGE SCROLLING FRAME
+local VisualPage = Instance.new("ScrollingFrame")
+VisualPage.Size = UDim2.new(1, -32, 1, -92)
+VisualPage.Position = UDim2.new(0, 16, 0, 86)
+VisualPage.BackgroundTransparency = 1
+VisualPage.ScrollBarThickness = 2
+VisualPage.ScrollBarImageColor3 = ATrainBlue
+VisualPage.CanvasSize = UDim2.new(0, 0, 0, 260)
+VisualPage.Visible = false
+VisualPage.Parent = MainFrame
+
+local MiscPage = Instance.new("ScrollingFrame")
+MiscPage.Size = UDim2.new(1, -32, 1, -92)
+MiscPage.Position = UDim2.new(0, 16, 0, 86)
+MiscPage.BackgroundTransparency = 1
+MiscPage.ScrollBarThickness = 2
+MiscPage.ScrollBarImageColor3 = ATrainBlue
+MiscPage.CanvasSize = UDim2.new(0, 0, 0, 420)
+MiscPage.Visible = false
+MiscPage.Parent = MainFrame
+
+-- MINI CONTROLLER
+local MiniContainer = Instance.new("Frame")
+MiniContainer.Name = "MiniContainer"
+MiniContainer.Size = UDim2.new(0, 240, 0, 48)
+MiniContainer.Position = MainFrame.Position
+MiniContainer.BackgroundTransparency = 1
+MiniContainer.Active = true
+MiniContainer.Visible = false
+MiniContainer.Parent = ScreenGui
+
+local MiniButton = Instance.new("TextButton")
+MiniButton.Size = UDim2.new(0, 44, 0, 44)
+MiniButton.BackgroundColor3 = CardBg
+MiniButton.Text = "⚡"
+MiniButton.TextColor3 = ATrainBlue
+MiniButton.Font = Enum.Font.GothamBold
+MiniButton.TextSize = 20
+MiniButton.Parent = MiniContainer
+Instance.new("UICorner", MiniButton).CornerRadius = UDim.new(1, 0)
+addStroke(MiniButton, ATrainBlue, 1.5)
+
+local MiniToggleBar = Instance.new("TextButton")
+MiniToggleBar.Size = UDim2.new(0, 100, 0, 36)
+MiniToggleBar.Position = UDim2.new(0, 52, 0, 4)
+MiniToggleBar.BackgroundColor3 = CrimsonRed
+MiniToggleBar.Text = "ENGINE OFF"
+MiniToggleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
+MiniToggleBar.Font = Enum.Font.GothamBold
+MiniToggleBar.TextSize = 10
+MiniToggleBar.Parent = MiniContainer
+Instance.new("UICorner", MiniToggleBar).CornerRadius = UDim.new(0, 10)
+addStroke(MiniToggleBar, Color3.fromRGB(255, 255, 255), 1, 0.4)
+
+local DashSphere = Instance.new("TextButton")
+DashSphere.Size = UDim2.new(0, 36, 0, 36)
+DashSphere.Position = UDim2.new(0, 158, 0, 4)
+DashSphere.BackgroundColor3 = ATrainBlue
+DashSphere.Text = "D"
+DashSphere.TextColor3 = Color3.fromRGB(255, 255, 255)
+DashSphere.Font = Enum.Font.GothamBold
+DashSphere.TextSize = 13
+DashSphere.Parent = MiniContainer
+Instance.new("UICorner", DashSphere).CornerRadius = UDim.new(1, 0)
+addStroke(DashSphere, Color3.fromRGB(255, 255, 255), 1, 0.4)
+
+local ShiftLockSphere = Instance.new("TextButton")
+ShiftLockSphere.Size = UDim2.new(0, 36, 0, 36)
+ShiftLockSphere.Position = UDim2.new(0, 200, 0, 4)
+ShiftLockSphere.BackgroundColor3 = CrimsonRed
+ShiftLockSphere.Text = "S"
+ShiftLockSphere.TextColor3 = Color3.fromRGB(255, 255, 255)
+ShiftLockSphere.Font = Enum.Font.GothamBold
+ShiftLockSphere.TextSize = 13
+ShiftLockSphere.Parent = MiniContainer
+Instance.new("UICorner", ShiftLockSphere).CornerRadius = UDim.new(1, 0)
+addStroke(ShiftLockSphere, Color3.fromRGB(255, 255, 255), 1, 0.4)
+
+-- SPEED PAGE
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(1, 0, 0, 38)
+ToggleButton.Position = UDim2.new(0, 0, 0, 4)
+ToggleButton.BackgroundColor3 = CrimsonRed
+ToggleButton.Text = "SYSTEM ENGINE: DISABLED"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 11
+ToggleButton.Parent = SpeedPage
+Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(0, 10)
+addStroke(ToggleButton, Color3.fromRGB(255, 255, 255), 1, 0.5)
+
+local SpeedInput = Instance.new("TextBox")
+SpeedInput.Size = UDim2.new(1, 0, 0, 32)
+SpeedInput.Position = UDim2.new(0, 0, 0, 52)
+SpeedInput.BackgroundColor3 = CardBg
+SpeedInput.Text = "Hız: " .. tostring(Settings.WalkSpeed)
+SpeedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedInput.Font = Enum.Font.GothamSemibold
+SpeedInput.TextSize = 12
+SpeedInput.Parent = SpeedPage
+Instance.new("UICorner", SpeedInput).CornerRadius = UDim.new(0, 8)
+addStroke(SpeedInput, BorderColor, 1.2)
+
+local SliderTrack = Instance.new("Frame")
+SliderTrack.Size = UDim2.new(1, -6, 0, 6)
+SliderTrack.Position = UDim2.new(0, 3, 0, 96)
+SliderTrack.BackgroundColor3 = BorderColor
+SliderTrack.BorderSizePixel = 0
+SliderTrack.Parent = SpeedPage
+Instance.new("UICorner", SliderTrack).CornerRadius = UDim.new(0, 3)
+
+local SliderButton = Instance.new("TextButton")
+SliderButton.Size = UDim2.new(0, 14, 0, 14)
+local initialPercentage = math.clamp((Settings.WalkSpeed - Settings.MinSpeed) / (Settings.MaxSpeed - Settings.MinSpeed), 0, 1)
+SliderButton.Position = UDim2.new(initialPercentage, -7, 0, -4)
+SliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SliderButton.Text = ""
+SliderButton.Parent = SliderTrack
+Instance.new("UICorner", SliderButton).CornerRadius = UDim.new(1, 0)
+addStroke(SliderButton, ATrainBlue, 1.5)
+
+local NormalSpeedCheck = Instance.new("TextButton")
+NormalSpeedCheck.Size = UDim2.new(0, 16, 0, 16)
+NormalSpeedCheck.Position = UDim2.new(0, 2, 0, 116)
+NormalSpeedCheck.BackgroundColor3 = ATrainBlue
+NormalSpeedCheck.Text = "✓"
+NormalSpeedCheck.TextColor3 = Color3.fromRGB(255, 255, 255)
+NormalSpeedCheck.Font = Enum.Font.GothamBold
+NormalSpeedCheck.TextSize = 11
+NormalSpeedCheck.Parent = SpeedPage
+Instance.new("UICorner", NormalSpeedCheck).CornerRadius = UDim.new(0, 5)
+
+local NormalSpeedLabel = Instance.new("TextButton")
+NormalSpeedLabel.Size = UDim2.new(0, 180, 0, 16)
+NormalSpeedLabel.Position = UDim2.new(0, 26, 0, 116)
+NormalSpeedLabel.BackgroundTransparency = 1
+NormalSpeedLabel.Text = "Normal Mod (Standard Speed)"
+NormalSpeedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+NormalSpeedLabel.Font = Enum.Font.GothamMedium
+NormalSpeedLabel.TextSize = 11
+NormalSpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
+NormalSpeedLabel.Parent = SpeedPage
+
+local BypassSpeedCheck = Instance.new("TextButton")
+BypassSpeedCheck.Size = UDim2.new(0, 16, 0, 16)
+BypassSpeedCheck.Position = UDim2.new(0, 2, 0, 140)
+BypassSpeedCheck.BackgroundColor3 = CardBg
+BypassSpeedCheck.Text = ""
+BypassSpeedCheck.TextColor3 = TextMuted
+BypassSpeedCheck.Font = Enum.Font.GothamBold
+BypassSpeedCheck.TextSize = 11
+BypassSpeedCheck.Parent = SpeedPage 
+Instance.new("UICorner", BypassSpeedCheck).CornerRadius = UDim.new(0, 5)
+addStroke(BypassSpeedCheck, BorderColor, 1)
+
+local BypassSpeedLabel = Instance.new("TextButton")
+BypassSpeedLabel.Size = UDim2.new(0, 180, 0, 16)
+BypassSpeedLabel.Position = UDim2.new(0, 26, 0, 140)
+BypassSpeedLabel.BackgroundTransparency = 1
+BypassSpeedLabel.Text = "Bypass Mod (Anti-Cheat Vector)"
+BypassSpeedLabel.TextColor3 = TextMuted
+BypassSpeedLabel.Font = Enum.Font.GothamMedium
+BypassSpeedLabel.TextSize = 11
+BypassSpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
+BypassSpeedLabel.Parent = SpeedPage
+
+
+-- DASH PAGE
+local NormalCheck = Instance.new("TextButton")
+NormalCheck.Size = UDim2.new(0, 16, 0, 16)
+NormalCheck.Position = UDim2.new(0, 2, 0, 8)
+NormalCheck.BackgroundColor3 = ATrainBlue
+NormalCheck.Text = "✓"
+NormalCheck.TextColor3 = Color3.fromRGB(255, 255, 255)
+NormalCheck.Font = Enum.Font.GothamBold
+NormalCheck.TextSize = 11
+NormalCheck.Parent = DashPage
+Instance.new("UICorner", NormalCheck).CornerRadius = UDim.new(0, 5)
+
+local NormalLabel = Instance.new("TextButton")
+NormalLabel.Size = UDim2.new(0, 180, 0, 16)
+NormalLabel.Position = UDim2.new(0, 26, 0, 8)
+NormalLabel.BackgroundTransparency = 1
+NormalLabel.Text = "Normal Velocity Dash"
+NormalLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+NormalLabel.Font = Enum.Font.GothamMedium
+NormalLabel.TextSize = 12
+NormalLabel.TextXAlignment = Enum.TextXAlignment.Left
+NormalLabel.Parent = DashPage
+
+local BlinkCheck = Instance.new("TextButton")
+BlinkCheck.Size = UDim2.new(0, 16, 0, 16)
+BlinkCheck.Position = UDim2.new(0, 2, 0, 34)
+BlinkCheck.BackgroundColor3 = CardBg
+BlinkCheck.Text = ""
+BlinkCheck.TextColor3 = TextMuted
+BlinkCheck.Font = Enum.Font.GothamBold
+BlinkCheck.TextSize = 11
+BlinkCheck.Parent = DashPage
+Instance.new("UICorner", BlinkCheck).CornerRadius = UDim.new(0, 5)
+addStroke(BlinkCheck, BorderColor, 1)
+
+local BlinkLabel = Instance.new("TextButton")
+BlinkLabel.Size = UDim2.new(0, 180, 0, 16)
+BlinkLabel.Position = UDim2.new(0, 26, 0, 34)
+BlinkLabel.BackgroundTransparency = 1
+BlinkLabel.Text = "Blink (Teleport Quantum)"
+BlinkLabel.TextColor3 = TextMuted
+BlinkLabel.Font = Enum.Font.GothamMedium
+BlinkLabel.TextSize = 12
+BlinkLabel.TextXAlignment = Enum.TextXAlignment.Left
+BlinkLabel.Parent = DashPage
+
+local DashInput = Instance.new("TextBox")
+DashInput.Size = UDim2.new(1, 0, 0, 32)
+DashInput.Position = UDim2.new(0, 0, 0, 64)
+DashInput.BackgroundColor3 = CardBg
+DashInput.Text = "Dash: " .. tostring(Settings.DashPower)
+DashInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+DashInput.Font = Enum.Font.GothamSemibold
+DashInput.TextSize = 11
+DashInput.Parent = DashPage
+Instance.new("UICorner", DashInput).CornerRadius = UDim.new(0, 8)
+addStroke(DashInput, BorderColor, 1.2)
+
+local DashSliderTrack = Instance.new("Frame")
+DashSliderTrack.Size = UDim2.new(1, -6, 0, 6)
+DashSliderTrack.Position = UDim2.new(0, 3, 0, 108)
+DashSliderTrack.BackgroundColor3 = BorderColor
+DashSliderTrack.BorderSizePixel = 0
+DashSliderTrack.Parent = DashPage
+Instance.new("UICorner", DashSliderTrack).CornerRadius = UDim.new(0, 3)
+
+local DashSliderButton = Instance.new("TextButton")
+DashSliderButton.Size = UDim2.new(0, 14, 0, 14)
+local initialDashPercentage = math.clamp((Settings.DashPower - Settings.MinDash) / (Settings.MaxDash - Settings.MinDash), 0, 1)
+DashSliderButton.Position = UDim2.new(initialDashPercentage, -7, 0, -4)
+DashSliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+DashSliderButton.Text = ""
+DashSliderButton.Parent = DashSliderTrack
+Instance.new("UICorner", DashSliderButton).CornerRadius = UDim.new(0, 8)
+addStroke(DashSliderButton, ATrainBlue, 1.5)
+
+local BlinkInput = Instance.new("TextBox")
+BlinkInput.Size = UDim2.new(1, 0, 0, 32)
+BlinkInput.Position = UDim2.new(0, 0, 0, 64)
+BlinkInput.BackgroundColor3 = CardBg
+BlinkInput.Text = "Blink: " .. tostring(Settings.BlinkDistance) .. " Stud"
+BlinkInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+BlinkInput.Font = Enum.Font.GothamSemibold
+BlinkInput.TextSize = 11
+BlinkInput.Visible = false
+BlinkInput.Parent = DashPage
+Instance.new("UICorner", BlinkInput).CornerRadius = UDim.new(0, 8)
+addStroke(BlinkInput, BorderColor, 1.2)
+
+local BlinkSliderTrack = Instance.new("Frame")
+BlinkSliderTrack.Size = UDim2.new(1, -6, 0, 6)
+BlinkSliderTrack.Position = UDim2.new(0, 3, 0, 108)
+BlinkSliderTrack.BackgroundColor3 = BorderColor
+BlinkSliderTrack.BorderSizePixel = 0
+BlinkSliderTrack.Visible = false
+BlinkSliderTrack.Parent = DashPage
+Instance.new("UICorner", BlinkSliderTrack).CornerRadius = UDim.new(0, 3)
+
+local BlinkSliderButton = Instance.new("TextButton")
+BlinkSliderButton.Size = UDim2.new(0, 14, 0, 14)
+local initialBlinkPercentage = math.clamp((Settings.BlinkDistance - Settings.MinBlink) / (Settings.MaxBlink - Settings.MinBlink), 0, 1)
+BlinkSliderButton.Position = UDim2.new(initialBlinkPercentage, -7, 0, -4)
+BlinkSliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+BlinkSliderButton.Text = ""
+BlinkSliderButton.Parent = BlinkSliderTrack
+Instance.new("UICorner", BlinkSliderButton).CornerRadius = UDim.new(0, 8)
+addStroke(BlinkSliderButton, ATrainBlue, 1.5)
+
+local MainDashButton = Instance.new("TextButton")
+MainDashButton.Size = UDim2.new(1, 0, 0, 38)
+MainDashButton.Position = UDim2.new(0, 0, 0, 134)
+MainDashButton.BackgroundColor3 = ATrainBlue
+MainDashButton.Text = "EXECUTE KINETIC MOTOR (Q)"
+MainDashButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MainDashButton.Font = Enum.Font.GothamBold
+MainDashButton.TextSize = 11
+MainDashButton.Parent = DashPage
+Instance.new("UICorner", MainDashButton).CornerRadius = UDim.new(0, 10)
+addStroke(MainDashButton, Color3.fromRGB(255, 255, 255), 1, 0.4)
+
+
+-- CAMERA PAGE (SHIFTLOCK & FOV OVERHAUL)
+local ShiftLockButton = Instance.new("TextButton")
+ShiftLockButton.Size = UDim2.new(1, 0, 0, 32)
+ShiftLockButton.Position = UDim2.new(0, 0, 0, 4)
+ShiftLockButton.BackgroundColor3 = CrimsonRed
+ShiftLockButton.Text = "SHIFT LOCK: OFF"
+ShiftLockButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ShiftLockButton.Font = Enum.Font.GothamBold
+ShiftLockButton.TextSize = 10
+ShiftLockButton.Parent = CameraPage
+Instance.new("UICorner", ShiftLockButton).CornerRadius = UDim.new(0, 8)
+addStroke(ShiftLockButton, Color3.fromRGB(255, 255, 255), 1, 0.4)
+
+local OffsetXInput = Instance.new("TextBox")
+OffsetXInput.Size = UDim2.new(0, 85, 0, 22)
+OffsetXInput.Position = UDim2.new(0, 0, 0, 44)
+OffsetXInput.BackgroundColor3 = CardBg
+OffsetXInput.Text = "X Eksen: " .. tostring(Settings.ShiftLockOffsetX)
+OffsetXInput.TextColor3 = Color3.fromRGB(240, 240, 240)
+OffsetXInput.Font = Enum.Font.GothamSemibold
+OffsetXInput.TextSize = 9
+OffsetXInput.Parent = CameraPage
+Instance.new("UICorner", OffsetXInput).CornerRadius = UDim.new(0, 6)
+addStroke(OffsetXInput, BorderColor, 1)
+
+local OffsetXSliderTrack = Instance.new("Frame")
+OffsetXSliderTrack.Size = UDim2.new(1, -95, 0, 4)
+OffsetXSliderTrack.Position = UDim2.new(0, 95, 0, 53)
+OffsetXSliderTrack.BackgroundColor3 = BorderColor
+OffsetXSliderTrack.BorderSizePixel = 0
+OffsetXSliderTrack.Parent = CameraPage
+
+local OffsetXSliderButton = Instance.new("TextButton")
+OffsetXSliderButton.Size = UDim2.new(0, 12, 0, 12)
+local initialXPct = math.clamp((Settings.ShiftLockOffsetX - Settings.MinOffsetX) / (Settings.MaxOffsetX - Settings.MinOffsetX), 0, 1)
+OffsetXSliderButton.Position = UDim2.new(initialXPct, -6, 0, -4)
+OffsetXSliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+OffsetXSliderButton.Text = ""
+OffsetXSliderButton.Parent = OffsetXSliderTrack
+Instance.new("UICorner", OffsetXSliderButton).CornerRadius = UDim.new(1, 0)
+addStroke(OffsetXSliderButton, ATrainBlue, 1)
+
+local OffsetYInput = Instance.new("TextBox")
+OffsetYInput.Size = UDim2.new(0, 85, 0, 22)
+OffsetYInput.Position = UDim2.new(0, 0, 0, 74)
+OffsetYInput.BackgroundColor3 = CardBg
+OffsetYInput.Text = "Y Eksen: " .. tostring(Settings.ShiftLockOffsetY)
+OffsetYInput.TextColor3 = Color3.fromRGB(240, 240, 240)
+OffsetYInput.Font = Enum.Font.GothamSemibold
+OffsetYInput.TextSize = 9
+OffsetYInput.Parent = CameraPage
+Instance.new("UICorner", OffsetYInput).CornerRadius = UDim.new(0, 6)
+addStroke(OffsetYInput, BorderColor, 1)
+
+local OffsetYSliderTrack = Instance.new("Frame")
+OffsetYSliderTrack.Size = UDim2.new(1, -95, 0, 4)
+OffsetYSliderTrack.Position = UDim2.new(0, 95, 0, 83)
+OffsetYSliderTrack.BackgroundColor3 = BorderColor
+OffsetYSliderTrack.BorderSizePixel = 0
+OffsetYSliderTrack.Parent = CameraPage
+
+local OffsetYSliderButton = Instance.new("TextButton")
+OffsetYSliderButton.Size = UDim2.new(0, 12, 0, 12)
+local initialYPct = math.clamp((Settings.ShiftLockOffsetY - Settings.MinOffsetY) / (Settings.MaxOffsetY - Settings.MinOffsetY), 0, 1)
+OffsetYSliderButton.Position = UDim2.new(initialYPct, -6, 0, -4)
+OffsetYSliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+OffsetYSliderButton.Text = ""
+OffsetYSliderButton.Parent = OffsetYSliderTrack
+Instance.new("UICorner", OffsetYSliderButton).CornerRadius = UDim.new(1, 0)
+addStroke(OffsetYSliderButton, ATrainBlue, 1)
+
+local SmoothInput = Instance.new("TextBox")
+SmoothInput.Size = UDim2.new(0, 85, 0, 22)
+SmoothInput.Position = UDim2.new(0, 0, 0, 104)
+SmoothInput.BackgroundColor3 = CardBg
+SmoothInput.Text = "Hassasiyet: " .. tostring(Settings.ShiftLockSmoothness)
+SmoothInput.TextColor3 = Color3.fromRGB(240, 240, 240)
+SmoothInput.Font = Enum.Font.GothamSemibold
+SmoothInput.TextSize = 9
+SmoothInput.Parent = CameraPage
+Instance.new("UICorner", SmoothInput).CornerRadius = UDim.new(0, 6)
+addStroke(SmoothInput, BorderColor, 1)
+
+local SmoothSliderTrack = Instance.new("Frame")
+SmoothSliderTrack.Size = UDim2.new(1, -95, 0, 4)
+SmoothSliderTrack.Position = UDim2.new(0, 95, 0, 113)
+SmoothSliderTrack.BackgroundColor3 = BorderColor
+SmoothSliderTrack.BorderSizePixel = 0
+SmoothSliderTrack.Parent = CameraPage
+
+local SmoothSliderButton = Instance.new("TextButton")
+SmoothSliderButton.Size = UDim2.new(0, 12, 0, 12)
+local initialSmoothPct = math.clamp((Settings.ShiftLockSmoothness - Settings.MinSmoothness) / (Settings.MaxSmoothness - Settings.MinSmoothness), 0, 1)
+SmoothSliderButton.Position = UDim2.new(initialSmoothPct, -6, 0, -4)
+SmoothSliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SmoothSliderButton.Text = ""
+SmoothSliderButton.Parent = SmoothSliderTrack
+Instance.new("UICorner", SmoothSliderButton).CornerRadius = UDim.new(1, 0)
+addStroke(SmoothSliderButton, ATrainBlue, 1)
+
+local MasterFovBtn = Instance.new("TextButton") 
+MasterFovBtn.Size = UDim2.new(1, 0, 0, 24)
+MasterFovBtn.Position = UDim2.new(0, 0, 0, 134)
+MasterFovBtn.BackgroundColor3 = NeonGreen
+MasterFovBtn.Text = "FOV MASTER ENGINE: ON"
+MasterFovBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MasterFovBtn.Font = Enum.Font.GothamBold
+MasterFovBtn.TextSize = 9
+MasterFovBtn.Parent = CameraPage
+Instance.new("UICorner", MasterFovBtn).CornerRadius = UDim.new(0, 6)
+
+local DynamicFovBtn = Instance.new("TextButton")
+DynamicFovBtn.Size = UDim2.new(1, 0, 0, 24)
+DynamicFovBtn.Position = UDim2.new(0, 0, 0, 162)
+DynamicFovBtn.BackgroundColor3 = NeonGreen
+DynamicFovBtn.Text = "DYNAMIC FOV: ACTIVE"
+DynamicFovBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+DynamicFovBtn.Font = Enum.Font.GothamBold
+DynamicFovBtn.TextSize = 9
+DynamicFovBtn.Parent = CameraPage
+Instance.new("UICorner", DynamicFovBtn).CornerRadius = UDim.new(0, 6)
+
+local BaseFovInput = Instance.new("TextBox")
+BaseFovInput.Size = UDim2.new(0, 85, 0, 22)
+BaseFovInput.Position = UDim2.new(0, 0, 0, 192)
+BaseFovInput.BackgroundColor3 = CardBg
+BaseFovInput.Text = "Taban FOV: " .. tostring(Settings.BaseFov)
+BaseFovInput.TextColor3 = Color3.fromRGB(240, 240, 240)
+BaseFovInput.Font = Enum.Font.GothamSemibold
+BaseFovInput.TextSize = 9
+BaseFovInput.Parent = CameraPage
+Instance.new("UICorner", BaseFovInput).CornerRadius = UDim.new(0, 6)
+addStroke(BaseFovInput, BorderColor, 1)
+
+local BaseFovTrack = Instance.new("Frame")
+BaseFovTrack.Size = UDim2.new(1, -95, 0, 4)
+BaseFovTrack.Position = UDim2.new(0, 95, 0, 201)
+BaseFovTrack.BackgroundColor3 = BorderColor
+BaseFovTrack.BorderSizePixel = 0
+BaseFovTrack.Parent = CameraPage
+
+local BaseFovSliderBtn = Instance.new("TextButton")
+BaseFovSliderBtn.Size = UDim2.new(0, 12, 0, 12)
+local initialFovPct = math.clamp((Settings.BaseFov - Settings.MinFov) / (Settings.MaxFov - Settings.MinFov), 0, 1)
+BaseFovSliderBtn.Position = UDim2.new(initialFovPct, -6, 0, -4)
+BaseFovSliderBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+BaseFovSliderBtn.Text = ""
+BaseFovSliderBtn.Parent = BaseFovTrack
+Instance.new("UICorner", BaseFovSliderBtn).CornerRadius = UDim.new(1, 0)
+addStroke(BaseFovSliderBtn, ATrainBlue, 1)
+
+local FovSensInput = Instance.new("TextBox")
+FovSensInput.Size = UDim2.new(0, 85, 0, 22)
+FovSensInput.Position = UDim2.new(0, 0, 0, 220)
+FovSensInput.BackgroundColor3 = CardBg
+FovSensInput.Text = "FOV Esneme: " .. tostring(Settings.FovSensitivity)
+FovSensInput.TextColor3 = Color3.fromRGB(240, 240, 240)
+FovSensInput.Font = Enum.Font.GothamSemibold
+FovSensInput.TextSize = 9
+FovSensInput.Parent = CameraPage
+Instance.new("UICorner", FovSensInput).CornerRadius = UDim.new(0, 6)
+addStroke(FovSensInput, BorderColor, 1)
+
+local FovSensTrack = Instance.new("Frame")
+FovSensTrack.Size = UDim2.new(1, -95, 0, 4)
+FovSensTrack.Position = UDim2.new(0, 95, 0, 229)
+FovSensTrack.BackgroundColor3 = BorderColor
+FovSensTrack.BorderSizePixel = 0
+FovSensTrack.Parent = CameraPage
+
+local FovSensSliderBtn = Instance.new("TextButton")
+FovSensSliderBtn.Size = UDim2.new(0, 12, 0, 12)
+local initialSensPct = math.clamp((Settings.FovSensitivity - Settings.MinFovSens) / (Settings.MaxFovSens - Settings.MinFovSens), 0, 1)
+FovSensSliderBtn.Position = UDim2.new(initialSensPct, -6, 0, -4)
+FovSensSliderBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+FovSensSliderBtn.Text = ""
+FovSensSliderBtn.Parent = FovSensTrack
+Instance.new("UICorner", FovSensSliderBtn).CornerRadius = UDim.new(1, 0)
+addStroke(FovSensSliderBtn, ATrainBlue, 1)
+
+
+-- ==========================================
+-- [YENİ]: VISUAL (ESP) PAGE UI COMPONENTS
+-- ==========================================
+local EspMasterBtn = Instance.new("TextButton")
+EspMasterBtn.Size = UDim2.new(1, 0, 0, 32)
+EspMasterBtn.Position = UDim2.new(0, 0, 0, 4)
+EspMasterBtn.BackgroundColor3 = CrimsonRed
+EspMasterBtn.Text = "MASTER ESP: DISABLED"
+EspMasterBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspMasterBtn.Font = Enum.Font.GothamBold
+EspMasterBtn.TextSize = 10
+EspMasterBtn.Parent = VisualPage
+Instance.new("UICorner", EspMasterBtn).CornerRadius = UDim.new(0, 8)
+addStroke(EspMasterBtn, Color3.fromRGB(255, 255, 255), 1, 0.4)
+
+local EspBoxesBtn = Instance.new("TextButton")
+EspBoxesBtn.Size = UDim2.new(1, 0, 0, 26)
+EspBoxesBtn.Position = UDim2.new(0, 0, 0, 42)
+EspBoxesBtn.BackgroundColor3 = CrimsonRed
+EspBoxesBtn.Text = "BOX ESP: OFF"
+EspBoxesBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspBoxesBtn.Font = Enum.Font.GothamBold
+EspBoxesBtn.TextSize = 9
+EspBoxesBtn.Parent = VisualPage
+Instance.new("UICorner", EspBoxesBtn).CornerRadius = UDim.new(0, 6)
+
+local EspTracersBtn = Instance.new("TextButton")
+EspTracersBtn.Size = UDim2.new(1, 0, 0, 26)
+EspTracersBtn.Position = UDim2.new(0, 0, 0, 72)
+EspTracersBtn.BackgroundColor3 = CrimsonRed
+EspTracersBtn.Text = "TRACER ESP: OFF"
+EspTracersBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspTracersBtn.Font = Enum.Font.GothamBold
+EspTracersBtn.TextSize = 9
+EspTracersBtn.Parent = VisualPage
+Instance.new("UICorner", EspTracersBtn).CornerRadius = UDim.new(0, 6)
+
+local EspChamsBtn = Instance.new("TextButton")
+EspChamsBtn.Size = UDim2.new(1, 0, 0, 26)
+EspChamsBtn.Position = UDim2.new(0, 0, 0, 102)
+EspChamsBtn.BackgroundColor3 = CrimsonRed
+EspChamsBtn.Text = "CHAMS ESP: OFF"
+EspChamsBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspChamsBtn.Font = Enum.Font.GothamBold
+EspChamsBtn.TextSize = 9
+EspChamsBtn.Parent = VisualPage
+Instance.new("UICorner", EspChamsBtn).CornerRadius = UDim.new(0, 6)
+
+local EspNamesBtn = Instance.new("TextButton")
+EspNamesBtn.Size = UDim2.new(1, 0, 0, 26)
+EspNamesBtn.Position = UDim2.new(0, 0, 0, 132)
+EspNamesBtn.BackgroundColor3 = CrimsonRed
+EspNamesBtn.Text = "NAME & DISTANCE ESP: OFF"
+EspNamesBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspNamesBtn.Font = Enum.Font.GothamBold
+EspNamesBtn.TextSize = 9
+EspNamesBtn.Parent = VisualPage
+Instance.new("UICorner", EspNamesBtn).CornerRadius = UDim.new(0, 6)
+
+local EspTeamBtn = Instance.new("TextButton")
+EspTeamBtn.Size = UDim2.new(1, 0, 0, 26)
+EspTeamBtn.Position = UDim2.new(0, 0, 0, 162)
+EspTeamBtn.BackgroundColor3 = CrimsonRed
+EspTeamBtn.Text = "TEAM CHECK: IGNORED"
+EspTeamBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EspTeamBtn.Font = Enum.Font.GothamBold
+EspTeamBtn.TextSize = 9
+EspTeamBtn.Parent = VisualPage
+Instance.new("UICorner", EspTeamBtn).CornerRadius = UDim.new(0, 6)
+
+
+-- MISC PAGE
+local Sandy=Instance.new("Frame")--Yama
+local ShakeToggleButton = Instance.new("TextButton")
+ShakeToggleButton.Size = UDim2.new(1, 0, 0, 26)
+ShakeToggleButton.Position = UDim2.new(0, 0, 0, 2)
+ShakeToggleButton.BackgroundColor3 = CrimsonRed
+ShakeToggleButton.Text = "SHAKE MECHANISM: OFF"
+ShakeToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ShakeToggleButton.Font = Enum.Font.GothamBold
+ShakeToggleButton.TextSize = 9
+ShakeToggleButton.Parent = MiscPage
+Instance.new("UICorner", ShakeToggleButton).CornerRadius = UDim.new(0, 6)
+
+local ShakeInput = Instance.new("TextBox")
+ShakeInput.Size = UDim2.new(0, 85, 0, 24)
+ShakeInput.Position = UDim2.new(0, 0, 0, 34)
+ShakeInput.BackgroundColor3 = CardBg
+ShakeInput.Text = "Shk: " .. tostring(Settings.ShakePower)
+ShakeInput.TextColor3 = Color3.fromRGB(240, 240, 240)
+ShakeInput.Font = Enum.Font.GothamSemibold
+ShakeInput.TextSize = 9
+ShakeInput.Parent = MiscPage
+Instance.new("UICorner", ShakeInput).CornerRadius = UDim.new(0, 6)
+addStroke(ShakeInput, BorderColor, 1)
+
+local ShakeSliderTrack = Instance.new("Frame")
+ShakeSliderTrack.Size = UDim2.new(1, -95, 0, 4)
+ShakeSliderTrack.Position = UDim2.new(0, 95, 0, 44)
+ShakeSliderTrack.BackgroundColor3 = BorderColor
+ShakeSliderTrack.BorderSizePixel = 0
+ShakeSliderTrack.Parent = MiscPage
+
+local ShakeSliderButton = Instance.new("TextButton")
+ShakeSliderButton.Size = UDim2.new(0, 12, 0, 12)
+local initialShakePercentage = math.clamp((Settings.ShakePower - Settings.MinShake) / (Settings.MaxShake - Settings.MinShake), 0, 1)
+ShakeSliderButton.Position = UDim2.new(initialShakePercentage, -6, 0, -4)
+ShakeSliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ShakeSliderButton.Text = ""
+ShakeSliderButton.Parent = ShakeSliderTrack
+Instance.new("UICorner", ShakeSliderButton).CornerRadius = UDim.new(1, 0)
+addStroke(ShakeSliderButton, ATrainBlue, 1)
+
+local NoclipButton = Instance.new("TextButton")
+NoclipButton.Size = UDim2.new(1, 0, 0, 26)
+NoclipButton.Position = UDim2.new(0, 0, 0, 66)
+NoclipButton.BackgroundColor3 = CrimsonRed
+NoclipButton.Text = "MATRIX NOCLIP: OFF"
+NoclipButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+NoclipButton.Font = Enum.Font.GothamBold
+NoclipButton.TextSize = 9
+NoclipButton.Parent = MiscPage
+Instance.new("UICorner", NoclipButton).CornerRadius = UDim.new(0, 6)
+
+local NoclipThreshInput = Instance.new("TextBox")
+NoclipThreshInput.Size = UDim2.new(0, 85, 0, 24)
+NoclipThreshInput.Position = UDim2.new(0, 0, 0, 98)
+NoclipThreshInput.BackgroundColor3 = CardBg
+NoclipThreshInput.Text = "Ncl Lmt: " .. tostring(Settings.NoclipThreshold)
+NoclipThreshInput.TextColor3 = Color3.fromRGB(240, 240, 240)
+NoclipThreshInput.Font = Enum.Font.GothamSemibold
+NoclipThreshInput.TextSize = 9
+NoclipThreshInput.Parent = MiscPage
+Instance.new("UICorner", NoclipThreshInput).CornerRadius = UDim.new(0, 6)
+addStroke(NoclipThreshInput, BorderColor, 1)
+
+local NoclipSliderTrack = Instance.new("Frame")
+NoclipSliderTrack.Size = UDim2.new(1, -95, 0, 4)
+NoclipSliderTrack.Position = UDim2.new(0, 95, 0, 108)
+NoclipSliderTrack.BackgroundColor3 = BorderColor
+NoclipSliderTrack.BorderSizePixel = 0
+NoclipSliderTrack.Parent = MiscPage
+
+local NoclipSliderButton = Instance.new("TextButton")
+NoclipSliderButton.Size = UDim2.new(0, 12, 0, 12)
+local initialNoclipPercentage = math.clamp((Settings.NoclipThreshold - Settings.MinNoclip) / (Settings.MaxNoclip - Settings.MinNoclip), 0, 1)
+NoclipSliderButton.Position = UDim2.new(initialNoclipPercentage, -6, 0, -4)
+NoclipSliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+NoclipSliderButton.Text = ""
+NoclipSliderButton.Parent = NoclipSliderTrack
+Instance.new("UICorner", NoclipSliderButton).CornerRadius = UDim.new(0, 12)
+addStroke(NoclipSliderButton, ATrainBlue, 1)
+
+local WaterButton = Instance.new("TextButton")
+WaterButton.Size = UDim2.new(1, 0, 0, 26)
+WaterButton.Position = UDim2.new(0, 0, 0, 130)
+WaterButton.BackgroundColor3 = CrimsonRed
+WaterButton.Text = "HYDRO RUNNER: OFF"
+WaterButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+WaterButton.Font = Enum.Font.GothamBold
+WaterButton.TextSize = 9
+WaterButton.Parent = MiscPage
+Instance.new("UICorner", WaterButton).CornerRadius = UDim.new(0, 6)
+
+local WaterThreshInput = Instance.new("TextBox")
+WaterThreshInput.Size = UDim2.new(0, 85, 0, 24)
+WaterThreshInput.Position = UDim2.new(0, 0, 0, 162)
+WaterThreshInput.BackgroundColor3 = CardBg
+WaterThreshInput.Text = "Wat Lmt: " .. tostring(Settings.WaterThreshold)
+WaterThreshInput.TextColor3 = Color3.fromRGB(240, 240, 240)
+WaterThreshInput.Font = Enum.Font.GothamSemibold
+WaterThreshInput.TextSize = 9
+WaterThreshInput.Parent = MiscPage
+Instance.new("UICorner", WaterThreshInput).CornerRadius = UDim.new(0, 6)
+addStroke(WaterThreshInput, BorderColor, 1)
+
+local WaterSliderTrack = Instance.new("Frame")
+WaterSliderTrack.Size = UDim2.new(1, -95, 0, 4)
+WaterSliderTrack.Position = UDim2.new(0, 95, 0, 172)
+WaterSliderTrack.BackgroundColor3 = BorderColor
+WaterSliderTrack.BorderSizePixel = 0
+WaterSliderTrack.Parent = MiscPage
+
+local WaterSliderButton = Instance.new("TextButton")
+WaterSliderButton.Size = UDim2.new(0, 12, 0, 12)
+local initialWaterPercentage = math.clamp((Settings.WaterThreshold - Settings.MinWater) / (Settings.MaxWater - Settings.MinWater), 0, 1)
+WaterSliderButton.Position = UDim2.new(initialWaterPercentage, -6, 0, -4)
+WaterSliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+WaterSliderButton.Text = ""
+WaterSliderButton.Parent = WaterSliderTrack
+Instance.new("UICorner", WaterSliderButton).CornerRadius = UDim.new(0, 12)
+addStroke(WaterSliderButton, ATrainBlue, 1)
+
+local MomentumButton = Instance.new("TextButton")
+MomentumButton.Size = UDim2.new(1, 0, 0, 26)
+MomentumButton.Position = UDim2.new(0, 0, 0, 194)
+MomentumButton.BackgroundColor3 = NeonGreen
+MomentumButton.Text = "SPEED INERTIA: ON"
+MomentumButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MomentumButton.Font = Enum.Font.GothamBold
+MomentumButton.TextSize = 9
+MomentumButton.Parent = MiscPage
+Instance.new("UICorner", MomentumButton).CornerRadius = UDim.new(0, 6)
+
+local AutoStepButton = Instance.new("TextButton")
+AutoStepButton.Size = UDim2.new(1, 0, 0, 26)
+AutoStepButton.Position = UDim2.new(0, 0, 0, 224)
+AutoStepButton.BackgroundColor3 = NeonGreen
+AutoStepButton.Text = "AUTO-STEP ASSIST: ON"
+AutoStepButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoStepButton.Font = Enum.Font.GothamBold
+AutoStepButton.TextSize = 9
+AutoStepButton.Parent = MiscPage
+Instance.new("UICorner", AutoStepButton).CornerRadius = UDim.new(0, 6)
+
+local InfJumpButton = Instance.new("TextButton")
+InfJumpButton.Size = UDim2.new(1, 0, 0, 26)
+InfJumpButton.Position = UDim2.new(0, 0, 0, 254)
+InfJumpButton.BackgroundColor3 = CrimsonRed
+InfJumpButton.Text = "INFINITE JUMP: OFF"
+InfJumpButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+InfJumpButton.Font = Enum.Font.GothamBold
+InfJumpButton.TextSize = 9
+InfJumpButton.Parent = MiscPage
+Instance.new("UICorner", InfJumpButton).CornerRadius = UDim.new(0, 6)
+
+local CameraTiltButton = Instance.new("TextButton")
+CameraTiltButton.Size = UDim2.new(1, 0, 0, 26)
+CameraTiltButton.Position = UDim2.new(0, 0, 0, 284)
+CameraTiltButton.BackgroundColor3 = NeonGreen
+CameraTiltButton.Text = "CAMERA LEAN TILT: ON"
+CameraTiltButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CameraTiltButton.Font = Enum.Font.GothamBold
+CameraTiltButton.TextSize = 9
+CameraTiltButton.Parent = MiscPage
+Instance.new("UICorner", CameraTiltButton).CornerRadius = UDim.new(0, 6)
+
+local SoundToggleButton = Instance.new("TextButton")
+SoundToggleButton.Size = UDim2.new(1, 0, 0, 26)
+SoundToggleButton.Position = UDim2.new(0, 0, 0, 314)
+SoundToggleButton.BackgroundColor3 = NeonGreen
+SoundToggleButton.Text = "AUDIO MASTER: ENGAGED"
+SoundToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SoundToggleButton.Font = Enum.Font.GothamBold
+SoundToggleButton.TextSize = 9
+SoundToggleButton.Parent = MiscPage
+Instance.new("UICorner", SoundToggleButton).CornerRadius = UDim.new(0, 6)
+
+local VfxToggleButton = Instance.new("TextButton")
+VfxToggleButton.Size = UDim2.new(1, 0, 0, 26)
+VfxToggleButton.Position = UDim2.new(0, 0, 0, 344)
+VfxToggleButton.BackgroundColor3 = NeonGreen
+VfxToggleButton.Text = "VISUAL EMITTERS: ACTIVE"
+VfxToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+VfxToggleButton.Font = Enum.Font.GothamBold
+VfxToggleButton.TextSize = 9
+VfxToggleButton.Parent = MiscPage
+Instance.new("UICorner", VfxToggleButton).CornerRadius = UDim.new(0, 6)
+
+-- ==========================================
+-- KOŞU MOTORU LİMİTLERİ VE HAREKET DÖNGÜSÜ
+-- ==========================================
+local function tweenColor(obj, color) 
+    TweenService:Create(obj, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {BackgroundColor3 = color}):Play() 
+end
+
+local function toggleWalkSpeed(state)
+    Settings.Enabled = state 
+    ToggleButton.Text = state and "SYSTEM ENGINE: OPERATIONAL" or "SYSTEM ENGINE: DISABLED"
+    tweenColor(ToggleButton, state and NeonGreen or CrimsonRed)
+    
+    if Settings.Enabled then 
+        tweenColor(MiniToggleBar, NeonGreen) MiniToggleBar.Text = "ENGINE ACTIVE" 
+    else 
+        tweenColor(MiniToggleBar, CrimsonRed) MiniToggleBar.Text = "ENGINE OFF" 
+    end
+
+    if Connections.SpeedLoop then Connections.SpeedLoop:Disconnect() Connections.SpeedLoop = nil end
+    stopCustomAnim()
+
+    if state then
+        local wasHighSpeed, crossedSoundBarrier = false, false
+        local lastGhostPos = Vector3.new()
+        local initChar = LocalPlayer.Character
+        local initRoot = initChar and initChar:FindFirstChild("HumanoidRootPart")
+        if initRoot then lastGhostPos = initRoot.Position end
+
+        Connections.SpeedLoop = RunService.RenderStepped:Connect(function(deltaTime)
+            local char = LocalPlayer.Character
+            local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+            local rootPart = char and char:FindFirstChild("HumanoidRootPart")
+            local CurrentCamera = workspace.CurrentCamera
+            
+            if humanoid and rootPart and humanoid.Health > 0 then
+                local moveDir = humanoid.MoveDirection
+                local velocityVec = rootPart.AssemblyLinearVelocity
+                if velocityVec.Magnitude > 5 then lastVelocityVec = velocityVec end
+
+                local targetSpeed = Settings.WalkSpeed
+                if moveDir.Magnitude > 0.05 then
+                    if Settings.MomentumEnabled then
+                        actualSpeed = math.min(actualSpeed + (Settings.AccelerationRate * deltaTime), targetSpeed)
+                    else
+                        actualSpeed = targetSpeed
+                    end
+                else
+                    if Settings.MomentumEnabled then
+                        actualSpeed = math.max(actualSpeed - (Settings.AccelerationRate * 1.5 * deltaTime), 16)
+                    else
+                        actualSpeed = 16
+                    end
+                end
+
+                if Settings.SpeedType == "Normal" then
+                    stopCustomAnim()
+                    humanoid.WalkSpeed = actualSpeed
+                elseif Settings.SpeedType == "Bypass" then
+                    humanoid.WalkSpeed = 16 
+                    manageBypassAnimation(humanoid, moveDir)
+                    
+                    if moveDir.Magnitude > 0.05 and tostring(moveDir.X) ~= "nan" then
+                        local flatMoveDir = Vector3.new(moveDir.X, 0, moveDir.Z).Unit
+                        local bypassStepFactor = (actualSpeed - 16) * deltaTime
+                        local currentPos = rootPart.Position
+                        local targetX = currentPos.X + (flatMoveDir.X * bypassStepFactor)
+                        local targetZ = currentPos.Z + (flatMoveDir.Z * bypassStepFactor)
+                        local targetY = currentPos.Y 
+
+                        local wallParams = RaycastParams.new()
+                        wallParams.FilterType = Enum.RaycastFilterType.Exclude
+                        wallParams.FilterDescendantsInstances = {char, CurrentCamera, VfxFolder}
+
+                        if Settings.AutoStepEnabled then
+                            local kneeHeightOffset = Vector3.new(0, -1, 0)
+                            local stepRay = workspace:Raycast(currentPos + kneeHeightOffset, flatMoveDir * 2.2, wallParams)
+                            if stepRay and stepRay.CanCollide then
+                                local headHeightOffset = Vector3.new(0, Settings.StepHeight, 0)
+                                local clearRay = workspace:Raycast(currentPos + headHeightOffset, flatMoveDir * 2.2, wallParams)
+                                if not clearRay then
+                                    targetY = targetY + 0.85
+                                end
+                            end
+                        end
+
+                        if not Settings.NoclipEnabled or actualSpeed <= Settings.NoclipThreshold then
+                            local frontRay = workspace:Raycast(currentPos, flatMoveDir * (bypassStepFactor + 1.5), wallParams)
+                            if frontRay and frontRay.CanCollide then
+                                targetX = currentPos.X
+                                targetZ = currentPos.Z
+                            end
+                        end
+                        
+                        rootPart.CFrame = CFrame.new(targetX, targetY, targetZ) * rootPart.CFrame.Rotation
+                        rootPart.AssemblyLinearVelocity = Vector3.new(flatMoveDir.X * 16, rootPart.AssemblyLinearVelocity.Y, flatMoveDir.Z * 16)
+                        lastVelocityVec = flatMoveDir * actualSpeed
+                    else
+                        rootPart.AssemblyLinearVelocity = Vector3.new(0, rootPart.AssemblyLinearVelocity.Y, 0)
+                    end
+                end
+                
+                if CurrentCamera then
+                    local activeBaseFov = Settings.FovSystemEnabled and Settings.BaseFov or 70
+                    if Settings.DynamicFovEnabled and moveDir.Magnitude > 0.05 then
+                        local speedPercent = math.clamp((actualSpeed - 16) / 234, 0, 1)
+                        local targetFov = activeBaseFov + (speedPercent * Settings.FovSensitivity)
+                        CurrentCamera.FieldOfView = math.max(CurrentCamera.FieldOfView + (targetFov - CurrentCamera.FieldOfView) * math.clamp(8 * deltaTime, 0, 1), 1)
+                    else
+                        CurrentCamera.FieldOfView = CurrentCamera.FieldOfView + (activeBaseFov - CurrentCamera.FieldOfView) * math.clamp(8 * deltaTime, 0, 1)
+                    end
+                end
+
+                if Settings.WaterEnabled and moveDir.Magnitude > 0.05 and actualSpeed >= Settings.WaterThreshold then
+                    local waterParams = RaycastParams.new()
+                    waterParams.FilterType = Enum.RaycastFilterType.Exclude
+                    waterParams.FilterDescendantsInstances = {char, CurrentCamera, VfxFolder}
+                    waterParams.IgnoreWater = false
+                    
+                    local ray = workspace:Raycast(rootPart.Position + Vector3.new(0, 2, 0), Vector3.new(0, -9, 0), waterParams)
+                    if ray and ray.Material == Enum.Material.Water then
+                        WaterPlatform.CFrame = CFrame.new(rootPart.Position.X, ray.Position.Y - 0.5, rootPart.Position.Z)
+                        WaterPlatform.CanCollide = true
+                    else
+                        WaterPlatform.CanCollide = false
+                    end
+                else
+                    WaterPlatform.CanCollide = false
+                end
+
+                if moveDir.Magnitude > 0 and actualSpeed >= Settings.SoundBarrier then
+                    createSpeedLinesVFX()
+                    if not crossedSoundBarrier then
+                        crossedSoundBarrier = true playSonicBoomSound() createJetSonicBoomVFX(rootPart.Position, moveDir)
+                    end
+                elseif actualSpeed < (Settings.SoundBarrier - 15) then crossedSoundBarrier = false end
+
+                if moveDir.Magnitude > 0 and actualSpeed > 35 then
+                    if (rootPart.Position - lastGhostPos).Magnitude >= 4.0 then 
+                        createGhostAfterimage(char, ATrainBlue) 
+                        lastGhostPos = rootPart.Position 
+                    end
+                    if not wasHighSpeed then wasHighSpeed = true stopPool(RunSoundPool) playSmartSoundAI("Run", 0.0, 3.2, actualSpeed) playShockwaveSound() end
+                else
+                    if wasHighSpeed and (moveDir.Magnitude == 0 or actualSpeed < 12) then wasHighSpeed = false stopPool(RunSoundPool) end
+                end
+            end
+        end)
+    else
+        local CurrentCamera = workspace.CurrentCamera
+        if CurrentCamera then CurrentCamera.FieldOfView = Settings.FovSystemEnabled and Settings.BaseFov or 70 end
+        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then hum.WalkSpeed = 16 end stopPool(RunSoundPool)
+        WaterPlatform.CanCollide = false
+        actualSpeed = 16
+    end
+end
+
+local function executeDashEngine()
+    local char = LocalPlayer.Character
+    local rootPart = char and char:FindFirstChild("HumanoidRootPart")
+    local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+    local CurrentCamera = workspace.CurrentCamera
+    if rootPart and humanoid and humanoid.Health > 0 then
+        isDashing = true local moveDirection = humanoid.MoveDirection
+        if moveDirection.Magnitude < 0.1 then local look = CurrentCamera and CurrentCamera.CFrame.LookVector or rootPart.CFrame.LookVector moveDirection = Vector3.new(look.X, 0, look.Z) end
+        moveDirection = moveDirection.Magnitude < 0.1 and rootPart.CFrame.LookVector or moveDirection.Unit
+        playSonicBoomSound() createSonicBoomVFX(rootPart.Position, moveDirection)
+        
+        local rp = RaycastParams.new() 
+        rp.FilterType = Enum.RaycastFilterType.Exclude 
+        rp.FilterDescendantsInstances = {char, CurrentCamera, VfxFolder}
+        
+        if Settings.DashType == "Normal" then
+            task.spawn(function()
+                local steps, dist = 12, (Settings.DashPower * 0.16) / 12
+                for i = 1, steps do
+                    if not char or not rootPart or humanoid.Health <= 0 then break end
+                    local target = rootPart.Position + (moveDirection * dist)
+                    local ray = workspace:Raycast(rootPart.Position, moveDirection * dist, rp)
+                    local downRay = workspace:Raycast(target + Vector3.new(0, 3, 0), Vector3.new(0, -7, 0), rp)
+                    if downRay and humanoid.FloorMaterial ~= Enum.Material.Air then target = Vector3.new(target.X, downRay.Position.Y + 3, target.Z) end
+                    if i % 2 == 0 then createGhostAfterimage(char, ATrainBlue) end
+                    if ray and not Settings.NoclipEnabled then char:PivotTo(CFrame.new(ray.Position - (moveDirection * 1.5)) * rootPart.CFrame.Rotation) break
+                    else char:PivotTo(CFrame.new(target) * rootPart.CFrame.Rotation) end
+                    RunService.Heartbeat:Wait()
+                end
+                isDashing = false
+            end)
+        elseif Settings.DashType == "Blink" then
+            local target = rootPart.Position + (moveDirection * Settings.BlinkDistance)
+            local ray = workspace:Raycast(rootPart.Position, moveDirection * Settings.BlinkDistance, rp)
+            if ray and not Settings.NoclipEnabled then char:PivotTo(CFrame.new(ray.Position - (moveDirection * 1.5)) * rootPart.CFrame.Rotation)
+            else char:PivotTo(CFrame.new(target) * rootPart.CFrame.Rotation) end isDashing = false
+        end
+    end
+end
+
+-- =======================================================
+-- [YENİ]: MOBİL UYUMLU GELİŞMİŞ ESP MOTORU
+-- =======================================================
+local function cleanEspOfPlayer(player)
+    local pName = player.Name
+    local b = EspFolder:FindFirstChild(pName .. "_Box") if b then b:Destroy() end
+    local t = EspFolder:FindFirstChild(pName .. "_Tracer") if t then t:Destroy() end
+    local n = EspFolder:FindFirstChild(pName .. "_Name") if n then n:Destroy() end
+    if player.Character then
+        local c = player.Character:FindFirstChild("RaiwesyChams") if c then c:Destroy() end
+    end
+end
+
+local function cleanAllEsp()
+    EspFolder:ClearAllChildren()
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p.Character then
+            local c = p.Character:FindFirstChild("RaiwesyChams") if c then c:Destroy() end
+        end
+    end
+end
+
+local function runEspEngine(state)
+    Settings.EspMasterEnabled = state
+    EspMasterBtn.Text = state and "MASTER ESP: OPERATIONAL" or "MASTER ESP: DISABLED"
+    tweenColor(EspMasterBtn, state and NeonGreen or CrimsonRed)
+    
+    if Connections.EspLoop then Connections.EspLoop:Disconnect() Connections.EspLoop = nil end
+    if not state then cleanAllEsp() return end
+    
+    Connections.EspLoop = RunService.RenderStepped:Connect(function()
+        local cam = workspace.CurrentCamera
+        if not cam then return end
+        
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p == LocalPlayer then continue end
+            
+            local char = p.Character
+            local root = char and char:FindFirstChild("HumanoidRootPart")
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            
+            -- ÖLÜ KARAKTERLERDE ESP ÇALIŞMASINI ENGELLEME (Geliştirici Güvenlik Protokolü)
+            if not (char and root and hum and hum.Health > 0) then
+                cleanEspOfPlayer(p)
+                continue
+            end
+            
+            -- Takım Kontrolü Filatrasyonu
+            if Settings.EspTeamCheck and p.Team == LocalPlayer.Team then
+                cleanEspOfPlayer(p)
+                continue
+            end
+            
+            local pos, onScreen = cam:WorldToViewportPoint(root.Position)
+            local pName = p.Name
+            
+            -- 1. BOX ESP (NATIVE BILLBOARD UI VECTOR)
+            if Settings.EspBoxes and onScreen then
+                local box = EspFolder:FindFirstChild(pName .. "_Box")
+                if not box then
+                    box = Instance.new("BillboardGui")
+                    box.Name = pName .. "_Box"
+                    box.Size = UDim2.new(4.5, 0, 6, 0)
+                    box.AlwaysOnTop = true
+                    
+                    local frame = Instance.new("Frame")
+                    frame.Size = UDim2.new(1, 0, 1, 0)
+                    frame.BackgroundTransparency = 1
+                    frame.Parent = box
+                    addStroke(frame, ATrainBlue, 1.8, 0)
+                    box.Parent = EspFolder
+                end
+                box.Adornee = root
+            else
+                local b = EspFolder:FindFirstChild(pName .. "_Box") if b then b:Destroy() end
+            end
+            
+            -- 2. TRACER ESP (SCREEN RADAR LINE WIREFRAME)
+            if Settings.EspTracers and onScreen then
+                local tracer = EspFolder:FindFirstChild(pName .. "_Tracer")
+                if not tracer then
+                    tracer = Instance.new("Frame")
+                    tracer.Name = pName .. "_Tracer"
+                    tracer.BorderSizePixel = 0
+                    tracer.BackgroundColor3 = ATrainBlue
+                    tracer.AnchorPoint = Vector2.new(0.5, 0.5)
+                    tracer.Parent = EspFolder
+                end
+                local screenCenter = Vector2.new(cam.ViewportSize.X / 2, cam.ViewportSize.Y / 1.1) -- Alt merkezden çizgi çeker
+                local targetPos = Vector2.new(pos.X, pos.Y)
+                local distance = (targetPos - screenCenter).Magnitude
+                tracer.Size = UDim2.new(0, distance, 0, 2)
+                tracer.Position = UDim2.new(0, (screenCenter.X + targetPos.X) / 2, 0, (screenCenter.Y + targetPos.Y) / 2)
+                tracer.Rotation = math.deg(math.atan2(targetPos.Y - screenCenter.Y, targetPos.X - screenCenter.X))
+            else
+                local t = EspFolder:FindFirstChild(pName .. "_Tracer") if t then t:Destroy() end
+            end
+            
+            -- 3. CHAMS ESP (HIGHLIGHT CORE MOTORU)
+            if Settings.EspChams then
+                local cham = char:FindFirstChild("RaiwesyChams")
+                if not cham then
+                    cham = Instance.new("Highlight")
+                    cham.Name = "RaiwesyChams"
+                    cham.FillColor = ATrainBlue
+                    cham.FillTransparency = 0.45
+                    cham.OutlineColor = Color3.fromRGB(255, 255, 255)
+                    cham.OutlineTransparency = 0.1
+                    cham.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                    cham.Parent = char
+                end
+            else
+                local c = char:FindFirstChild("RaiwesyChams") if c then c:Destroy() end
+            end
+            
+            -- 4. NAME & DISTANCE ESP
+            if Settings.EspNames and onScreen then
+                local nameGui = EspFolder:FindFirstChild(pName .. "_Name")
+                if not nameGui then
+                    nameGui = Instance.new("BillboardGui")
+                    nameGui.Name = pName .. "_Name"
+                    nameGui.Size = UDim2.new(0, 150, 0, 30)
+                    nameGui.AlwaysOnTop = true
+                    nameGui.StudsOffset = Vector3.new(0, 3.8, 0)
+                    
+                    local lbl = Instance.new("TextLabel")
+                    lbl.Size = UDim2.new(1, 0, 1, 0)
+                    lbl.BackgroundTransparency = 1
+                    lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    lbl.Font = Enum.Font.GothamBold
+                    lbl.TextSize = 10
+                    lbl.Parent = nameGui
+                    addStroke(lbl, Color3.fromRGB(0,0,0), 1)
+                    nameGui.Parent = EspFolder
+                end
+                nameGui.Adornee = root
+                local dist = math.floor((root.Position - cam.CFrame.Position).Magnitude)
+                nameGui.TextLabel.Text = pName .. " [" .. dist .. "m]"
+            else
+                local n = EspFolder:FindFirstChild(pName .. "_Name") if n then n:Destroy() end
+            end
+            
+        end
+    end)
+end
+
+-- =======================================================
+-- DIGER MOTOR TOGGLE ENTEGRASYONLARI
+-- =======================================================
+local function toggleShake(state)
+    Settings.ShakeEnabled = state ShakeToggleButton.Text = state and "SHAKE MECHANISM: ON" or "SHAKE MECHANISM: OFF"
+    tweenColor(ShakeToggleButton, state and NeonGreen or CrimsonRed)
+    if Connections.ShakeLoop then Connections.ShakeLoop:Disconnect() Connections.ShakeLoop = nil end
+    if state then 
+        Connections.ShakeLoop = RunService.Heartbeat:Connect(function()
+            local char = LocalPlayer.Character root = char and char:FindFirstChild("HumanoidRootPart")
+            if root and char:FindFirstChildOfClass("Humanoid") and Settings.ShakePower > 0 then
+                root.CFrame = root.CFrame * CFrame.new(math.random(-Settings.ShakePower, Settings.ShakePower)/100, 0, math.random(-Settings.ShakePower, Settings.ShakePower)/100)
+            end
+        end)
+    end
+end
+
+local function toggleShiftLock(state)
+    Settings.ShiftLockEnabled = state ShiftLockButton.Text = state and "SHIFT LOCK: OPERATIONAL" or "SHIFT LOCK: OFF"
+    local c = state and NeonGreen or CrimsonRed
+    tweenColor(ShiftLockButton, c) tweenColor(ShiftLockSphere, c)
+    local char = LocalPlayer.Character local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if state then UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter if hum then hum.AutoRotate = false end
+    else UserInputService.MouseBehavior = Enum.MouseBehavior.Default if hum then hum.AutoRotate = true end end
+end
+
+local function toggleDynamicFov(state)
+    Settings.DynamicFovEnabled = state DynamicFovBtn.Text = state and "DYNAMIC FOV: ACTIVE" or "DYNAMIC FOV: FIXED"
+    tweenColor(DynamicFovBtn, state and NeonGreen or CrimsonRed)
+    local CurrentCamera = workspace.CurrentCamera
+    if not state and CurrentCamera then CurrentCamera.FieldOfView = Settings.FovSystemEnabled and Settings.BaseFov or 70 end
+end
+
+local function toggleFovSystem(state) 
+    Settings.FovSystemEnabled = state MasterFovBtn.Text = state and "FOV MASTER ENGINE: ON" or "FOV MASTER ENGINE: OFF"
+    tweenColor(MasterFovBtn, state and NeonGreen or CrimsonRed)
+    local CurrentCamera = workspace.CurrentCamera
+    if CurrentCamera then CurrentCamera.FieldOfView = state and Settings.BaseFov or 70 end
+end
+
+local function toggleNoclip(state)
+    Settings.NoclipEnabled = state NoclipButton.Text = state and "MATRIX NOCLIP: RUNNING" or "MATRIX NOCLIP: OFF"
+    tweenColor(NoclipButton, state and NeonGreen or CrimsonRed)
+    if Connections.NoclipLoop then Connections.NoclipLoop:Disconnect() Connections.NoclipLoop = nil end
+    if state then
+        Connections.NoclipLoop = RunService.Stepped:Connect(function()
+            if Settings.NoclipEnabled and Settings.Enabled then
+                local char = LocalPlayer.Character local root = char and char:FindFirstChild("HumanoidRootPart")
+                if root and char:FindFirstChildOfClass("Humanoid") and actualSpeed > Settings.NoclipThreshold then
+                    for _, p in ipairs(char:GetChildren()) do if p:IsA("BasePart") then p.CanCollide = false end end
+                end
+            end
+        end)
+    end
+end
+
+local function toggleWaterWalk(state)
+    Settings.WaterEnabled = state WaterButton.Text = state and "HYDRO RUNNER: ENGAGED" or "HYDRO RUNNER: OFF"
+    tweenColor(WaterButton, state and NeonGreen or CrimsonRed)
+    if not state then WaterPlatform.CanCollide = false end
+end
+
+local function toggleSounds(state)
+    Settings.SoundsEnabled = state SoundToggleButton.Text = state and "AUDIO MASTER: ENGAGED" or "AUDIO MASTER: MUTED"
+    tweenColor(SoundToggleButton, state and NeonGreen or CrimsonRed)
+    if not state then stopPool(DashSoundPool) stopPool(RunSoundPool) end
+end
+
+local function toggleVfx(state)
+    Settings.VfxEnabled = state VfxToggleButton.Text = state and "VISUAL EMITTERS: ACTIVE" or "VISUAL EMITTERS: DISABLED"
+    tweenColor(VfxToggleButton, state and NeonGreen or CrimsonRed)
+end
+
+local function toggleMomentum(state)
+    Settings.MomentumEnabled = state
+    MomentumButton.Text = state and "SPEED INERTIA: ON" or "SPEED INERTIA: OFF"
+    tweenColor(MomentumButton, state and NeonGreen or CrimsonRed)
+end
+
+local function toggleAutoStep(state)
+    Settings.AutoStepEnabled = state
+    AutoStepButton.Text = state and "AUTO-STEP ASSIST: ON" or "AUTO-STEP ASSIST: OFF"
+    tweenColor(AutoStepButton, state and NeonGreen or CrimsonRed)
+end
+
+local function toggleInfiniteJump(state)
+    Settings.InfiniteJumpEnabled = state
+    InfJumpButton.Text = state and "INFINITE JUMP: ON" or "INFINITE JUMP: OFF"
+    tweenColor(InfJumpButton, state and NeonGreen or CrimsonRed)
+    
+    if Connections.InfJumpConnection then Connections.InfJumpConnection:Disconnect() Connections.InfJumpConnection = nil end
+    if state then
+        Connections.InfJumpConnection = UserInputService.JumpRequest:Connect(function()
+            if Settings.Enabled and Settings.InfiniteJumpEnabled then
+                local char = LocalPlayer.Character
+                local hum = char and char:FindFirstChildOfClass("Humanoid")
+                if hum and hum.Health > 0 then
+                    hum:ChangeState(Enum.HumanoidStateType.Jumping)
+                end
+            end
+        end)
+    end
+end
+
+local function toggleCameraTilt(state)
+    Settings.CameraTiltEnabled = state
+    CameraTiltButton.Text = state and "CAMERA LEAN TILT: ON" or "CAMERA LEAN TILT: OFF"
+    tweenColor(CameraTiltButton, state and NeonGreen or CrimsonRed)
+end
+
+-- CAMERA STABILIZER & SHIFTLOCK ADJUSTMENT DOCKING
+RunService:UnbindFromRenderStep("RaiwesyCameraEngine")
+RunService:BindToRenderStep("RaiwesyCameraEngine", Enum.RenderPriority.Camera.Value + 1, function(deltaTime)
+    local char = LocalPlayer.Character
+    local rootPart = char and char:FindFirstChild("HumanoidRootPart")
+    local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+    local CurrentCamera = workspace.CurrentCamera
+
+    if not (char and rootPart and humanoid and humanoid.Health > 0) then
+        lastRootPosition = nil
+        return
+    end
+
+    if lastRootPosition and CurrentCamera then
+        local currentRootPos = rootPart.Position
+        local delta = currentRootPos - lastRootPosition
+        if delta.Magnitude > 0.001 then CurrentCamera.CFrame = CurrentCamera.CFrame + delta end
+    end
+    lastRootPosition = rootPart.Position
+
+    local targetOffset = Settings.ShiftLockEnabled and Vector3.new(Settings.ShiftLockOffsetX, Settings.ShiftLockOffsetY, 0) or Vector3.new(0, 0, 0)
+    local smoothnessAlpha = 1 - math.exp(-Settings.ShiftLockSmoothness * deltaTime)
+    currentCameraOffset = currentCameraOffset:Lerp(targetOffset, math.clamp(smoothnessAlpha, 0, 1))
+    humanoid.CameraOffset = currentCameraOffset
+
+    if CurrentCamera then
+        if Settings.CameraTiltEnabled and Settings.Enabled and humanoid.MoveDirection.Magnitude > 0.05 then
+            local rightVector = CurrentCamera.CFrame.RightVector
+            local dotProduct = humanoid.MoveDirection:Dot(rightVector)
+            local speedRatio = actualSpeed / Settings.MaxSpeed
+            local targetTilt = -dotProduct * Settings.TiltIntensity * math.clamp(speedRatio * 2, 0.4, 1.5)
+            currentCameraTilt = currentCameraTilt + (targetTilt - currentCameraTilt) * math.clamp(10 * deltaTime, 0, 1)
+        else
+            currentCameraTilt = currentCameraTilt + (0 - currentCameraTilt) * math.clamp(10 * deltaTime, 0, 1)
+        end
+        CurrentCamera.CFrame = CurrentCamera.CFrame * CFrame.Angles(0, 0, currentCameraTilt)
+    end
+
+    if Settings.ShiftLockEnabled and CurrentCamera then
+        UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+        humanoid.AutoRotate = false
+        local look = CurrentCamera.CFrame.LookVector
+        local targetYaw = math.atan2(-look.X, -look.Z)
+        rootPart.CFrame = CFrame.new(rootPart.Position) * CFrame.Angles(0, targetYaw, 0)
+    end
+end)
+
+-- DRAG & SLIDER UTILITIES
+local function MakeDraggable(gui, triggers)
+    local dragging, dragStart, startPos, dragInput, hasMoved = false, nil, nil, nil, false
+    local function onInputBegan(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true hasMoved = false dragInput = input dragStart = input.Position startPos = gui.Position
+            input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false dragInput = nil end end)
+        end
+    end
+    gui.InputBegan:Connect(onInputBegan)
+    if triggers then for _, t in ipairs(triggers) do t.InputBegan:Connect(onInputBegan) end end
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input == dragInput and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart if delta.Magnitude > 6 then hasMoved = true end
+            gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    return function() return hasMoved end
+end
+
+local isMainMoved = MakeDraggable(MainFrame)
+local isMiniMoved = MakeDraggable(MiniContainer, {MiniButton, MiniToggleBar, DashSphere, ShiftLockSphere})
+
+local function SetupSlider(button, track, min, max, onUpdate, isFloat)
+    local dragging, sliderInput = false, nil
+    button.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true sliderInput = input
+            input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false sliderInput = nil end end)
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input == sliderInput and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local relativeX = input.Position.X - track.AbsolutePosition.X
+            local percentage = math.clamp(relativeX / track.AbsoluteSize.X, 0, 1)
+            button.Position = UDim2.new(percentage, -7, 0, -4)
+            local rawValue = min + ((max - min) * percentage)
+            local finalValue = isFloat and math.floor(rawValue * 10) / 10 or math.floor(rawValue)
+            onUpdate(finalValue)
+        end
+    end)
+end
+
+SetupSlider(SliderButton, SliderTrack, Settings.MinSpeed, Settings.MaxSpeed, function(v) Settings.WalkSpeed = v SpeedInput.Text = "Hız: " .. v end, false)
+SetupSlider(DashSliderButton, DashSliderTrack, Settings.MinDash, Settings.MaxDash, function(v) Settings.DashPower = v DashInput.Text = "Dash: " .. v end, false)
+SetupSlider(BlinkSliderButton, BlinkSliderTrack, Settings.MinBlink, Settings.MaxBlink, function(v) Settings.BlinkDistance = v BlinkInput.Text = "Blink: " .. v .. " Stud" end, false)
+SetupSlider(ShakeSliderButton, ShakeSliderTrack, Settings.MinShake, Settings.MaxShake, function(v) Settings.ShakePower = v ShakeInput.Text = "Shk: " .. v end, false)
+SetupSlider(NoclipSliderButton, NoclipSliderTrack, Settings.MinNoclip, Settings.MaxNoclip, function(v) Settings.NoclipThreshold = v NoclipThreshInput.Text = "Ncl Lmt: " .. v end, false)
+SetupSlider(WaterSliderButton, WaterSliderTrack, Settings.MinWater, Settings.MaxWater, function(v) Settings.WaterThreshold = v WaterThreshInput.Text = "Wat Lmt: " .. v end, false)
+
+SetupSlider(OffsetXSliderButton, OffsetXSliderTrack, Settings.MinOffsetX, Settings.MaxOffsetX, function(v) Settings.ShiftLockOffsetX = v OffsetXInput.Text = "X Eksen: " .. v end, true)
+SetupSlider(OffsetYSliderButton, OffsetYSliderTrack, Settings.MinOffsetY, Settings.MaxOffsetY, function(v) Settings.ShiftLockOffsetY = v OffsetYInput.Text = "Y Eksen: " .. v end, true)
+SetupSlider(SmoothSliderButton, SmoothSliderTrack, Settings.MinSmoothness, Settings.MaxSmoothness, function(v) Settings.ShiftLockSmoothness = v SmoothInput.Text = "Hassasiyet: " .. v end, false)
+
+SetupSlider(BaseFovSliderBtn, BaseFovTrack, Settings.MinFov, Settings.MaxFov, function(v) Settings.BaseFov = v BaseFovInput.Text = "Taban FOV: " .. v local cc = workspace.CurrentCamera if cc and Settings.FovSystemEnabled then cc.FieldOfView = v end end, false)
+SetupSlider(FovSensSliderBtn, FovSensTrack, Settings.MinFovSens, Settings.MaxFovSens, function(v) Settings.FovSensitivity = v FovSensInput.Text = "FOV Esneme: " .. v end, false)
+
+-- CHECKBOX AND TAB INTERACTIONS
+local function updateCheckboxes()
+    if Settings.DashType == "Normal" then
+        tweenColor(NormalCheck, ATrainBlue) NormalCheck.Text = "✓" NormalLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tweenColor(BlinkCheck, CardBg) BlinkCheck.Text = "" BlinkLabel.TextColor3 = TextMuted
+        DashInput.Visible, DashSliderTrack.Visible, BlinkInput.Visible, BlinkSliderTrack.Visible = true, true, false, false
+    else
+        tweenColor(NormalCheck, CardBg) NormalCheck.Text = "" NormalLabel.TextColor3 = TextMuted
+        tweenColor(BlinkCheck, ATrainBlue) BlinkCheck.Text = "✓" BlinkLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        DashInput.Visible, DashSliderTrack.Visible, BlinkInput.Visible, BlinkSliderTrack.Visible = false, false, true, true
+    end
+    if Settings.SpeedType == "Normal" then
+        tweenColor(NormalSpeedCheck, ATrainBlue) NormalSpeedCheck.Text = "✓" NormalSpeedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tweenColor(BypassSpeedCheck, CardBg) BypassSpeedCheck.Text = "" BypassSpeedLabel.TextColor3 = TextMuted
+    else
+        tweenColor(NormalSpeedCheck, CardBg) NormalSpeedCheck.Text = "" NormalSpeedLabel.TextColor3 = TextMuted
+        tweenColor(BypassSpeedCheck, ATrainBlue) BypassSpeedCheck.Text = "✓" BypassSpeedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    end
+end
+
+local function switchTab(tabName)
+    local inactiveColor, activeColor = DarkBg, CardBg
+    local inactiveText, activeText = TextMuted, Color3.fromRGB(255, 255, 255)
+    SpeedTabBtn.BackgroundColor3 = inactiveColor SpeedTabBtn.TextColor3 = inactiveText
+    DashTabBtn.BackgroundColor3 = inactiveColor DashTabBtn.TextColor3 = inactiveText
+    CameraTabBtn.BackgroundColor3 = inactiveColor CameraTabBtn.TextColor3 = inactiveText
+    VisualTabBtn.BackgroundColor3 = inactiveColor VisualTabBtn.TextColor3 = inactiveText
+    MiscTabBtn.BackgroundColor3 = inactiveColor MiscTabBtn.TextColor3 = inactiveText
+    
+    SpeedPage.Visible = false DashPage.Visible = false CameraPage.Visible = false VisualPage.Visible = false MiscPage.Visible = false
+    
+    if tabName == "SPEED" then SpeedTabBtn.BackgroundColor3 = activeColor SpeedTabBtn.TextColor3 = activeText SpeedPage.Visible = true
+    elseif tabName == "DASH" then DashTabBtn.BackgroundColor3 = activeColor DashTabBtn.TextColor3 = activeText DashPage.Visible = true
+    elseif tabName == "CAMERA" then CameraTabBtn.BackgroundColor3 = activeColor CameraTabBtn.TextColor3 = activeText CameraPage.Visible = true
+    elseif tabName == "VISUAL" then VisualTabBtn.BackgroundColor3 = activeColor VisualTabBtn.TextColor3 = activeText VisualPage.Visible = true
+    elseif tabName == "MISC" then MiscTabBtn.BackgroundColor3 = activeColor MiscTabBtn.TextColor3 = activeText MiscPage.Visible = true end
+end
+
+local function selectNormalSpeed()
+    Settings.SpeedType = "Normal" updateCheckboxes()
+    if Settings.Enabled then toggleWalkSpeed(false) toggleWalkSpeed(true) end
+end
+
+local function selectBypassSpeed()
+    Settings.SpeedType = "Bypass" updateCheckboxes()
+    if Settings.Enabled then toggleWalkSpeed(false) toggleWalkSpeed(true) end
+end
+
+-- TRIGGER MENULERI VE BUTON BAGLANTILARI
+SpeedTabBtn.Activated:Connect(function() switchTab("SPEED") end)
+DashTabBtn.Activated:Connect(function() switchTab("DASH") end)
+CameraTabBtn.Activated:Connect(function() switchTab("CAMERA") end)
+VisualTabBtn.Activated:Connect(function() switchTab("VISUAL") end)
+MiscTabBtn.Activated:Connect(function() switchTab("MISC") end)
+
+NormalCheck.Activated:Connect(function() Settings.DashType = "Normal" updateCheckboxes() end)
+BlinkCheck.Activated:Connect(function() Settings.DashType = "Blink" updateCheckboxes() end)
+
+NormalSpeedCheck.Activated:Connect(selectNormalSpeed)
+NormalSpeedLabel.Activated:Connect(selectNormalSpeed)
+BypassSpeedCheck.Activated:Connect(selectBypassSpeed)
+BypassSpeedLabel.Activated:Connect(selectBypassSpeed)
+
+-- VISUAL INTERACTION HANDLERS
+EspMasterBtn.Activated:Connect(function() runEspEngine(not Settings.EspMasterEnabled) end)
+
+EspBoxesBtn.Activated:Connect(function()
+    Settings.EspBoxes = not Settings.EspBoxes
+    EspBoxesBtn.Text = Settings.EspBoxes and "BOX ESP: ON" or "BOX ESP: OFF"
+    tweenColor(EspBoxesBtn, Settings.EspBoxes and NeonGreen or CrimsonRed)
+    if not Settings.EspBoxes then cleanAllEsp() end
+end)
+
+EspTracersBtn.Activated:Connect(function()
+    Settings.EspTracers = not Settings.EspTracers
+    EspTracersBtn.Text = Settings.EspTracers and "TRACER ESP: ON" or "TRACER ESP: OFF"
+    tweenColor(EspTracersBtn, Settings.EspTracers and NeonGreen or CrimsonRed)
+    if not Settings.EspTracers then cleanAllEsp() end
+end)
+
+EspChamsBtn.Activated:Connect(function()
+    Settings.EspChams = not Settings.EspChams
+    EspChamsBtn.Text = Settings.EspChams and "CHAMS ESP: ON" or "CHAMS ESP: OFF"
+    tweenColor(EspChamsBtn, Settings.EspChams and NeonGreen or CrimsonRed)
+    if not Settings.EspChams then cleanAllEsp() end
+end)
+
+EspNamesBtn.Activated:Connect(function()
+    Settings.EspNames = not Settings.EspNames
+    EspNamesBtn.Text = Settings.EspNames and "NAME & DISTANCE ESP: ON" or "NAME & DISTANCE ESP: OFF"
+    tweenColor(EspNamesBtn, Settings.EspNames and NeonGreen or CrimsonRed)
+    if not Settings.EspNames then cleanAllEsp() end
+end)
+
+EspTeamBtn.Activated:Connect(function()
+    Settings.EspTeamCheck = not Settings.EspTeamCheck
+    EspTeamBtn.Text = Settings.EspTeamCheck and "TEAM CHECK: ENFORCED" or "TEAM CHECK: IGNORED"
+    tweenColor(EspTeamBtn, Settings.EspTeamCheck and NeonGreen or CrimsonRed)
+    cleanAllEsp()
+end)
+
+MinimizeButton.Activated:Connect(function()
+    local tx, ty = MainFrame.AbsolutePosition.X + (MainFrame.AbsoluteSize.X / 2), MainFrame.AbsolutePosition.Y + (MainFrame.AbsoluteSize.Y / 2)
+    MiniContainer.Position = UDim2.new(0, tx - 120, 0, ty - 24) MiniContainer.Visible = true
+    local mt = TweenService:Create(MainFrame, TweenInfo.new(0), {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0, tx, 0, ty)})
+    mt:Play() mt.Completed:Once(function() MainFrame.Visible = false end)
+    MiniButton.Size, MiniToggleBar.Size = UDim2.new(0, 0, 0, 0), UDim2.new(0, 0, 0, 36)
+    TweenService:Create(MiniButton, TweenInfo.new(0.4, Enum.EasingStyle.Elastic), {Size = UDim2.new(0, 44, 0, 44)}):Play()
+    TweenService:Create(MiniToggleBar, TweenInfo.new(0.4, Enum.EasingStyle.Elastic), {Size = UDim2.new(0, 100, 0, 36)}):Play()
+end)
+
+MiniButton.Activated:Connect(function()
+    if isMiniMoved() then return end
+    local tx, ty = MiniContainer.AbsolutePosition.X + 120, MiniContainer.AbsolutePosition.Y + 24
+    MainFrame.Position, MainFrame.Size, MainFrame.Visible = UDim2.new(0, tx, 0, ty), UDim2.new(0, 0, 0, 0), true
+    local b1 = TweenService:Create(MiniButton, TweenInfo.new(0.2), {Size = UDim2.new(0, 0, 0, 0)})
+    TweenService:Create(MiniToggleBar, TweenInfo.new(0.2), {Size = UDim2.new(0, 0, 0, 36)}):Play()
+    b1:Play() b1.Completed:Once(function() MiniContainer.Visible = false end)
+    TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Elastic), {Size = UDim2.new(0, 260, 0, 420), Position = UDim2.new(0, tx - 130, 0, ty - 210)}):Play()
+end)
+
+MiniToggleBar.Activated:Connect(function() if not isMiniMoved() then toggleWalkSpeed(not Settings.Enabled) end end)
+ToggleButton.Activated:Connect(function() toggleWalkSpeed(not Settings.Enabled) end)
+ShakeToggleButton.Activated:Connect(function() toggleShake(not Settings.ShakeEnabled) end)
+ShiftLockButton.Activated:Connect(function() toggleShiftLock(not Settings.ShiftLockEnabled) end)
+MasterFovBtn.Activated:Connect(function() toggleFovSystem(not Settings.FovSystemEnabled) end) 
+DynamicFovBtn.Activated:Connect(function() toggleDynamicFov(not Settings.DynamicFovEnabled) end)
+NoclipButton.Activated:Connect(function() toggleNoclip(not Settings.NoclipEnabled) end)
+WaterButton.Activated:Connect(function() toggleWaterWalk(not Settings.WaterEnabled) end)
+
+MomentumButton.Activated:Connect(function() toggleMomentum(not Settings.MomentumEnabled) end)
+AutoStepButton.Activated:Connect(function() toggleAutoStep(not Settings.AutoStepEnabled) end)
+InfJumpButton.Activated:Connect(function() toggleInfiniteJump(not Settings.InfiniteJumpEnabled) end)
+CameraTiltButton.Activated:Connect(function() toggleCameraTilt(not Settings.CameraTiltEnabled) end)
+
+SoundToggleButton.Activated:Connect(function() toggleSounds(not Settings.SoundsEnabled) end)
+VfxToggleButton.Activated:Connect(function() toggleVfx(not Settings.VfxEnabled) end)
+ShiftLockSphere.Activated:Connect(function() if not isMiniMoved() then toggleShiftLock(not Settings.ShiftLockEnabled) end end)
+MainDashButton.Activated:Connect(executeDashEngine)
+DashSphere.Activated:Connect(function() if not isMiniMoved() then executeDashEngine() end end)
+
+UserInputService.InputBegan:Connect(function(input, gpe) if not gpe and input.KeyCode == Enum.KeyCode.Q then executeDashEngine() end end)
+
+-- BOX INPUT VERIFICATIONS
+SpeedInput.FocusLost:Connect(function()
+    local num = tonumber(string.match(SpeedInput.Text, "%d+"))
+    if num then Settings.WalkSpeed = math.max(0, num) SliderButton.Position = UDim2.new(math.clamp((Settings.WalkSpeed - Settings.MinSpeed) / (Settings.MaxSpeed - Settings.MinSpeed), 0, 1), -7, 0, -4) end
+    SpeedInput.Text = "Hız: " .. Settings.WalkSpeed
+end)
+
+NoclipThreshInput.FocusLost:Connect(function()
+    local num = tonumber(string.match(NoclipThreshInput.Text, "%d+"))
+    if num then Settings.NoclipThreshold = math.clamp(num, Settings.MinNoclip, Settings.MaxNoclip) NoclipSliderButton.Position = UDim2.new(math.clamp((Settings.NoclipThreshold - Settings.MinNoclip) / (Settings.MaxNoclip - Settings.MinNoclip), 0, 1), -6, 0, -4) end
+    NoclipThreshInput.Text = "Ncl Lmt: " .. Settings.NoclipThreshold
+end)
+
+WaterThreshInput.FocusLost:Connect(function()
+    local num = tonumber(string.match(WaterThreshInput.Text, "%d+"))
+    if num then Settings.WaterThreshold = math.max(0, num) WaterSliderButton.Position = UDim2.new(math.clamp((Settings.WaterThreshold - Settings.MinWater) / (Settings.MaxWater - Settings.MinWater), 0, 1), -6, 0, -4) end
+    WaterThreshInput.Text = "Wat Lmt: " .. Settings.WaterThreshold
+end)
+
+OffsetXInput.FocusLost:Connect(function()
+    local num = tonumber(string.match(OffsetXInput.Text, "%-?%d+%.?%d*"))
+    if num then Settings.ShiftLockOffsetX = math.clamp(num, Settings.MinOffsetX, Settings.MaxOffsetX) OffsetXSliderButton.Position = UDim2.new(math.clamp((Settings.ShiftLockOffsetX - Settings.MinOffsetX) / (Settings.MaxOffsetX - Settings.MinOffsetX), 0, 1), -6, 0, -4) end
+    OffsetXInput.Text = "X Eksen: " .. Settings.ShiftLockOffsetX
+end)
+
+OffsetYInput.FocusLost:Connect(function()
+    local num = tonumber(string.match(OffsetYInput.Text, "%-?%d+%.?%d*"))
+    if num then Settings.ShiftLockOffsetY = math.clamp(num, Settings.MinOffsetY, Settings.MaxOffsetY) OffsetYSliderButton.Position = UDim2.new(math.clamp((Settings.ShiftLockOffsetY - Settings.MinOffsetY) / (Settings.MaxOffsetY - Settings.MinOffsetY), 0, 1), -6, 0, -4) end
+    OffsetYInput.Text = "Y Eksen: " .. Settings.ShiftLockOffsetY
+end)
+
+SmoothInput.FocusLost:Connect(function()
+    local num = tonumber(string.match(SmoothInput.Text, "%d+"))
+    if num then Settings.ShiftLockSmoothness = math.clamp(num, Settings.MinSmoothness, Settings.MaxSmoothness) SmoothSliderButton.Position = UDim2.new(math.clamp((Settings.ShiftLockSmoothness - Settings.MinSmoothness) / (Settings.MaxSmoothness - Settings.MinSmoothness), 0, 1), -6, 0, -4) end
+    SmoothInput.Text = "Hassasiyet: " .. Settings.ShiftLockSmoothness
+end)
+
+BaseFovInput.FocusLost:Connect(function()
+    local num = tonumber(string.match(BaseFovInput.Text, "%d+"))
+    if num then Settings.BaseFov = math.clamp(num, Settings.MinFov, Settings.MaxFov) BaseFovSliderBtn.Position = UDim2.new(math.clamp((Settings.BaseFov - Settings.MinFov) / (Settings.MaxFov - Settings.MinFov), 0, 1), -6, 0, -4) local cc = workspace.CurrentCamera if cc and Settings.FovSystemEnabled then cc.FieldOfView = Settings.BaseFov end end
+    BaseFovInput.Text = "Taban FOV: " .. Settings.BaseFov
+end)
+
+FovSensInput.FocusLost:Connect(function()
+    local num = tonumber(string.match(FovSensInput.Text, "%d+"))
+    if num then Settings.FovSensitivity = math.clamp(num, Settings.MinFovSens, Settings.MaxFovSens) FovSensSliderBtn.Position = UDim2.new(math.clamp((Settings.FovSensitivity - Settings.MinFovSens) / (Settings.MaxFovSens - Settings.MinFovSens), 0, 1), -6, 0, -4) end
+    FovSensInput.Text = "FOV Esneme: " .. Settings.FovSensitivity
+end)
+
+-- PHYSICAL SENSE
+local lastWallCrashTime, lastPlayerCrashTime = 0, 0
+local function setupCharacterPhysicsSenses(char)
+    local humanoid = char:WaitForChild("Humanoid", 5) local rootPart = char:WaitForChild("HumanoidRootPart", 5)
+    if not humanoid or not rootPart then return end
+    if Connections.TouchConnection then Connections.TouchConnection:Disconnect() end
+    Connections.TouchConnection = humanoid.Touched:Connect(function(hit)
+        if not Settings.Enabled or lastVelocityVec.Magnitude < 32 then return end
+        if hit and hit.CanCollide and not hit:IsDescendantOf(char) and not hit:IsDescendantOf(VfxFolder) then
+            if (hit.Position - rootPart.Position).Magnitude < 7 then
+                local hm = hit:FindFirstAncestorOfClass("Model")
+                if hm and Players:GetPlayerFromCharacter(hm) then if os.clock() - lastPlayerCrashTime > 0.4 then lastPlayerCrashTime = os.clock() playPlayerCrashSound() end
+                else if hit.Anchored and os.clock() - lastWallCrashTime > 0.4 then lastWallCrashTime = os.clock() playCrashWallSound() end end
+            end
+        end
+    end)
+end
+
+-- RESPONSIVE RELOAD
+local function onCharacterAdded(char)
+    lastRootPosition = nil
+    toggleWalkSpeed(Settings.Enabled) toggleShake(Settings.ShakeEnabled) toggleShiftLock(Settings.ShiftLockEnabled) toggleFovSystem(Settings.FovSystemEnabled) toggleNoclip(Settings.NoclipEnabled) toggleWaterWalk(Settings.WaterEnabled) setupCharacterPhysicsSenses(char)
+    toggleInfiniteJump(Settings.InfiniteJumpEnabled)
+    if Settings.EspMasterEnabled then runEspEngine(false) runEspEngine(true) end
+end
+
+if LocalPlayer.Character then onCharacterAdded(LocalPlayer.Character) end
+Connections.Respawn = LocalPlayer.CharacterAdded:Connect(onCharacterAdded)
+
+-- ASSETS LOADING
+task.spawn(function()
+    local success, err = pcall(function()
+        local canUseFileSystem = (typeof(writefile) == "function" and typeof(isfile) == "function")
+        local function loadAndPool(url, name, pool, size, vol)
+            if url == "" or typeof(getcustomasset) ~= "function" then return end
+            if canUseFileSystem and not isfile(name) then writefile(name, game:HttpGet(url)) end
+            local assetId = canUseFileSystem and getcustomasset(name) or url
+            for i = 1, size do
+                local snd = Instance.new("Sound") snd.SoundId = assetId snd.Volume = vol snd.Parent = ScreenGui table.insert(pool, snd)
+            end
+        end
+        loadAndPool(githubUrl, filename, DashSoundPool, poolSize, 2.5)
+        loadAndPool(githubUrl, filename, RunSoundPool, poolSize, 3.0)
+        loadAndPool(sonicBoomUrl, sonicBoomFilename, SonicBoomPool, 3, 3.5)
+        loadAndPool(crashWallUrl, crashWallFilename, CrashWallPool, 3, 4.0)
+        loadAndPool(playerCrashUrl, playerCrashFilename, PlayerCrashPool, 3, 4.0)
+        loadAndPool(fallUrl, fallFilename, FallSoundPool, 3, 4.0)
+        loadAndPool(shockwaveUrl, shockwaveFilename, ShockwavePool, 3, 3.5)
+        ContentProvider:PreloadAsync(DashSoundPool) ContentProvider:PreloadAsync(RunSoundPool)
+    end)
+end)
+
+switchTab("SPEED") updateCheckboxes()
